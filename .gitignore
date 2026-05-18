@@ -1,6 +1,8 @@
 # Miscellaneous
 *.class
 *.lock
+!pubspec.lock
+!package-lock.json
 *.log
 *.pyc
 *.swp
@@ -19,6 +21,11 @@ electron-app/out/
 # Expo / React Native
 .expo/
 *.hbc
+
+# AI tooling configs
+.claude/
+CLAUDE.md
+AGENTS.md
 
 
 
