@@ -1,2 +1,4 @@
 # Team_3_SWEN_661
-The space for all code, tests, documentation, and communication materials for the class project
+Project Name: 
+Project is to allow for mobile, desktop and web customization for care recipieent that have Low vision accessibility
+Team Charter: 
