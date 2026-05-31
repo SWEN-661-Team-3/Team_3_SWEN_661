@@ -56,9 +56,29 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildNextAppointment(),
-                  const SizedBox(height: 32),
-                  _buildReminders(),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isNarrow = constraints.maxWidth < 800;
+                      if (isNarrow) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildNextAppointment(),
+                            const SizedBox(height: 32),
+                            _buildReminders(),
+                          ],
+                        );
+                      }
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: _buildNextAppointment()),
+                          const SizedBox(width: 24),
+                          Expanded(child: _buildReminders()),
+                        ],
+                      );
+                    },
+                  ),
                   const SizedBox(height: 32),
                   _buildDailyTasks(),
                   const SizedBox(height: 32),
