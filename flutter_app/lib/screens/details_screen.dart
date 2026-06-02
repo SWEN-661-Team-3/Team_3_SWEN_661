@@ -269,7 +269,7 @@ class DetailsScreen extends StatelessWidget {
       children: [
         ElevatedButton.icon(
           onPressed: () {
-            context.pop();
+            context.go('/success?type=complete&title=${Uri.encodeComponent(_taskDetails.title)}');
           },
           icon: const Icon(Icons.check_circle, size: 28),
           label: const Padding(
@@ -291,9 +291,7 @@ class DetailsScreen extends StatelessWidget {
         const SizedBox(height: 18),
         OutlinedButton.icon(
           onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Snoozed for 1 hour')),
-            );
+            context.go('/success?type=snooze&title=${Uri.encodeComponent(_taskDetails.title)}');
           },
           icon: const Icon(Icons.alarm, size: 24, color: AppColors.warningDark),
           label: const Padding(
@@ -336,11 +334,7 @@ class DetailsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         ElevatedButton.icon(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Caregiver message flow not implemented yet')),
-            );
-          },
+          onPressed: () => context.push('/caregiver-help'),
           icon: const Icon(Icons.message, size: 28),
           label: const Padding(
             padding: EdgeInsets.symmetric(vertical: 18),
