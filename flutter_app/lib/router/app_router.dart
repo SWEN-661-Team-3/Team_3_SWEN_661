@@ -10,6 +10,18 @@ import '../screens/setup_screen.dart';
 import '../screens/preview_screen.dart';
 import '../screens/caregiver_setup_screen.dart';
 import '../screens/confirmation_screen.dart';
+import '../screens/todays_plan_screen.dart';
+import '../screens/expanded_plan_screen.dart';
+import '../screens/success_screen.dart';
+import '../screens/notification_screen.dart';
+import '../screens/reminder_detail_screen.dart';
+import '../screens/snooze_options_screen.dart';
+import '../screens/reminder_success_screen.dart';
+import '../screens/missed_reminder_screen.dart';
+import '../screens/caregiver_help_screen.dart';
+import '../screens/notification_warning_screen.dart';
+import '../screens/reminder_preferences_screen.dart';
+import '../screens/schedule_screen.dart';
 import '../screens/stub_screens.dart';
 
 GoRoute _route(String path, Widget child) =>
