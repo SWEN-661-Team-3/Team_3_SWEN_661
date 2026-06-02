@@ -1,31 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/app_state.dart';
+import 'router/app_router.dart';
 import 'theme/app_theme.dart';
-import 'screens/home_screen.dart';
-import 'screens/emergency_screen.dart';
-import 'screens/activity_log_screen.dart';
-import 'screens/details_screen.dart';
 
-void main() {
-  runApp(const CareConnectApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final appState = AppState();
+  await appState.init();
+
+  runApp(CareConnectApp(appState: appState));
 }
 
 class CareConnectApp extends StatelessWidget {
-  const CareConnectApp({super.key});
+  final AppState appState;
+
+  const CareConnectApp({super.key, required this.appState});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CareConnect',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      initialRoute: '/',
-      routes: {
-        '/': (_) => const HomeScreen(),
-        '/emergency': (_) => const EmergencyScreen(),
-        '/emergency-confirmed': (_) => const EmergencyConfirmedScreen(),
-        '/activity-log': (_) => const ActivityLogScreen(),
-        '/details': (_) => const DetailsScreen(),
-      },
+    return ChangeNotifierProvider.value(
+      value: appState,
+      child: Builder(
+        builder: (context) {
+          final router = createAppRouter(
+            context.read<AppState>(),
+          );
+          return MaterialApp.router(
+            title: 'CareConnect',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            routerConfig: router,
+          );
+        },
+      ),
     );
   }
 }
