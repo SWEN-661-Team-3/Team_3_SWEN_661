@@ -47,12 +47,15 @@ class WelcomeScreen extends StatelessWidget {
             child: const Icon(Icons.favorite, color: AppColors.white, size: 28),
           ),
           const SizedBox(width: 16),
-          const Text(
-            'CareConnect',
-            style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.w900,
-              color: AppColors.heading,
+          const Flexible(
+            child: Text(
+              'CareConnect',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.w900,
+                color: AppColors.heading,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
