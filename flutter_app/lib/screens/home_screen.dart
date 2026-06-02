@@ -127,20 +127,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const Spacer(),
-                  SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: Material(
-                      color: AppColors.blueBg,
-                      borderRadius: BorderRadius.circular(16),
-                      child: InkWell(
+                  Semantics(
+                    label: 'Emergency help',
+                    button: true,
+                    child: SizedBox(
+                      width: 48,
+                      height: 48,
+                      child: Material(
+                        color: AppColors.blueBg,
                         borderRadius: BorderRadius.circular(16),
-                        onTap: () => context.push('/emergency'),
-                        child: const Icon(
-                          Icons.emergency,
-                          size: 28,
-                          color: AppColors.emergency,
-                          semanticLabel: 'Emergency help',
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => context.push('/emergency'),
+                          child: const Icon(
+                            Icons.emergency,
+                            size: 28,
+                            color: AppColors.emergency,
+                            semanticLabel: 'Emergency help',
+                          ),
                         ),
                       ),
                     ),

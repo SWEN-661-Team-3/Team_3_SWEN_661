@@ -42,6 +42,9 @@ class CareHeader extends StatelessWidget implements PreferredSizeWidget {
                     child: Material(
                       color: AppColors.subtleBg,
                       borderRadius: BorderRadius.circular(16),
+                      child: Semantics(
+                      label: 'Go back',
+                      button: true,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
                         onTap: onBack,
@@ -51,6 +54,7 @@ class CareHeader extends StatelessWidget implements PreferredSizeWidget {
                           color: AppColors.heading,
                           semanticLabel: 'Go back',
                         ),
+                      ),
                       ),
                     ),
                   ),
@@ -88,14 +92,18 @@ class CareHeader extends StatelessWidget implements PreferredSizeWidget {
                   child: Material(
                     color: AppColors.blueBg,
                     borderRadius: BorderRadius.circular(16),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: onAccessibility,
-                      child: const Icon(
-                        Icons.accessibility_new,
-                        size: 28,
-                        color: AppColors.primaryAction,
-                        semanticLabel: 'Accessibility settings',
+                    child: Semantics(
+                      label: 'Accessibility settings',
+                      button: true,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: onAccessibility,
+                        child: const Icon(
+                          Icons.accessibility_new,
+                          size: 28,
+                          color: AppColors.primaryAction,
+                          semanticLabel: 'Accessibility settings',
+                        ),
                       ),
                     ),
                   ),

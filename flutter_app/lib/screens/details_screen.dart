@@ -38,25 +38,41 @@ class DetailsScreen extends StatelessWidget {
                   const SizedBox(height: 32),
                   _buildNotesSection(),
                   const SizedBox(height: 32),
-                  Wrap(
-                    runSpacing: 16,
-                    spacing: 16,
-                    children: [
-                      _buildCompactInfoCard(
-                        icon: Icons.visibility,
-                        iconColor: AppColors.caregiver,
-                        title: 'Visibility',
-                        subtitle: _taskDetails.caregiverVisible,
-                        backgroundColor: AppColors.purpleBg,
-                      ),
-                      _buildCompactInfoCard(
-                        icon: Icons.notifications,
-                        iconColor: AppColors.warningDark,
-                        title: 'Reminders',
-                        subtitle: _taskDetails.reminderStatus,
-                        backgroundColor: AppColors.amberBg,
-                      ),
-                    ],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final cards = [
+                        _buildCompactInfoCard(
+                          icon: Icons.visibility,
+                          iconColor: AppColors.caregiver,
+                          title: 'Visibility',
+                          subtitle: _taskDetails.caregiverVisible,
+                          backgroundColor: AppColors.purpleBg,
+                        ),
+                        _buildCompactInfoCard(
+                          icon: Icons.notifications,
+                          iconColor: AppColors.warningDark,
+                          title: 'Reminders',
+                          subtitle: _taskDetails.reminderStatus,
+                          backgroundColor: AppColors.amberBg,
+                        ),
+                      ];
+                      if (constraints.maxWidth > 600) {
+                        return Row(
+                          children: [
+                            Expanded(child: cards[0]),
+                            const SizedBox(width: 16),
+                            Expanded(child: cards[1]),
+                          ],
+                        );
+                      }
+                      return Column(
+                        children: [
+                          cards[0],
+                          const SizedBox(height: 16),
+                          cards[1],
+                        ],
+                      );
+                    },
                   ),
                   const SizedBox(height: 32),
                   _buildActionButtons(context),
@@ -224,9 +240,7 @@ class DetailsScreen extends StatelessWidget {
     required String subtitle,
     required Color backgroundColor,
   }) {
-    return SizedBox(
-      width: 320,
-      child: CareCard(
+    return CareCard(
         borderRadius: 36,
         borderColor: AppColors.border,
         backgroundColor: backgroundColor,
@@ -259,7 +273,6 @@ class DetailsScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 

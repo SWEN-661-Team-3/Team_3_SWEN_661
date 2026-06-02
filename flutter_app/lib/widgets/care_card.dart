@@ -39,9 +39,12 @@ class CareCard extends StatelessWidget {
     );
 
     if (onTap != null) {
-      return GestureDetector(
-        onTap: onTap,
-        child: card,
+      return Semantics(
+        button: true,
+        child: GestureDetector(
+          onTap: onTap,
+          child: card,
+        ),
       );
     }
     return card;
