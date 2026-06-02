@@ -3,6 +3,7 @@ import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
 import 'screens/emergency_screen.dart';
 import 'screens/activity_log_screen.dart';
+import 'screens/details_screen.dart';
 
 void main() {
   runApp(const CareConnectApp());
@@ -23,6 +24,7 @@ class CareConnectApp extends StatelessWidget {
         '/emergency': (_) => const EmergencyScreen(),
         '/emergency-confirmed': (_) => const EmergencyConfirmedScreen(),
         '/activity-log': (_) => const ActivityLogScreen(),
+        '/details': (_) => const DetailsScreen(),
       },
     );
   }

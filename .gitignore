@@ -8,6 +8,7 @@
 *.swp
 .buildlog/
 .history
+.idea/
 
 # Node.js
 node_modules/
