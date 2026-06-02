@@ -5,6 +5,11 @@ import '../screens/home_screen.dart';
 import '../screens/emergency_screen.dart';
 import '../screens/activity_log_screen.dart';
 import '../screens/details_screen.dart';
+import '../screens/welcome_screen.dart';
+import '../screens/setup_screen.dart';
+import '../screens/preview_screen.dart';
+import '../screens/caregiver_setup_screen.dart';
+import '../screens/confirmation_screen.dart';
 import '../screens/stub_screens.dart';
 
 GoRoute _route(String path, Widget child) =>
