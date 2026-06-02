@@ -182,8 +182,8 @@ class DetailsScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: const [
+        const Row(
+          children: [
             Icon(Icons.article, size: 32, color: AppColors.primaryAction),
             SizedBox(width: 12),
             Text(
