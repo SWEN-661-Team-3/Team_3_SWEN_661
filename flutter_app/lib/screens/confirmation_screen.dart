@@ -177,7 +177,7 @@ class ConfirmationScreen extends StatelessWidget {
         child: ElevatedButton.icon(
           onPressed: () {
             context.read<AppState>().markOnboarded();
-            context.go('/home');
+            context.go('/todays-plan');
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryAction,
