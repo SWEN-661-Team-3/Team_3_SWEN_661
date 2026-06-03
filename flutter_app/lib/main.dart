@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_state.dart';
 import 'router/app_router.dart';
@@ -15,25 +16,19 @@ void main() async {
 
 class CareConnectApp extends StatelessWidget {
   final AppState appState;
+  late final GoRouter _router = createAppRouter(appState);
 
-  const CareConnectApp({super.key, required this.appState});
+  CareConnectApp({super.key, required this.appState});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: appState,
-      child: Builder(
-        builder: (context) {
-          final router = createAppRouter(
-            context.read<AppState>(),
-          );
-          return MaterialApp.router(
-            title: 'CareConnect',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.light,
-            routerConfig: router,
-          );
-        },
+      child: MaterialApp.router(
+        title: 'CareConnect',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        routerConfig: _router,
       ),
     );
   }

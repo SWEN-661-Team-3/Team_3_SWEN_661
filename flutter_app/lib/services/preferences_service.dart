@@ -17,9 +17,13 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_settingsKey);
     if (raw == null) return const AccessibilitySettings();
-    return AccessibilitySettings.fromJson(
-      jsonDecode(raw) as Map<String, dynamic>,
-    );
+    try {
+      return AccessibilitySettings.fromJson(
+        jsonDecode(raw) as Map<String, dynamic>,
+      );
+    } catch (_) {
+      return const AccessibilitySettings();
+    }
   }
 
   Future<void> saveReminderPreferences(ReminderPreferences preferences) async {
@@ -31,9 +35,13 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_reminderPrefsKey);
     if (raw == null) return const ReminderPreferences();
-    return ReminderPreferences.fromJson(
-      jsonDecode(raw) as Map<String, dynamic>,
-    );
+    try {
+      return ReminderPreferences.fromJson(
+        jsonDecode(raw) as Map<String, dynamic>,
+      );
+    } catch (_) {
+      return const ReminderPreferences();
+    }
   }
 
   Future<void> saveOnboarded(bool value) async {
