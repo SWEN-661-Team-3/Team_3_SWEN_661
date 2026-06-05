@@ -113,6 +113,20 @@ class TodaysPlanScreen extends StatelessWidget {
             width: 48,
             height: 48,
             child: Material(
+              color: AppColors.blueBg,
+              borderRadius: BorderRadius.circular(16),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => context.go('/home'),
+                child: const Icon(Icons.home, color: AppColors.primaryAction, size: 24),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 48,
+            height: 48,
+            child: Material(
               color: AppColors.subtleBg,
               borderRadius: BorderRadius.circular(16),
               child: InkWell(
