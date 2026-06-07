@@ -209,7 +209,7 @@ class TodaysPlanScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: AppColors.white.withValues(alpha: 0.7),
+                color: AppColors.white.withValues(alpha: 0.85),
               ),
             ),
           ],
