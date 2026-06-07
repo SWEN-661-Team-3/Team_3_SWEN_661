@@ -61,41 +61,6 @@ class _StubScreen extends StatelessWidget {
   }
 }
 
-class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Welcome', subtitle: 'Onboarding entry point', showBack: false);
-}
-
-class SetupScreen extends StatelessWidget {
-  const SetupScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Set Up View');
-}
-
-class PreviewScreen extends StatelessWidget {
-  const PreviewScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Readability Check');
-}
-
-class CaregiverSetupScreen extends StatelessWidget {
-  const CaregiverSetupScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Add Help');
-}
-
-class ConfirmationScreen extends StatelessWidget {
-  const ConfirmationScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: "You're All Set!", showBack: false);
-}
-
 class TodaysPlanScreen extends StatelessWidget {
   const TodaysPlanScreen({super.key});
   @override
