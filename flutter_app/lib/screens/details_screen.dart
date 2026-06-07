@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_card.dart';
 import '../widgets/care_header.dart';
@@ -25,7 +26,7 @@ class DetailsScreen extends StatelessWidget {
         children: [
           CareHeader(
             title: 'Item Details',
-            onBack: () => Navigator.pop(context),
+            onBack: () => context.pop(),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -268,7 +269,7 @@ class DetailsScreen extends StatelessWidget {
       children: [
         ElevatedButton.icon(
           onPressed: () {
-            Navigator.pop(context);
+            context.pop();
           },
           icon: const Icon(Icons.check_circle, size: 28),
           label: const Padding(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_header.dart';
 import '../widgets/care_card.dart';
@@ -88,7 +89,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
         children: [
           CareHeader(
             title: 'Activity Log',
-            onBack: () => Navigator.pop(context),
+            onBack: () => context.pop(),
             onAccessibility: () {},
           ),
           _buildFilterRow(),

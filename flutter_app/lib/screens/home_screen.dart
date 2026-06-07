@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_card.dart';
 import '../widgets/bottom_nav_bar.dart';
@@ -91,8 +92,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: CareBottomNavBar(
-        onFullPlan: () => Navigator.pushNamed(context, '/full-plan'),
-        onSettings: () => Navigator.pushNamed(context, '/settings'),
+        onFullPlan: () => context.push('/full-plan'),
+        onSettings: () => context.push('/setup'),
       ),
     );
   }
@@ -134,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(16),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
-                        onTap: () => Navigator.pushNamed(context, '/emergency'),
+                        onTap: () => context.push('/emergency'),
                         child: const Icon(
                           Icons.emergency,
                           size: 28,
@@ -189,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderColor: AppColors.primaryActionDark,
           backgroundColor: AppColors.primaryAction,
           borderRadius: 40,
-          onTap: () => Navigator.pushNamed(context, '/details'),
+          onTap: () => context.push('/details'),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

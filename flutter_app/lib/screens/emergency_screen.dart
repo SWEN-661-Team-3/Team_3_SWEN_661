@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_header.dart';
 import '../widgets/care_card.dart';
@@ -41,7 +42,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
   void _onAlertSent() {
     _timer?.cancel();
-    Navigator.pushReplacementNamed(context, '/emergency-confirmed');
+    context.go('/emergency-confirmed');
   }
 
   @override
@@ -58,7 +59,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         children: [
           CareHeader(
             title: 'Emergency Help',
-            onBack: () => Navigator.pop(context),
+            onBack: () => context.pop(),
           ),
           Expanded(
             child: _counting ? _buildCountdown() : _buildIdle(),
@@ -337,9 +338,7 @@ class EmergencyConfirmedScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 72,
                 child: ElevatedButton.icon(
-                  onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                    context, '/', (_) => false,
-                  ),
+                  onPressed: () => context.go('/home'),
                   icon: const Icon(Icons.home, size: 28),
                   label: const Text(
                     'Return Home',
