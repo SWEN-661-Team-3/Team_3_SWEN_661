@@ -19,6 +19,20 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
   final _relationController = TextEditingController();
   final _phoneController = TextEditingController();
   final _permissions = <String>{'appointments', 'reminders', 'help'};
+  bool _nameValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_onNameChanged);
+  }
+
+  void _onNameChanged() {
+    final valid = _nameController.text.trim().isNotEmpty;
+    if (valid != _nameValid) {
+      setState(() => _nameValid = valid);
+    }
+  }
 
   @override
   void dispose() {
@@ -49,7 +63,10 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
       backgroundColor: AppColors.pageBg,
       body: Column(
         children: [
-          CareHeader(title: 'Add Help', onBack: () => context.pop()),
+          CareHeader(
+            title: 'Add Help',
+            onBack: () => context.canPop() ? context.pop() : context.go('/welcome'),
+          ),
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -332,10 +349,12 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
               child: SizedBox(
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: _addAndContinue,
+                  onPressed: _nameValid ? _addAndContinue : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryAction,
                     foregroundColor: AppColors.white,
+                    disabledBackgroundColor: AppColors.border,
+                    disabledForegroundColor: AppColors.disabledText,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),

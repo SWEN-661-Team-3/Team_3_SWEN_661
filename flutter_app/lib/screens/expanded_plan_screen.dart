@@ -97,7 +97,7 @@ class ExpandedPlanScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: GestureDetector(
-        onTap: () => context.push('/details'),
+        onTap: () => context.push('/details?id=${item.id}'),
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(

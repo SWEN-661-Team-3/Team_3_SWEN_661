@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state.dart';
+import '../models/appointment.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_card.dart';
 import '../widgets/care_header.dart';
@@ -7,26 +10,19 @@ import '../widgets/care_header.dart';
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({super.key});
 
-  static const _taskDetails = _TaskDetails(
-    title: 'Eye Doctor Checkup',
-    date: 'Monday, May 25',
-    time: '2:00 PM',
-    location: 'City Eye Clinic, 123 Vision Way',
-    notes:
-        'Remember to bring your current glasses and the list of eye drops you use. Dr. Smith will check your intraocular pressure.',
-    caregiverVisible: 'Shared with Sarah (Caregiver)',
-    reminderStatus: 'Reminder set for 30 minutes before',
-  );
-
   @override
   Widget build(BuildContext context) {
+    final id = GoRouterState.of(context).uri.queryParameters['id'];
+    final appState = context.watch<AppState>();
+    final appointment = _resolveAppointment(id, appState);
+
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       body: Column(
         children: [
           CareHeader(
             title: 'Item Details',
-            onBack: () => context.pop(),
+            onBack: () => context.canPop() ? context.pop() : context.go('/home'),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -34,10 +30,12 @@ class DetailsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildPrimaryInfoCard(),
+                  _buildPrimaryInfoCard(appointment),
                   const SizedBox(height: 32),
-                  _buildNotesSection(),
-                  const SizedBox(height: 32),
+                  if (appointment.notes.isNotEmpty)
+                    _buildNotesSection(appointment.notes),
+                  if (appointment.notes.isNotEmpty)
+                    const SizedBox(height: 32),
                   LayoutBuilder(
                     builder: (context, constraints) {
                       final cards = [
@@ -45,14 +43,14 @@ class DetailsScreen extends StatelessWidget {
                           icon: Icons.visibility,
                           iconColor: AppColors.caregiver,
                           title: 'Visibility',
-                          subtitle: _taskDetails.caregiverVisible,
+                          subtitle: 'Shared with Sarah (Caregiver)',
                           backgroundColor: AppColors.purpleBg,
                         ),
                         _buildCompactInfoCard(
                           icon: Icons.notifications,
                           iconColor: AppColors.warningDark,
                           title: 'Reminders',
-                          subtitle: _taskDetails.reminderStatus,
+                          subtitle: 'Reminder set for 30 minutes before',
                           backgroundColor: AppColors.amberBg,
                         ),
                       ];
@@ -75,7 +73,7 @@ class DetailsScreen extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 32),
-                  _buildActionButtons(context),
+                  _buildActionButtons(context, appointment),
                   const SizedBox(height: 80),
                 ],
               ),
@@ -86,7 +84,17 @@ class DetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPrimaryInfoCard() {
+  Appointment _resolveAppointment(String? id, AppState appState) {
+    if (id != null) {
+      final match = appState.todaysPlan.where((a) => a.id == id);
+      if (match.isNotEmpty) return match.first;
+    }
+    final nextTodo = appState.todaysPlan.where((a) => a.status != 'done');
+    if (nextTodo.isNotEmpty) return nextTodo.first;
+    return appState.todaysPlan.first;
+  }
+
+  Widget _buildPrimaryInfoCard(Appointment appointment) {
     return CareCard(
       borderRadius: 44,
       borderColor: AppColors.border,
@@ -101,9 +109,9 @@ class DetailsScreen extends StatelessWidget {
               color: AppColors.blueBg,
               borderRadius: BorderRadius.circular(24),
             ),
-            child: const Text(
-              'Appointment',
-              style: TextStyle(
+            child: Text(
+              appointment.type.toUpperCase(),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
                 color: AppColors.primaryAction,
@@ -113,7 +121,7 @@ class DetailsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            _taskDetails.title,
+            appointment.title,
             style: const TextStyle(
               fontSize: 42,
               fontWeight: FontWeight.w900,
@@ -127,20 +135,22 @@ class DetailsScreen extends StatelessWidget {
               _buildDetailRow(
                 icon: Icons.calendar_today,
                 label: 'Date',
-                value: _taskDetails.date,
+                value: appointment.date,
               ),
               const SizedBox(height: 18),
               _buildDetailRow(
                 icon: Icons.access_time,
                 label: 'Time',
-                value: _taskDetails.time,
+                value: appointment.time,
               ),
-              const SizedBox(height: 18),
-              _buildDetailRow(
-                icon: Icons.location_on,
-                label: 'Location',
-                value: _taskDetails.location,
-              ),
+              if (appointment.location.isNotEmpty) ...[
+                const SizedBox(height: 18),
+                _buildDetailRow(
+                  icon: Icons.location_on,
+                  label: 'Location',
+                  value: appointment.location,
+                ),
+              ],
             ],
           ),
         ],
@@ -195,7 +205,7 @@ class DetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotesSection() {
+  Widget _buildNotesSection(String notes) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -220,7 +230,7 @@ class DetailsScreen extends StatelessWidget {
           backgroundColor: AppColors.white,
           padding: const EdgeInsets.all(28),
           child: Text(
-            _taskDetails.notes,
+            notes,
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
@@ -276,13 +286,14 @@ class DetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, Appointment appointment) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ElevatedButton.icon(
           onPressed: () {
-            context.go('/success?type=complete&title=${Uri.encodeComponent(_taskDetails.title)}');
+            context.read<AppState>().completeTask(appointment.id);
+            context.go('/success?type=complete&title=${Uri.encodeComponent(appointment.title)}');
           },
           icon: const Icon(Icons.check_circle, size: 28),
           label: const Padding(
@@ -304,7 +315,7 @@ class DetailsScreen extends StatelessWidget {
         const SizedBox(height: 18),
         OutlinedButton.icon(
           onPressed: () {
-            context.go('/success?type=snooze&title=${Uri.encodeComponent(_taskDetails.title)}');
+            context.go('/success?type=snooze&title=${Uri.encodeComponent(appointment.title)}');
           },
           icon: const Icon(Icons.alarm, size: 24, color: AppColors.warningDark),
           label: const Padding(
@@ -368,24 +379,4 @@ class DetailsScreen extends StatelessWidget {
       ],
     );
   }
-}
-
-class _TaskDetails {
-  final String title;
-  final String date;
-  final String time;
-  final String location;
-  final String notes;
-  final String caregiverVisible;
-  final String reminderStatus;
-
-  const _TaskDetails({
-    required this.title,
-    required this.date,
-    required this.time,
-    required this.location,
-    required this.notes,
-    required this.caregiverVisible,
-    required this.reminderStatus,
-  });
 }

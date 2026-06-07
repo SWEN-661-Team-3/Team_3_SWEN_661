@@ -39,7 +39,7 @@ class ScheduleScreen extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: CareCard(
-                          onTap: () => context.push('/details'),
+                          onTap: () => context.push('/details?id=${item.id}'),
                           child: Row(
                             children: [
                               Container(

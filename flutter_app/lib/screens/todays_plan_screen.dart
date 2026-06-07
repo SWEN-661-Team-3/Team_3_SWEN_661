@@ -143,7 +143,7 @@ class TodaysPlanScreen extends StatelessWidget {
 
   Widget _buildHeroCard(BuildContext context, dynamic nextTask) {
     return GestureDetector(
-      onTap: () => context.push('/details'),
+      onTap: () => context.push('/details?id=${nextTask.id}'),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),

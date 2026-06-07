@@ -10,8 +10,9 @@ class NotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reminder = context.watch<AppState>().reminders.isNotEmpty
-        ? context.watch<AppState>().reminders.first
+    final appState = context.watch<AppState>();
+    final reminder = appState.reminders.isNotEmpty
+        ? appState.reminders.first
         : null;
 
     return Scaffold(
