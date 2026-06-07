@@ -10,6 +10,7 @@ class _StubScreen extends StatelessWidget {
 
   const _StubScreen({
     required this.title,
+    // ignore: unused_element_parameter
     this.subtitle = 'Coming soon',
     this.showBack = true,
   });
@@ -61,95 +62,9 @@ class _StubScreen extends StatelessWidget {
   }
 }
 
-class TodaysPlanScreen extends StatelessWidget {
-  const TodaysPlanScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: "Today's Plan", showBack: false);
-}
-
-class ExpandedPlanScreen extends StatelessWidget {
-  const ExpandedPlanScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Your Full Plan');
-}
-
-class SuccessScreen extends StatelessWidget {
-  final String type;
-  final String title;
-  const SuccessScreen({super.key, this.type = 'complete', this.title = 'Task'});
-  @override
-  Widget build(BuildContext context) =>
-      _StubScreen(title: 'Success', subtitle: '$title - $type', showBack: false);
-}
-
-class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Medication Reminder');
-}
-
-class ReminderDetailScreen extends StatelessWidget {
-  const ReminderDetailScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Reminder Detail');
-}
-
-class SnoozeOptionsScreen extends StatelessWidget {
-  const SnoozeOptionsScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Snooze Reminder');
-}
-
-class ReminderSuccessScreen extends StatelessWidget {
-  const ReminderSuccessScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Reminder Complete', showBack: false);
-}
-
-class MissedReminderScreen extends StatelessWidget {
-  const MissedReminderScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Missed Task');
-}
-
-class CaregiverHelpScreen extends StatelessWidget {
-  const CaregiverHelpScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Ask for Help');
-}
-
-class NotificationWarningScreen extends StatelessWidget {
-  const NotificationWarningScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Notifications');
-}
-
-class ReminderPreferencesScreen extends StatelessWidget {
-  const ReminderPreferencesScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'Reminder Settings');
-}
-
 class EmergencyCountdownScreen extends StatelessWidget {
   const EmergencyCountdownScreen({super.key});
   @override
   Widget build(BuildContext context) =>
       const _StubScreen(title: 'Emergency Countdown', showBack: false);
-}
-
-class ScheduleScreen extends StatelessWidget {
-  const ScheduleScreen({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const _StubScreen(title: 'My Schedule');
 }
