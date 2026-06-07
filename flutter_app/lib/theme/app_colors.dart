@@ -13,7 +13,7 @@ class AppColors {
   static const Color pageBg = Color(0xFFF8FAFC);
   static const Color subtleBg = Color(0xFFF1F5F9);
   static const Color border = Color(0xFFE2E8F0);
-  static const Color mutedText = Color(0xFF64748B);
+  static const Color mutedText = Color(0xFF383D7A);
   static const Color heading = Color(0xFF0F172A);
   static const Color disabledText = Color(0xFF94A3B8);
 
