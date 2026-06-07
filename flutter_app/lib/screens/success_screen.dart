@@ -42,7 +42,7 @@ class SuccessScreen extends StatelessWidget {
                       Text(
                         config.status,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.5,
                           color: config.iconColor,
@@ -107,7 +107,7 @@ class SuccessScreen extends StatelessWidget {
               child: Text(
                 'Action Recorded Securely',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: config.iconColor.withValues(alpha: 0.7),
                 ),

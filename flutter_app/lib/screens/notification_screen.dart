@@ -45,7 +45,7 @@ class NotificationScreen extends StatelessWidget {
                       const Text(
                         'REMINDER',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.5,
                           color: AppColors.warningDark,

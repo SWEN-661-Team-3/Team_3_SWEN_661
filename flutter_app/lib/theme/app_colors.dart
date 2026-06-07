@@ -15,7 +15,7 @@ class AppColors {
   static const Color border = Color(0xFFE2E8F0);
   static const Color mutedText = Color(0xFF383D7A);
   static const Color heading = Color(0xFF0F172A);
-  static const Color disabledText = Color(0xFF94A3B8);
+  static const Color disabledText = Color(0xFF686F79);
 
   // Semantic
   static const Color success = Color(0xFF047857);

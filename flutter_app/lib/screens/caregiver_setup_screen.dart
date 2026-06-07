@@ -114,9 +114,9 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
                       Text(
                         'You can change permissions at any time in Settings.',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 18,
                           fontStyle: FontStyle.italic,
-                          color: AppColors.mutedText.withValues(alpha: 0.8),
+                          color: AppColors.mutedText,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -301,7 +301,7 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
                   ),
                   Text(
                     desc,
-                    style: const TextStyle(fontSize: 14, color: AppColors.mutedText),
+                    style: const TextStyle(fontSize: 16, color: AppColors.mutedText),
                   ),
                 ],
               ),
@@ -339,7 +339,7 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
                   ),
                   child: const Text(
                     'Skip for Now',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.0),
                   ),
                 ),
               ),
@@ -361,7 +361,7 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
                   ),
                   child: const Text(
                     'Add Caregiver',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.0),
                   ),
                 ),
               ),

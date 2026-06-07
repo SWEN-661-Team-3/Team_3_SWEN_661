@@ -116,7 +116,7 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
         Text(
           title.toUpperCase(),
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.5,
             color: AppColors.mutedText,
@@ -156,7 +156,7 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
                   ),
                   Text(
                     desc,
-                    style: const TextStyle(fontSize: 14, color: AppColors.mutedText),
+                    style: const TextStyle(fontSize: 16, color: AppColors.mutedText),
                   ),
                 ],
               ),
@@ -210,7 +210,7 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
                     ),
                     Text(
                       desc,
-                      style: const TextStyle(fontSize: 14, color: AppColors.mutedText),
+                      style: const TextStyle(fontSize: 16, color: AppColors.mutedText),
                     ),
                   ],
                 ),

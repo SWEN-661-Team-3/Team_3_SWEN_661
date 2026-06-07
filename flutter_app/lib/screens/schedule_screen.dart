@@ -73,7 +73,7 @@ class ScheduleScreen extends StatelessWidget {
                                     Text(
                                       item.time,
                                       style: const TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         color: AppColors.mutedText,
                                       ),
                                     ),

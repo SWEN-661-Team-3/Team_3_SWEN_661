@@ -48,7 +48,7 @@ class AppTheme {
           color: AppColors.heading,
         ),
         labelLarge: TextStyle(
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: FontWeight.w700,
           height: 1.5,
           letterSpacing: 1.5,
@@ -88,7 +88,7 @@ class AppTheme {
         headlineSmall: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, height: 1.5, color: Colors.white),
         bodyLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.5, color: Colors.white),
         bodyMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, height: 1.5, color: Colors.white),
-        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, height: 1.5, letterSpacing: 1.5, color: Colors.white70),
+        labelLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, height: 1.5, letterSpacing: 1.5, color: Colors.white70),
         bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, height: 1.5, color: Colors.white70),
       ),
       appBarTheme: const AppBarTheme(

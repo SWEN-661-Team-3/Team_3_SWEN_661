@@ -183,7 +183,7 @@ class DetailsScreen extends StatelessWidget {
               Text(
                 label.toUpperCase(),
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.5,
                   color: AppColors.mutedText,

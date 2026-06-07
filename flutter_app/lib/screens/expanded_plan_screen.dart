@@ -75,7 +75,7 @@ class ExpandedPlanScreen extends StatelessWidget {
           Text(
             title.toUpperCase(),
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.5,
               color: AppColors.mutedText,
@@ -166,7 +166,7 @@ class ExpandedPlanScreen extends StatelessWidget {
                   child: Text(
                     item.actionLabel!,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: isDone ? AppColors.mutedText : AppColors.primaryAction,
                     ),

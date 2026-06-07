@@ -41,7 +41,7 @@ class ReminderDetailScreen extends StatelessWidget {
                           child: const Text(
                             'Medication',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primaryAction,
                             ),
@@ -123,7 +123,7 @@ class ReminderDetailScreen extends StatelessWidget {
                                 const Text(
                                   'Related Appointment',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.mutedText,
                                   ),
@@ -140,7 +140,7 @@ class ReminderDetailScreen extends StatelessWidget {
                                   Text(
                                     reminder.relatedAppointmentTime!,
                                     style: const TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       color: AppColors.mutedText,
                                     ),
                                   ),

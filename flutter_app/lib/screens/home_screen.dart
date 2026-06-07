@@ -212,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Text(
                       'TODAY @ 2:00 PM',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.5,
                         color: AppColors.white,
@@ -332,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   subtitle,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.5,
                     color: AppColors.mutedText,
@@ -465,12 +465,12 @@ class _HomeScreenState extends State<HomeScreen> {
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.refresh, size: 16, color: AppColors.mutedText),
-                SizedBox(width: 8),
+                Icon(Icons.refresh, size: 18, color: AppColors.mutedText),
+                SizedBox(width: 10),
                 Text(
                   'Last Updated: Just now',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: AppColors.mutedText,
                   ),
@@ -481,7 +481,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 12),
           const Text(
             'Data is securely synced with your health provider.',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.mutedText),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.mutedText),
             textAlign: TextAlign.center,
           ),
         ],

@@ -148,9 +148,10 @@ class ConfirmationScreen extends StatelessWidget {
                     const Text(
                       'Located in "Profile" > "Display"',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 18,
                         fontStyle: FontStyle.italic,
                         color: AppColors.mutedText,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],

@@ -162,7 +162,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.2,
                 color: isSelected
@@ -231,7 +231,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                     Text(
                       '10:30 AM \u2022 2 miles away',
                       style: TextStyle(
-                        fontSize: 14 * _scaleFactor,
+                        fontSize: 16 * _scaleFactor,
                         color: mutedColor,
                       ),
                     ),
@@ -247,7 +247,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                 child: Text(
                   'Confirmed',
                   style: TextStyle(
-                    fontSize: 14 * _scaleFactor,
+                    fontSize: 16 * _scaleFactor,
                     fontWeight: FontWeight.w700,
                     color: accent,
                   ),
@@ -286,7 +286,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                     Text(
                       'Take 1 Vitamin at Noon',
                       style: TextStyle(
-                        fontSize: 14 * _scaleFactor,
+                        fontSize: 16 * _scaleFactor,
                         color: mutedColor,
                       ),
                     ),
@@ -329,8 +329,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
                     ),
                   ),
                   child: const Text(
-                    'Change Settings',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    'Makes Changes',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, height: 1.0),
                   ),
                 ),
               ),
@@ -359,7 +359,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                   ),
                   child: const Text(
                     'Looks Good',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.0),
                   ),
                 ),
               ),

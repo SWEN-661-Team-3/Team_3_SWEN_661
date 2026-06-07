@@ -135,7 +135,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                   label: Text(
                     filter,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w900,
                       color: isActive ? AppColors.white : AppColors.heading,
                     ),
@@ -233,7 +233,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                 Text(
                   entry.time,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.5,
                     color: AppColors.mutedText,
