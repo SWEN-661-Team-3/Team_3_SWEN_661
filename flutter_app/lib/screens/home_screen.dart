@@ -83,6 +83,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 32),
                   _buildDailyTasks(),
                   const SizedBox(height: 32),
+                  _buildQuickLinks(context),
+                  const SizedBox(height: 32),
                   _buildLastUpdated(),
                   const SizedBox(height: 100),
                 ],
@@ -127,20 +129,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const Spacer(),
-                  SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: Material(
-                      color: AppColors.blueBg,
-                      borderRadius: BorderRadius.circular(16),
-                      child: InkWell(
+                  Semantics(
+                    label: 'Emergency help',
+                    button: true,
+                    child: SizedBox(
+                      width: 48,
+                      height: 48,
+                      child: Material(
+                        color: AppColors.blueBg,
                         borderRadius: BorderRadius.circular(16),
-                        onTap: () => context.push('/emergency'),
-                        child: const Icon(
-                          Icons.emergency,
-                          size: 28,
-                          color: AppColors.emergency,
-                          semanticLabel: 'Emergency help',
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => context.push('/emergency'),
+                          child: const Icon(
+                            Icons.emergency,
+                            size: 28,
+                            color: AppColors.emergency,
+                            semanticLabel: 'Emergency help',
+                          ),
                         ),
                       ),
                     ),
@@ -297,6 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String subtitle,
   }) {
     return CareCard(
+      onTap: () => context.push('/notification'),
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
@@ -398,6 +405,47 @@ class _HomeScreenState extends State<HomeScreen> {
               color: completed ? AppColors.heading : AppColors.mutedText,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickLinks(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeading('Quick Links', AppColors.caregiver),
+        const SizedBox(height: 16),
+        _quickLinkTile(context, Icons.history, 'Activity Log', '/activity-log'),
+        const SizedBox(height: 8),
+        _quickLinkTile(context, Icons.calendar_month, 'My Schedule', '/schedule'),
+        const SizedBox(height: 8),
+        _quickLinkTile(context, Icons.tune, 'Reminder Preferences', '/reminder-preferences'),
+        const SizedBox(height: 8),
+        _quickLinkTile(context, Icons.notifications_off, 'Notification Settings', '/notification-warning'),
+      ],
+    );
+  }
+
+  Widget _quickLinkTile(BuildContext context, IconData icon, String label, String route) {
+    return CareCard(
+      onTap: () => context.push(route),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        children: [
+          Icon(icon, size: 24, color: AppColors.primaryAction),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.heading,
+              ),
+            ),
+          ),
+          const Icon(Icons.chevron_right, size: 24, color: AppColors.disabledText),
         ],
       ),
     );
