@@ -119,16 +119,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Icon(Icons.favorite, color: AppColors.emergency, size: 32),
                   const SizedBox(width: 12),
-                  const Text(
-                    'CareConnect',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.heading,
-                      letterSpacing: -0.5,
+                  const Expanded(
+                    child: Text(
+                      'CareConnect',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.heading,
+                        letterSpacing: -0.5,
+                      ),
                     ),
                   ),
-                  const Spacer(),
                   Semantics(
                     label: 'Emergency help',
                     button: true,
@@ -158,13 +159,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Icon(Icons.calendar_today, size: 20, color: AppColors.heading),
                   const SizedBox(width: 8),
-                  Text(
-                    _formattedDate.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2,
-                      color: AppColors.heading,
+                  Flexible(
+                    child: Text(
+                      _formattedDate.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 2,
+                        color: AppColors.heading,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -203,22 +207,26 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryActionDark.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      'TODAY @ 2:00 PM',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.5,
-                        color: AppColors.white,
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryActionDark.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'TODAY @ 2:00 PM',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                          color: AppColors.white,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   const Icon(Icons.medical_services, size: 32, color: AppColors.white),
                 ],
               ),
@@ -397,12 +405,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           const SizedBox(width: 12),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: completed ? AppColors.heading : AppColors.mutedText,
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: completed ? AppColors.heading : AppColors.mutedText,
+              ),
             ),
           ),
         ],
@@ -501,12 +511,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(width: 12),
-        Text(
-          text,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w900,
-            color: AppColors.heading,
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: AppColors.heading,
+            ),
           ),
         ),
       ],

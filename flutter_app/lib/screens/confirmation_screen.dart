@@ -79,12 +79,14 @@ class ConfirmationScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              const Text(
-                                'Active Settings',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.heading,
+                              const Expanded(
+                                child: Text(
+                                  'Active Settings',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.heading,
+                                  ),
                                 ),
                               ),
                             ],

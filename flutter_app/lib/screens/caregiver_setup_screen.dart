@@ -225,12 +225,14 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
                 child: const Icon(Icons.shield, color: AppColors.primaryAction, size: 24),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'What they can see',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.heading,
+              const Expanded(
+                child: Text(
+                  'What they can see',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.heading,
+                  ),
                 ),
               ),
             ],

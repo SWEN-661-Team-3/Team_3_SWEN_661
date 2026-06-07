@@ -213,12 +213,14 @@ class DetailsScreen extends StatelessWidget {
           children: [
             Icon(Icons.article, size: 32, color: AppColors.primaryAction),
             SizedBox(width: 12),
-            Text(
-              'Important Notes',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w900,
-                color: AppColors.heading,
+            Expanded(
+              child: Text(
+                'Important Notes',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.heading,
+                ),
               ),
             ),
           ],
@@ -262,12 +264,14 @@ class DetailsScreen extends StatelessWidget {
               children: [
                 Icon(icon, size: 28, color: iconColor),
                 const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.heading,
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.heading,
+                    ),
                   ),
                 ),
               ],

@@ -169,6 +169,7 @@ class ExpandedPlanScreen extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: isDone ? AppColors.mutedText : AppColors.heading,
                         decoration: isDone ? TextDecoration.lineThrough : null,
+                        decorationColor: AppColors.heading,
                       ),
                     ),
                   ],

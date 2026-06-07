@@ -61,12 +61,14 @@ class ReminderDetailScreen extends StatelessWidget {
                           children: [
                             const Icon(Icons.access_time, color: AppColors.mutedText, size: 20),
                             const SizedBox(width: 8),
-                            Text(
-                              reminder?.dueTime ?? '9:00 AM Today',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.mutedText,
+                            Expanded(
+                              child: Text(
+                                reminder?.dueTime ?? '9:00 AM Today',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.mutedText,
+                                ),
                               ),
                             ),
                           ],
