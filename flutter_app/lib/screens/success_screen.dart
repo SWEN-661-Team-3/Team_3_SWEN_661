@@ -42,10 +42,10 @@ class SuccessScreen extends StatelessWidget {
                       Text(
                         config.status,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.5,
-                          color: config.iconColor,
+                          color: config.iconBg,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -75,12 +75,13 @@ class SuccessScreen extends StatelessWidget {
                             _navButton(
                               context, 'Return to Home', '/home',
                               primary: true,
-                              color: config.iconColor,
+                              color: config.iconBg,
                             ),
                             const SizedBox(width: 16, height: 16),
                             _navButton(
                               context, "Return to Today's Plan", '/todays-plan',
                               primary: false,
+                              color: config.iconColor,
                             ),
                           ];
 
@@ -107,7 +108,7 @@ class SuccessScreen extends StatelessWidget {
               child: Text(
                 'Action Recorded Securely',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: config.iconColor.withValues(alpha: 0.7),
                 ),
@@ -154,7 +155,7 @@ class SuccessScreen extends StatelessWidget {
         onPressed: () => context.go(path),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.heading,
-          side: const BorderSide(color: AppColors.border, width: 3),
+          side: const BorderSide(color: AppColors.primary, width: 3),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -172,9 +173,9 @@ class SuccessScreen extends StatelessWidget {
       case 'snooze':
         return _SuccessConfig(
           bg: AppColors.warningBg,
-          iconBg: AppColors.warningLight,
-          iconBorder: AppColors.warningLight,
-          iconColor: AppColors.warningDark,
+          iconBg: AppColors.warningDark,
+          iconBorder: AppColors.warningDark,
+          iconColor: AppColors.warningLight,
           icon: Icons.snooze,
           status: 'SNOOZED',
           heading: 'Reminder Snoozed',
@@ -194,9 +195,9 @@ class SuccessScreen extends StatelessWidget {
       default:
         return _SuccessConfig(
           bg: AppColors.successBg,
-          iconBg: AppColors.successLight,
+          iconBg: AppColors.success,
           iconBorder: AppColors.successLight,
-          iconColor: AppColors.success,
+          iconColor: AppColors.successLight,
           icon: Icons.check_circle,
           status: 'COMPLETE',
           heading: 'Task Complete',

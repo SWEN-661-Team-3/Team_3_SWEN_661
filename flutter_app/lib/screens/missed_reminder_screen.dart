@@ -90,7 +90,7 @@ class MissedReminderScreen extends StatelessWidget {
                                       Text(
                                         'Was due at 12:30 PM',
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 16,
                                           color: AppColors.emergency,
                                           fontWeight: FontWeight.w700,
                                         ),

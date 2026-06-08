@@ -75,7 +75,7 @@ class ExpandedPlanScreen extends StatelessWidget {
           Text(
             title.toUpperCase(),
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.5,
               color: AppColors.mutedText,
@@ -97,7 +97,7 @@ class ExpandedPlanScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: GestureDetector(
-        onTap: () => context.push('/details'),
+        onTap: () => context.push('/details?id=${item.id}'),
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -106,6 +106,7 @@ class ExpandedPlanScreen extends StatelessWidget {
             border: Border.all(color: AppColors.border, width: 3),
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
@@ -120,7 +121,9 @@ class ExpandedPlanScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -139,8 +142,23 @@ class ExpandedPlanScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
                         _statusBadge(isDone),
+                        if (item.actionLabel != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isDone ? AppColors.subtleBg : AppColors.blueBg,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              item.actionLabel!,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: isDone ? AppColors.mutedText : AppColors.primaryAction,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -151,27 +169,12 @@ class ExpandedPlanScreen extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: isDone ? AppColors.mutedText : AppColors.heading,
                         decoration: isDone ? TextDecoration.lineThrough : null,
+                        decorationColor: AppColors.heading,
                       ),
                     ),
                   ],
                 ),
               ),
-              if (item.actionLabel != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isDone ? AppColors.subtleBg : AppColors.blueBg,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Text(
-                    item.actionLabel!,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: isDone ? AppColors.mutedText : AppColors.primaryAction,
-                    ),
-                  ),
-                ),
             ],
           ),
         ),

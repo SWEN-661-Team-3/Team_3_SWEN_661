@@ -125,7 +125,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                 const Text(
                   'EMERGENCY CONTACTS',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.5,
                     color: AppColors.heading,
@@ -207,7 +207,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
           const Text(
             'Alert will be sent automatically when the timer reaches zero.',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppColors.mutedText,
             ),
@@ -315,7 +315,7 @@ class EmergencyConfirmedScreen extends StatelessWidget {
                     const Text(
                       'ALERT SENT',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.5,
                         color: AppColors.mutedText,

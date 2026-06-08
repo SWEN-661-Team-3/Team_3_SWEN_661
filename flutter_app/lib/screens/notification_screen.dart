@@ -10,8 +10,9 @@ class NotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reminder = context.watch<AppState>().reminders.isNotEmpty
-        ? context.watch<AppState>().reminders.first
+    final appState = context.watch<AppState>();
+    final reminder = appState.reminders.isNotEmpty
+        ? appState.reminders.first
         : null;
 
     return Scaffold(
@@ -44,7 +45,7 @@ class NotificationScreen extends StatelessWidget {
                       const Text(
                         'REMINDER',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.5,
                           color: AppColors.warningDark,

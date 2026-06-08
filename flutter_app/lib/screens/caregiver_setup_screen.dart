@@ -19,6 +19,20 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
   final _relationController = TextEditingController();
   final _phoneController = TextEditingController();
   final _permissions = <String>{'appointments', 'reminders', 'help'};
+  bool _nameValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_onNameChanged);
+  }
+
+  void _onNameChanged() {
+    final valid = _nameController.text.trim().isNotEmpty;
+    if (valid != _nameValid) {
+      setState(() => _nameValid = valid);
+    }
+  }
 
   @override
   void dispose() {
@@ -49,7 +63,10 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
       backgroundColor: AppColors.pageBg,
       body: Column(
         children: [
-          CareHeader(title: 'Add Help', onBack: () => context.pop()),
+          CareHeader(
+            title: 'Add Help',
+            onBack: () => context.canPop() ? context.pop() : context.go('/welcome'),
+          ),
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -97,9 +114,9 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
                       Text(
                         'You can change permissions at any time in Settings.',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 18,
                           fontStyle: FontStyle.italic,
-                          color: AppColors.mutedText.withValues(alpha: 0.8),
+                          color: AppColors.mutedText,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -208,12 +225,14 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
                 child: const Icon(Icons.shield, color: AppColors.primaryAction, size: 24),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'What they can see',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.heading,
+              const Expanded(
+                child: Text(
+                  'What they can see',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.heading,
+                  ),
                 ),
               ),
             ],
@@ -284,7 +303,7 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
                   ),
                   Text(
                     desc,
-                    style: const TextStyle(fontSize: 14, color: AppColors.mutedText),
+                    style: const TextStyle(fontSize: 16, color: AppColors.mutedText),
                   ),
                 ],
               ),
@@ -322,7 +341,7 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
                   ),
                   child: const Text(
                     'Skip for Now',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.0),
                   ),
                 ),
               ),
@@ -332,17 +351,19 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
               child: SizedBox(
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: _addAndContinue,
+                  onPressed: _nameValid ? _addAndContinue : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryAction,
                     foregroundColor: AppColors.white,
+                    disabledBackgroundColor: AppColors.border,
+                    disabledForegroundColor: AppColors.disabledText,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   child: const Text(
                     'Add Caregiver',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.0),
                   ),
                 ),
               ),

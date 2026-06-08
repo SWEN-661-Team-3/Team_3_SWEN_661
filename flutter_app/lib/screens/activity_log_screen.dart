@@ -89,8 +89,8 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
         children: [
           CareHeader(
             title: 'Activity Log',
-            onBack: () => context.pop(),
-            onAccessibility: () {},
+            onBack: () => context.canPop() ? context.pop() : context.go('/home'),
+            onAccessibility: () => context.push('/setup'),
           ),
           _buildFilterRow(),
           Expanded(
@@ -115,44 +115,48 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
 
   Widget _buildFilterRow() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: const BoxDecoration(
         color: AppColors.white,
         border: Border(bottom: BorderSide(color: AppColors.border, width: 2)),
       ),
-      child: Row(
-        children: _filters.map((filter) {
-          final isActive = _activeFilter == filter;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: SizedBox(
-              height: 40,
-              child: FilterChip(
-                selected: isActive,
-                label: Text(
-                  filter,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    color: isActive ? AppColors.white : AppColors.heading,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Row(
+          children: _filters.map((filter) {
+            final isActive = _activeFilter == filter;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: SizedBox(
+                height: 40,
+                child: FilterChip(
+                  selected: isActive,
+                  label: Text(
+                    filter,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: isActive ? AppColors.white : AppColors.heading,
+                    ),
                   ),
+                  onSelected: (_) => setState(() => _activeFilter = filter),
+                  backgroundColor: AppColors.white,
+                  selectedColor: AppColors.primaryAction,
+                  side: BorderSide(
+                    color: isActive ? AppColors.primaryAction : AppColors.border,
+                    width: isActive ? 0 : 2,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  showCheckmark: false,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                 ),
-                onSelected: (_) => setState(() => _activeFilter = filter),
-                backgroundColor: AppColors.white,
-                selectedColor: AppColors.primaryAction,
-                side: BorderSide(
-                  color: isActive ? AppColors.primaryAction : AppColors.border,
-                  width: isActive ? 0 : 2,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                showCheckmark: false,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
               ),
-            ),
-          );
-        }).toList(),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
@@ -173,12 +177,14 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-                color: AppColors.heading,
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.heading,
+                ),
               ),
             ),
           ],
@@ -229,7 +235,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                 Text(
                   entry.time,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.5,
                     color: AppColors.mutedText,

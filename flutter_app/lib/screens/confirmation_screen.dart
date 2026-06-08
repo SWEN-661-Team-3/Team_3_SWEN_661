@@ -79,12 +79,14 @@ class ConfirmationScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              const Text(
-                                'Active Settings',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.heading,
+                              const Expanded(
+                                child: Text(
+                                  'Active Settings',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.heading,
+                                  ),
                                 ),
                               ),
                             ],
@@ -148,9 +150,10 @@ class ConfirmationScreen extends StatelessWidget {
                     const Text(
                       'Located in "Profile" > "Display"',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 18,
                         fontStyle: FontStyle.italic,
                         color: AppColors.mutedText,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],

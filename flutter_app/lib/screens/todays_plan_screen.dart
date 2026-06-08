@@ -143,7 +143,7 @@ class TodaysPlanScreen extends StatelessWidget {
 
   Widget _buildHeroCard(BuildContext context, dynamic nextTask) {
     return GestureDetector(
-      onTap: () => context.push('/details'),
+      onTap: () => context.push('/details?id=${nextTask.id}'),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),
@@ -176,7 +176,7 @@ class TodaysPlanScreen extends StatelessWidget {
                   Text(
                     'Up Next',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColors.white,
                       letterSpacing: 1.2,
@@ -207,9 +207,9 @@ class TodaysPlanScreen extends StatelessWidget {
             Text(
               'Tap to see details',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.white.withValues(alpha: 0.7),
+                color: AppColors.white.withValues(alpha: 0.85),
               ),
             ),
           ],
@@ -249,7 +249,7 @@ class TodaysPlanScreen extends StatelessWidget {
                 const Text(
                   'Helper',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     color: AppColors.mutedText,
                   ),
                 ),
@@ -290,7 +290,7 @@ class TodaysPlanScreen extends StatelessWidget {
                 const Text(
                   'Today',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     color: AppColors.mutedText,
                   ),
                 ),

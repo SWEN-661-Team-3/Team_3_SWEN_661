@@ -68,7 +68,7 @@ class WelcomeScreen extends StatelessWidget {
       children: [
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(40),
+            padding: const EdgeInsets.all(30),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -76,7 +76,7 @@ class WelcomeScreen extends StatelessWidget {
                 const Text(
                   'Welcome to your\nhealthcare support.',
                   style: TextStyle(
-                    fontSize: 40,
+                    fontSize: 35,
                     fontWeight: FontWeight.w900,
                     color: AppColors.heading,
                     height: 1.2,
@@ -115,7 +115,7 @@ class WelcomeScreen extends StatelessWidget {
           const Text(
             'Welcome to your\nhealthcare support.',
             style: TextStyle(
-              fontSize: 32,
+              fontSize: 28,
               fontWeight: FontWeight.w900,
               color: AppColors.heading,
               height: 1.2,
@@ -126,7 +126,7 @@ class WelcomeScreen extends StatelessWidget {
             'We are here to help you manage your health simply and clearly.',
             style: TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: AppColors.mutedText,
               height: 1.5,
             ),
@@ -141,9 +141,9 @@ class WelcomeScreen extends StatelessWidget {
 
   Widget _buildHeroImage() {
     return Container(
-      constraints: const BoxConstraints(maxHeight: 400),
+      constraints: const BoxConstraints(maxHeight: 290),
       decoration: BoxDecoration(
-        color: AppColors.blueBg,
+        color: AppColors.blueLight,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.border, width: 4),
       ),
@@ -169,7 +169,8 @@ class WelcomeScreen extends StatelessWidget {
                 Text(
                   'Your health, simplified.',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.mutedText,
                   ),
                 ),
@@ -212,7 +213,7 @@ class WelcomeScreen extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
           ),
           icon: const Icon(Icons.settings, size: 24),
           label: const Text('Use Recommended Settings'),

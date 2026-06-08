@@ -113,7 +113,7 @@ class _SnoozeOptionsScreenState extends State<SnoozeOptionsScreen> {
                     ),
                     Text(
                       opt['desc']!,
-                      style: const TextStyle(fontSize: 14, color: AppColors.mutedText),
+                      style: const TextStyle(fontSize: 16, color: AppColors.mutedText),
                     ),
                   ],
                 ),

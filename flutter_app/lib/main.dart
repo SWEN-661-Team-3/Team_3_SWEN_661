@@ -24,11 +24,30 @@ class CareConnectApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: appState,
-      child: MaterialApp.router(
-        title: 'CareConnect',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        routerConfig: _router,
+      child: Consumer<AppState>(
+        builder: (context, state, _) {
+          final textScale = switch (state.settings.textSize) {
+            'extra-large' => 1.3,
+            'large' => 1.15,
+            _ => 1.0,
+          };
+          final isHighContrast = state.settings.contrast == 'high';
+
+          return MaterialApp.router(
+            title: 'CareConnect',
+            debugShowCheckedModeBanner: false,
+            theme: isHighContrast ? AppTheme.highContrast : AppTheme.light,
+            routerConfig: _router,
+            builder: (context, child) {
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: TextScaler.linear(textScale),
+                ),
+                child: child!,
+              );
+            },
+          );
+        },
       ),
     );
   }

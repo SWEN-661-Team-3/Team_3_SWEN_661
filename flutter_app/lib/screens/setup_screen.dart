@@ -194,12 +194,14 @@ class _SetupScreenState extends State<SetupScreen> {
                 child: Icon(icon, size: 24, color: AppColors.primaryAction),
               ),
               const SizedBox(width: 12),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.heading,
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.heading,
+                  ),
                 ),
               ),
             ],

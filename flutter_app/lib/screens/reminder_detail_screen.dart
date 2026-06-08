@@ -41,7 +41,7 @@ class ReminderDetailScreen extends StatelessWidget {
                           child: const Text(
                             'Medication',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primaryAction,
                             ),
@@ -61,12 +61,14 @@ class ReminderDetailScreen extends StatelessWidget {
                           children: [
                             const Icon(Icons.access_time, color: AppColors.mutedText, size: 20),
                             const SizedBox(width: 8),
-                            Text(
-                              reminder?.dueTime ?? '9:00 AM Today',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.mutedText,
+                            Expanded(
+                              child: Text(
+                                reminder?.dueTime ?? '9:00 AM Today',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.mutedText,
+                                ),
                               ),
                             ),
                           ],
@@ -123,7 +125,7 @@ class ReminderDetailScreen extends StatelessWidget {
                                 const Text(
                                   'Related Appointment',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.mutedText,
                                   ),
@@ -140,7 +142,7 @@ class ReminderDetailScreen extends StatelessWidget {
                                   Text(
                                     reminder.relatedAppointmentTime!,
                                     style: const TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       color: AppColors.mutedText,
                                     ),
                                   ),

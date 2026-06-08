@@ -76,7 +76,7 @@ class CareHeader extends StatelessWidget implements PreferredSizeWidget {
                       Text(
                         subtitle!,
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.5,
                           color: AppColors.mutedText,
