@@ -195,9 +195,9 @@ class SuccessScreen extends StatelessWidget {
       default:
         return _SuccessConfig(
           bg: AppColors.successBg,
-          iconBg: AppColors.successLight,
+          iconBg: AppColors.success,
           iconBorder: AppColors.successLight,
-          iconColor: AppColors.success,
+          iconColor: AppColors.successLight,
           icon: Icons.check_circle,
           status: 'COMPLETE',
           heading: 'Task Complete',
