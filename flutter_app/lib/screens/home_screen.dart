@@ -207,21 +207,6 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-<<<<<<< HEAD
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryActionDark.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      'TODAY @ 2:00 PM',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.5,
-                        color: AppColors.white,
-=======
                   Flexible(
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -232,13 +217,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: const Text(
                         'TODAY @ 2:00 PM',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.5,
                           color: AppColors.white,
                         ),
                         overflow: TextOverflow.ellipsis,
->>>>>>> f288cff7f7118d74aeeba48c64dd48685441de82
                       ),
                     ),
                   ),
@@ -421,23 +405,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           const SizedBox(width: 12),
-<<<<<<< HEAD
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: completed ? AppColors.heading : AppColors.mutedText,
-=======
           Expanded(
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: completed ? AppColors.heading : AppColors.mutedText,
               ),
->>>>>>> f288cff7f7118d74aeeba48c64dd48685441de82
             ),
           ),
         ],

@@ -175,25 +175,6 @@ class ExpandedPlanScreen extends StatelessWidget {
                   ],
                 ),
               ),
-<<<<<<< HEAD
-              if (item.actionLabel != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isDone ? AppColors.subtleBg : AppColors.blueBg,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Text(
-                    item.actionLabel!,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: isDone ? AppColors.mutedText : AppColors.primaryAction,
-                    ),
-                  ),
-                ),
-=======
->>>>>>> f288cff7f7118d74aeeba48c64dd48685441de82
             ],
           ),
         ),

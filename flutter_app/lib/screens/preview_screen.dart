@@ -238,20 +238,6 @@ class _PreviewScreenState extends State<PreviewScreen> {
                   ],
                 ),
               ),
-<<<<<<< HEAD
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Confirmed',
-                  style: TextStyle(
-                    fontSize: 16 * _scaleFactor,
-                    fontWeight: FontWeight.w700,
-                    color: accent,
-=======
               Flexible(
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -262,12 +248,11 @@ class _PreviewScreenState extends State<PreviewScreen> {
                   child: Text(
                     'Confirmed',
                     style: TextStyle(
-                      fontSize: 14 * _scaleFactor,
+                      fontSize: 16 * _scaleFactor,
                       fontWeight: FontWeight.w700,
                       color: accent,
                     ),
                     overflow: TextOverflow.ellipsis,
->>>>>>> f288cff7f7118d74aeeba48c64dd48685441de82
                   ),
                 ),
               ),
