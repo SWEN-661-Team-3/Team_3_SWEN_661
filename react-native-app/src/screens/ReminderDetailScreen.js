@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   instrTitle: { fontSize: 18, fontWeight: '700', color: Colors.heading },
   instrBody: { fontSize: 16, color: Colors.heading, lineHeight: 24 },
   relatedSection: { marginTop: 24 },
-  relatedLabel: { fontSize: 14, fontWeight: '700', letterSpacing: 1, color: Colors.primaryAction, textTransform: 'uppercase' },
+  relatedLabel: { fontSize: 16, fontWeight: '700', letterSpacing: 1, color: Colors.primaryAction, textTransform: 'uppercase' },
   relatedTitle: { fontSize: 18, fontWeight: '700', color: Colors.heading, marginTop: 4 },
   relatedTime: { fontSize: 16, color: Colors.mutedText, marginTop: 2 },
   primaryButton: {

@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginRight: 16,
   },
   name: { fontSize: 18, fontWeight: '700', color: Colors.heading },
-  relationship: { fontSize: 14, color: Colors.mutedText, marginTop: 2 },
+  relationship: { fontSize: 16, color: Colors.mutedText, marginTop: 2 },
   notifiedBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.successBg, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4 },
-  notifiedText: { fontSize: 13, fontWeight: '700', color: Colors.success },
+  notifiedText: { fontSize: 16, fontWeight: '700', color: Colors.success },
 });

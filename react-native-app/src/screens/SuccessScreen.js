@@ -72,5 +72,5 @@ const styles = StyleSheet.create({
   },
   secondaryText: { fontSize: 20, fontWeight: '700', color: Colors.primaryAction },
   securityFooter: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 32 },
-  securityText: { fontSize: 14, color: Colors.mutedText },
+  securityText: { fontSize: 16, color: Colors.mutedText },
 });

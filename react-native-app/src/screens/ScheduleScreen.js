@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   icon: { width: 56, height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
   title: { fontSize: 18, fontWeight: '700', color: Colors.heading },
   titleDone: { color: Colors.mutedText, textDecorationLine: 'line-through' },
-  time: { fontSize: 14, color: Colors.mutedText, marginTop: 4 },
+  time: { fontSize: 16, color: Colors.mutedText, marginTop: 4 },
   badge: { borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 },
-  badgeText: { fontSize: 13, fontWeight: '700' },
+  badgeText: { fontSize: 16, fontWeight: '700' },
 });

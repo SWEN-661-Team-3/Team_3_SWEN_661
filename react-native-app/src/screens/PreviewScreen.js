@@ -70,12 +70,12 @@ export default function PreviewScreen({ navigation }) {
                 <Text style={{ fontSize: 18 * scaleFactor, fontWeight: '700', color: textColor }}>
                   Eye Doctor Appt
                 </Text>
-                <Text style={{ fontSize: 14 * scaleFactor, color: mutedColor }}>
+                <Text style={{ fontSize: 16 * scaleFactor, color: mutedColor }}>
                   10:30 AM - 2 miles away
                 </Text>
               </View>
               <View style={[styles.badge, { backgroundColor: `${accent}25` }]}>
-                <Text style={{ fontSize: 14 * scaleFactor, fontWeight: '700', color: accent }}>
+                <Text style={{ fontSize: 16 * scaleFactor, fontWeight: '700', color: accent }}>
                   Confirmed
                 </Text>
               </View>
@@ -93,7 +93,7 @@ export default function PreviewScreen({ navigation }) {
                 <Text style={{ fontSize: 18 * scaleFactor, fontWeight: '700', color: textColor }}>
                   Medicine Reminder
                 </Text>
-                <Text style={{ fontSize: 14 * scaleFactor, color: mutedColor }}>
+                <Text style={{ fontSize: 16 * scaleFactor, color: mutedColor }}>
                   Take 1 Vitamin at Noon
                 </Text>
               </View>

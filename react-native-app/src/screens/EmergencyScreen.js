@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   contactsTitle: { fontSize: 18, fontWeight: '700', color: Colors.heading, marginBottom: 12 },
   contactRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
   contactName: { fontSize: 18, fontWeight: '700', color: Colors.heading },
-  contactRel: { fontSize: 14, color: Colors.mutedText },
+  contactRel: { fontSize: 16, color: Colors.mutedText },
   cancelButton: {
     backgroundColor: Colors.white, borderRadius: 20, paddingVertical: 18, paddingHorizontal: 48,
     borderWidth: 3, borderColor: Colors.emergency,

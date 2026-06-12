@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     padding: 12, borderRadius: 20, marginRight: 16,
   },
   reminderTitle: { fontSize: 18, fontWeight: '900', color: Colors.heading },
-  reminderSubtitle: { fontSize: 14, fontWeight: '700', letterSpacing: 1.5, color: Colors.mutedText },
+  reminderSubtitle: { fontSize: 16, fontWeight: '700', letterSpacing: 1.5, color: Colors.mutedText },
   taskItem: {
     flexDirection: 'row', alignItems: 'center', padding: 16,
     borderRadius: 20, borderWidth: 2, gap: 12,
@@ -203,5 +203,5 @@ const styles = StyleSheet.create({
   quickRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   quickLabel: { fontSize: 18, fontWeight: '700', color: Colors.heading, flex: 1 },
   lastUpdated: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 },
-  lastUpdatedText: { fontSize: 14, color: Colors.mutedText },
+  lastUpdatedText: { fontSize: 16, color: Colors.mutedText },
 });

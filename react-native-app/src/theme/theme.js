@@ -33,14 +33,14 @@ export const Typography = StyleSheet.create({
     color: Colors.heading,
   },
   labelLarge: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '700',
     lineHeight: 21,
     letterSpacing: 1.5,
     color: Colors.mutedText,
   },
   bodySmall: {
-    fontSize: 12,
+    fontSize: 16,
     fontWeight: '700',
     lineHeight: 18,
     color: Colors.mutedText,

@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   contactRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
   contactName: { fontSize: 18, fontWeight: '700', color: Colors.heading },
   statusBadge: { backgroundColor: Colors.successBg, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 4 },
-  statusText: { fontSize: 13, fontWeight: '700', color: Colors.success },
+  statusText: { fontSize: 16, fontWeight: '700', color: Colors.success },
   homeButton: {
     backgroundColor: Colors.primaryAction, borderRadius: 20,
     paddingVertical: 18, paddingHorizontal: 48, alignItems: 'center',

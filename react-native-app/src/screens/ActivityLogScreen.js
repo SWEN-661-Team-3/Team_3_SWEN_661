@@ -113,5 +113,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginRight: 12,
   },
   entryTitle: { fontSize: 16, fontWeight: '700', color: Colors.heading },
-  entryTime: { fontSize: 14, color: Colors.mutedText, marginTop: 2 },
+  entryTime: { fontSize: 16, color: Colors.mutedText, marginTop: 2 },
 });

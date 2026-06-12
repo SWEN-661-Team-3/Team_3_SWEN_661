@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     width: 44, height: 44, borderRadius: 14, backgroundColor: Colors.blueBg,
     justifyContent: 'center', alignItems: 'center', marginRight: 12,
   },
-  typeLabel: { fontSize: 14, fontWeight: '700', letterSpacing: 1.5, color: Colors.mutedText },
+  typeLabel: { fontSize: 16, fontWeight: '700', letterSpacing: 1.5, color: Colors.mutedText },
   apptTitle: { fontSize: 28, fontWeight: '900', color: Colors.heading },
   apptTime: { fontSize: 18, fontWeight: '500', color: Colors.mutedText, marginTop: 4 },
   locRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 },
