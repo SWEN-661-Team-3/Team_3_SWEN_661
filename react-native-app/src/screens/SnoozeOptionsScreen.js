@@ -56,9 +56,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 16,
     padding: 20, borderRadius: 20, marginBottom: 12,
     backgroundColor: Colors.white, borderWidth: 3, borderColor: Colors.border,
+    flexWrap: 'wrap',
   },
   optionSelected: { borderColor: Colors.primaryAction, backgroundColor: Colors.blueBg },
-  optionText: { fontSize: 18, fontWeight: '700', color: Colors.heading },
+  optionText: { fontSize: 18, fontWeight: '700', color: Colors.heading, flexShrink: 1 },
   optionTextSelected: { color: Colors.primaryAction },
   primaryButton: {
     backgroundColor: Colors.primaryAction, borderRadius: 20,

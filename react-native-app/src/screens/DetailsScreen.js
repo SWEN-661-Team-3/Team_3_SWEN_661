@@ -63,7 +63,6 @@ export default function DetailsScreen({ navigation, route }) {
         <View style={{ height: 32 }} />
         <View style={styles.infoRow}>
           <InfoCard icon="notifications" iconColor={Colors.warning} title="Reminders" subtitle="30 min before" />
-          <View style={{ width: 12 }} />
           <InfoCard icon="eye" iconColor={Colors.caregiver} title="Visibility" subtitle="Shared with Sarah" />
         </View>
 
@@ -116,11 +115,11 @@ function InfoCard({ icon, iconColor, title, subtitle }) {
 
 const infoStyles = StyleSheet.create({
   card: {
-    flex: 1, backgroundColor: Colors.white, borderRadius: 24,
+    flex: 1, minWidth: 140, backgroundColor: Colors.white, borderRadius: 24,
     borderWidth: 4, borderColor: Colors.border, padding: 24,
   },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 8 },
-  title: { fontSize: 20, fontWeight: '900', color: Colors.heading, flex: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 8, flexWrap: 'wrap' },
+  title: { fontSize: 20, fontWeight: '900', color: Colors.heading, flexShrink: 1 },
   subtitle: { fontSize: 16, color: Colors.mutedText },
 });
 
@@ -141,16 +140,17 @@ const styles = StyleSheet.create({
   notesHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
   notesTitle: { fontSize: 28, fontWeight: '900', color: Colors.heading, flex: 1 },
   notesBody: { fontSize: 18, color: Colors.heading, lineHeight: 28 },
-  infoRow: { flexDirection: 'row' },
+  infoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   primaryButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12,
-    backgroundColor: Colors.primaryAction, borderRadius: 20, paddingVertical: 18,
+    backgroundColor: Colors.primaryAction, borderRadius: 20, paddingVertical: 18, paddingHorizontal: 16,
+    flexWrap: 'wrap',
   },
-  primaryText: { fontSize: 20, fontWeight: '700', color: Colors.white },
+  primaryText: { fontSize: 20, fontWeight: '700', color: Colors.white, flexShrink: 1 },
   secondaryButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12,
-    backgroundColor: Colors.white, borderRadius: 20, paddingVertical: 18,
-    borderWidth: 3, borderColor: Colors.primaryAction,
+    backgroundColor: Colors.white, borderRadius: 20, paddingVertical: 18, paddingHorizontal: 16,
+    borderWidth: 3, borderColor: Colors.primaryAction, flexWrap: 'wrap',
   },
-  secondaryText: { fontSize: 20, fontWeight: '700', color: Colors.primaryAction },
+  secondaryText: { fontSize: 20, fontWeight: '700', color: Colors.primaryAction, flexShrink: 1 },
 });

@@ -78,8 +78,9 @@ const styles = StyleSheet.create({
   toggleRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: Colors.border,
+    gap: 12,
   },
-  toggleLabel: { fontSize: 18, fontWeight: '700', color: Colors.heading, flex: 1 },
+  toggleLabel: { fontSize: 18, fontWeight: '700', color: Colors.heading, flex: 1, flexShrink: 1 },
   sectionTitle: { fontSize: 20, fontWeight: '900', color: Colors.heading, marginTop: 32, marginBottom: 16 },
   timingRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   timingChip: {

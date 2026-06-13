@@ -67,8 +67,9 @@ const styles = StyleSheet.create({
     width: 96, height: 96, borderRadius: 48,
     backgroundColor: Colors.successBg,
     justifyContent: 'center', alignItems: 'center', marginBottom: 16,
+    maxWidth: '40%', aspectRatio: 1,
   },
-  heading: { fontSize: 30, fontWeight: '900', color: Colors.heading, textAlign: 'center' },
+  heading: { fontSize: 30, fontWeight: '900', color: Colors.heading, textAlign: 'center', flexShrink: 1 },
   body: { fontSize: 18, color: Colors.mutedText, textAlign: 'center', lineHeight: 28, marginTop: 8 },
   settingsCard: {
     backgroundColor: Colors.white, borderRadius: 24,

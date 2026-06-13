@@ -38,7 +38,7 @@ export default function CareHeader({ title, subtitle, onBack, onAccessibility })
 
 const styles = StyleSheet.create({
   container: {
-    height: 72,
+    minHeight: 72,
     backgroundColor: Colors.white,
     borderBottomWidth: 4,
     borderBottomColor: Colors.border,

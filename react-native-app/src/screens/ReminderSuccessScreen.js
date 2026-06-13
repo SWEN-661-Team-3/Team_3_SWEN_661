@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CareCard from '../components/CareCard';
@@ -10,7 +10,7 @@ export default function ReminderSuccessScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.iconCircle}>
           <Ionicons name="checkmark-circle" size={64} color={Colors.success} />
         </View>
@@ -32,7 +32,7 @@ export default function ReminderSuccessScreen({ navigation }) {
         >
           <Text style={styles.primaryText}>Return to Today's Plan</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -48,7 +48,7 @@ function InfoRow({ label, value }) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.pageBg },
-  container: { flex: 1, justifyContent: 'center', padding: 24 },
+  container: { flexGrow: 1, justifyContent: 'center', padding: 24 },
   iconCircle: {
     width: 120, height: 120, borderRadius: 60, backgroundColor: Colors.successBg,
     justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 24,

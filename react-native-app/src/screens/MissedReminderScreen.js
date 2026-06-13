@@ -58,13 +58,14 @@ const styles = StyleSheet.create({
   time: { fontSize: 18, fontWeight: '500', color: Colors.mutedText, marginTop: 4 },
   primaryButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12,
-    backgroundColor: Colors.primaryAction, borderRadius: 20, paddingVertical: 18,
+    backgroundColor: Colors.primaryAction, borderRadius: 20, paddingVertical: 18, paddingHorizontal: 16,
+    flexWrap: 'wrap',
   },
-  primaryText: { fontSize: 20, fontWeight: '700', color: Colors.white },
+  primaryText: { fontSize: 20, fontWeight: '700', color: Colors.white, flexShrink: 1 },
   secondaryButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12,
-    backgroundColor: Colors.white, borderRadius: 20, paddingVertical: 18,
-    borderWidth: 3, borderColor: Colors.primaryAction,
+    backgroundColor: Colors.white, borderRadius: 20, paddingVertical: 18, paddingHorizontal: 16,
+    borderWidth: 3, borderColor: Colors.primaryAction, flexWrap: 'wrap',
   },
-  secondaryText: { fontSize: 20, fontWeight: '700', color: Colors.primaryAction },
+  secondaryText: { fontSize: 20, fontWeight: '700', color: Colors.primaryAction, flexShrink: 1 },
 });

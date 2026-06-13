@@ -33,7 +33,7 @@ function buildDefaultActivityLog() {
 }
 
 export const initialState = {
-  initialized: false,
+  initialized: true,
   isOnboarded: false,
   isOffline: false,
   settings: createAccessibilitySettings(),
@@ -110,12 +110,24 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     async function init() {
-      const [settings, reminderPrefs, isOnboarded] = await Promise.all([
-        Prefs.loadAccessibilitySettings(),
-        Prefs.loadReminderPreferences(),
-        Prefs.loadOnboarded(),
-      ]);
-      dispatch({ type: ACTION_TYPES.INIT, payload: { settings, reminderPrefs, isOnboarded } });
+      try {
+        const [settings, reminderPrefs, isOnboarded] = await Promise.all([
+          Prefs.loadAccessibilitySettings(),
+          Prefs.loadReminderPreferences(),
+          Prefs.loadOnboarded(),
+        ]);
+        dispatch({ type: ACTION_TYPES.INIT, payload: { settings, reminderPrefs, isOnboarded } });
+      } catch (e) {
+        console.warn('AppContext init failed, using defaults:', e);
+        dispatch({
+          type: ACTION_TYPES.INIT,
+          payload: {
+            settings: createAccessibilitySettings(),
+            reminderPrefs: createReminderPreferences(),
+            isOnboarded: false,
+          },
+        });
+      }
     }
     init();
   }, []);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../theme/colors';
@@ -17,8 +17,8 @@ export default function SuccessScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
-        <View style={[styles.iconCircle, { backgroundColor: config.bg }]}>  
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.iconCircle}>
           <Ionicons name={config.icon} size={64} color={config.color} />
         </View>
         <Text style={styles.heading}>{config.heading}</Text>
@@ -44,14 +44,14 @@ export default function SuccessScreen({ navigation, route }) {
           <Ionicons name="shield-checkmark" size={16} color={Colors.mutedText} />
           <Text style={styles.securityText}>Your data is stored securely on this device</Text>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.pageBg },
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  container: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   iconCircle: {
     width: 120, height: 120, borderRadius: 60,
     justifyContent: 'center', alignItems: 'center', marginBottom: 24,
@@ -71,6 +71,6 @@ const styles = StyleSheet.create({
     borderWidth: 3, borderColor: Colors.primaryAction,
   },
   secondaryText: { fontSize: 20, fontWeight: '700', color: Colors.primaryAction },
-  securityFooter: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 32 },
-  securityText: { fontSize: 16, color: Colors.mutedText },
+  securityFooter: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 32, flexWrap: 'wrap', justifyContent: 'center' },
+  securityText: { fontSize: 16, color: Colors.mutedText, flexShrink: 1 },
 });
