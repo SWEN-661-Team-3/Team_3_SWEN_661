@@ -15,6 +15,7 @@ export default function ScheduleScreen({ navigation }) {
       <CareHeader
         title="My Schedule"
         onBack={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         {state.todaysPlan.map((item) => {

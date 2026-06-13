@@ -37,6 +37,7 @@ export default function SetupScreen({ navigation }) {
       <CareHeader
         title="Accessibility Settings"
         onBack={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Welcome')}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         {SECTIONS.map((section) => (

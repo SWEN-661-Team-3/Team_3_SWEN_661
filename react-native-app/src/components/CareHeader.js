@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../theme/colors';
 
-export default function CareHeader({ title, subtitle, onBack, onAccessibility }) {
+export default function CareHeader({ title, subtitle, onBack, onEmergency }) {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
@@ -21,14 +21,14 @@ export default function CareHeader({ title, subtitle, onBack, onAccessibility })
           <Text style={styles.title} numberOfLines={1}>{title}</Text>
           {subtitle && <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>}
         </View>
-        {onAccessibility && (
+        {onEmergency && (
           <TouchableOpacity
-            onPress={onAccessibility}
+            onPress={onEmergency}
             style={styles.iconButton}
             accessibilityRole="button"
-            accessibilityLabel="Accessibility settings"
+            accessibilityLabel="Emergency help"
           >
-            <Ionicons name="settings-outline" size={24} color={Colors.heading} />
+            <Ionicons name="warning" size={24} color={Colors.emergency} />
           </TouchableOpacity>
         )}
       </View>

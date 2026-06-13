@@ -29,6 +29,7 @@ export default function DetailsScreen({ navigation, route }) {
       <CareHeader
         title="Item Details"
         onBack={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         <CareCard borderRadius={32}>

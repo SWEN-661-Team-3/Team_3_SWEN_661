@@ -25,10 +25,10 @@ describe('CareHeader', () => {
     expect(queryByLabelText('Go back')).toBeNull();
   });
 
-  test('shows accessibility button when onAccessibility provided', () => {
-    const onA11y = jest.fn();
-    const { getByLabelText } = render(<CareHeader title="Title" onAccessibility={onA11y} />);
-    fireEvent.press(getByLabelText('Accessibility settings'));
-    expect(onA11y).toHaveBeenCalledTimes(1);
+  test('shows emergency button when onEmergency provided', () => {
+    const onEmergency = jest.fn();
+    const { getByLabelText } = render(<CareHeader title="Title" onEmergency={onEmergency} />);
+    fireEvent.press(getByLabelText('Emergency help'));
+    expect(onEmergency).toHaveBeenCalledTimes(1);
   });
 });

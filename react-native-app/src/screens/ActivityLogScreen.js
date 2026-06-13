@@ -36,23 +36,21 @@ export default function ActivityLogScreen({ navigation }) {
       <CareHeader
         title="Activity Log"
         onBack={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
-        onAccessibility={() => navigation.navigate('Setup')}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
-      <ScrollView horizontal style={styles.filterScroll} showsHorizontalScrollIndicator={false}>
-        <View style={styles.filterRow}>
-          {FILTERS.map((f) => (
-            <TouchableOpacity
-              key={f}
-              style={[styles.filterChip, filter === f && styles.filterChipActive]}
-              onPress={() => setFilter(f)}
-            >
-              <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>
-                {FILTER_LABELS[f]}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
+      <View style={styles.filterRow}>
+        {FILTERS.map((f) => (
+          <TouchableOpacity
+            key={f}
+            style={[styles.filterChip, filter === f && styles.filterChipActive]}
+            onPress={() => setFilter(f)}
+          >
+            <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>
+              {FILTER_LABELS[f]}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
         <DateGroup label="Today" entries={filterEntries(ENTRIES_TODAY)} />
@@ -92,8 +90,7 @@ function DateGroup({ label, entries }) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.pageBg },
-  filterScroll: { maxHeight: 64 },
-  filterRow: { flexDirection: 'row', paddingHorizontal: 24, paddingVertical: 12, gap: 8 },
+  filterRow: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 24, paddingVertical: 12, gap: 8 },
   filterChip: {
     paddingHorizontal: 20, paddingVertical: 10,
     borderRadius: 14, borderWidth: 3, borderColor: Colors.border, backgroundColor: Colors.white,

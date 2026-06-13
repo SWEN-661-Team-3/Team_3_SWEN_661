@@ -11,6 +11,7 @@ export default function NotificationWarningScreen({ navigation }) {
       <CareHeader
         title="Notifications"
         onBack={() => navigation.goBack()}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>

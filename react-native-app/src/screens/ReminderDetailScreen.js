@@ -24,6 +24,7 @@ export default function ReminderDetailScreen({ navigation, route }) {
       <CareHeader
         title="Reminder Details"
         onBack={() => navigation.goBack()}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         <CareCard borderRadius={24}>

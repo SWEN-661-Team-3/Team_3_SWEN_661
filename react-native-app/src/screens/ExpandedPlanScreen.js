@@ -33,6 +33,7 @@ export default function ExpandedPlanScreen({ navigation }) {
       <CareHeader
         title="Full Plan"
         onBack={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         {['Morning', 'Afternoon', 'Evening'].map((group) => {

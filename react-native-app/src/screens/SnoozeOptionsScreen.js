@@ -20,7 +20,7 @@ export default function SnoozeOptionsScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <CareHeader title="Snooze Reminder" onBack={() => navigation.goBack()} />
+      <CareHeader title="Snooze Reminder" onBack={() => navigation.goBack()} onEmergency={() => navigation.navigate('Emergency')} />
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.heading}>How long would you like to snooze?</Text>
         {DURATIONS.map((d) => (

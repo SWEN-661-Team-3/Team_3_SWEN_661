@@ -38,6 +38,7 @@ export default function PreviewScreen({ navigation }) {
       <CareHeader
         title="Preview Settings"
         onBack={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Setup')}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.heading}>Try Your Settings</Text>

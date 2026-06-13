@@ -46,6 +46,7 @@ export default function CaregiverSetupScreen({ navigation }) {
       <CareHeader
         title="Add Help"
         onBack={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Welcome')}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.heading}>Add a Caregiver</Text>

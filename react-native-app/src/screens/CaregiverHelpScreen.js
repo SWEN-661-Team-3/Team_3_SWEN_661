@@ -21,6 +21,7 @@ export default function CaregiverHelpScreen({ navigation }) {
       <CareHeader
         title="Ask for Help"
         onBack={() => navigation.goBack()}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.heading}>Your Caregivers</Text>

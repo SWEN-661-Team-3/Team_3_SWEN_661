@@ -32,6 +32,7 @@ export default function ReminderPreferencesScreen({ navigation }) {
       <CareHeader
         title="Reminder Preferences"
         onBack={() => navigation.goBack()}
+        onEmergency={() => navigation.navigate('Emergency')}
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         {TOGGLES.map((t) => (
