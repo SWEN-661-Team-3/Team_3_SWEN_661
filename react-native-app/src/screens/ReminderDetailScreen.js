@@ -7,9 +7,12 @@ import CareCard from '../components/CareCard';
 import Colors from '../theme/colors';
 import { useAppState } from '../context/AppContext';
 
-export default function ReminderDetailScreen({ navigation }) {
+export default function ReminderDetailScreen({ navigation, route }) {
   const { state, dismissReminder } = useAppState();
-  const reminder = state.reminders.length > 0 ? state.reminders[0] : null;
+  const reminderId = route?.params?.reminderId;
+  const reminder = reminderId
+    ? state.reminders.find((r) => r.id === reminderId) || state.reminders[0]
+    : state.reminders[0];
 
   const handleComplete = () => {
     if (reminder) dismissReminder(reminder.id);

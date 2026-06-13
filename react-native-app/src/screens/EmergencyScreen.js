@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../theme/colors';
@@ -31,7 +31,7 @@ export default function EmergencyScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         {!counting ? (
           <>
             <View style={styles.iconCircle}>
@@ -70,7 +70,7 @@ export default function EmergencyScreen({ navigation }) {
             </TouchableOpacity>
           </>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -89,7 +89,7 @@ function ContactRow({ name, relationship }) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.pageBg },
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  container: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   iconCircle: {
     width: 120, height: 120, borderRadius: 60, backgroundColor: Colors.emergencyBg,
     justifyContent: 'center', alignItems: 'center', marginBottom: 24,

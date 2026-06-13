@@ -9,11 +9,12 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 }));
 
 const navigation = { navigate: jest.fn() };
+const route = { params: {} };
 
 function renderWithProvider() {
   return render(
     <AppProvider>
-      <NotificationScreen navigation={navigation} />
+      <NotificationScreen navigation={navigation} route={route} />
     </AppProvider>
   );
 }

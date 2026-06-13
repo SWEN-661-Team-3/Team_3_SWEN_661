@@ -6,9 +6,12 @@ import CareCard from '../components/CareCard';
 import Colors from '../theme/colors';
 import { useAppState } from '../context/AppContext';
 
-export default function NotificationScreen({ navigation }) {
+export default function NotificationScreen({ navigation, route }) {
   const { state, dismissReminder } = useAppState();
-  const reminder = state.reminders.length > 0 ? state.reminders[0] : null;
+  const reminderId = route?.params?.reminderId;
+  const reminder = reminderId
+    ? state.reminders.find((r) => r.id === reminderId) || state.reminders[0]
+    : state.reminders[0];
 
   const handleDismiss = () => {
     if (reminder) dismissReminder(reminder.id);
@@ -40,7 +43,7 @@ export default function NotificationScreen({ navigation }) {
         <View style={{ height: 32 }} />
         <TouchableOpacity
           style={styles.primaryButton}
-          onPress={() => navigation.navigate('ReminderDetail')}
+          onPress={() => navigation.navigate('ReminderDetail', { reminderId: reminder?.id })}
         >
           <Ionicons name="eye" size={24} color={Colors.white} />
           <Text style={styles.primaryText}>View Details</Text>

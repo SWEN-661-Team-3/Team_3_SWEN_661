@@ -35,13 +35,13 @@ export async function loadReminderPreferences() {
 }
 
 export async function saveOnboarded(value) {
-  await AsyncStorage.setItem(ONBOARDED_KEY, JSON.stringify(value));
+  await AsyncStorage.setItem(ONBOARDED_KEY, value ? 'true' : 'false');
 }
 
 export async function loadOnboarded() {
   try {
     const raw = await AsyncStorage.getItem(ONBOARDED_KEY);
-    return raw ? JSON.parse(raw) === true : false;
+    return raw === 'true';
   } catch {
     return false;
   }

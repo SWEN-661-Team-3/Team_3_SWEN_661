@@ -11,19 +11,24 @@ export default function PreviewScreen({ navigation }) {
   const { state, updateSettings } = useAppState();
   const [previewSize, setPreviewSize] = useState(state.settings.textSize);
   const [highContrast, setHighContrast] = useState(state.settings.contrast === 'high');
+  const [darkMode, setDarkMode] = useState(state.settings.theme === 'dark');
+  const [wideSpacing, setWideSpacing] = useState(state.settings.spacing === 'wide');
 
   const scaleFactor = previewSize === 'extra-large' ? 1.3 : 1.15;
-  const cardBg = highContrast ? '#1E1E1E' : Colors.white;
-  const cardBorder = highContrast ? '#444' : Colors.border;
-  const textColor = highContrast ? Colors.white : Colors.heading;
-  const mutedColor = highContrast ? 'rgba(255,255,255,0.7)' : Colors.mutedText;
+  const cardBg = highContrast || darkMode ? '#1E1E1E' : Colors.white;
+  const cardBorder = highContrast || darkMode ? '#444' : Colors.border;
+  const textColor = highContrast || darkMode ? Colors.white : Colors.heading;
+  const mutedColor = highContrast || darkMode ? 'rgba(255,255,255,0.7)' : Colors.mutedText;
   const accent = highContrast ? '#FACC15' : Colors.primaryAction;
+  const itemSpacing = wideSpacing ? 20 : 12;
 
   const handleLooksGood = async () => {
     await updateSettings({
       ...state.settings,
       textSize: previewSize,
       contrast: highContrast ? 'high' : 'standard',
+      theme: darkMode ? 'dark' : 'light',
+      spacing: wideSpacing ? 'wide' : 'standard',
     });
     navigation.navigate('CaregiverSetup');
   };
@@ -58,19 +63,35 @@ export default function PreviewScreen({ navigation }) {
               High Contrast
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.sizeButton, darkMode && styles.sizeButtonActive]}
+            onPress={() => setDarkMode(!darkMode)}
+          >
+            <Text style={[styles.sizeText, darkMode && styles.sizeTextActive]}>
+              Dark Mode
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.sizeButton, wideSpacing && styles.sizeButtonActive]}
+            onPress={() => setWideSpacing(!wideSpacing)}
+          >
+            <Text style={[styles.sizeText, wideSpacing && styles.sizeTextActive]}>
+              Wide Spacing
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={[styles.previewContainer, { backgroundColor: highContrast ? '#000' : Colors.pageBg }]}>
+        <View style={[styles.previewContainer, { backgroundColor: highContrast || darkMode ? '#000' : Colors.pageBg }]}>
           <CareCard backgroundColor={cardBg} borderColor={cardBorder}>
             <View style={styles.sampleRow}>
               <View style={[styles.sampleIcon, { backgroundColor: Colors.blueBg }]}>
                 <Ionicons name="medical" size={24} color={accent} />
               </View>
               <View style={styles.sampleText}>
-                <Text style={{ fontSize: 18 * scaleFactor, fontWeight: '700', color: textColor }}>
+                <Text style={{ fontSize: 18 * scaleFactor, fontWeight: '700', color: textColor }} numberOfLines={2}>
                   Eye Doctor Appt
                 </Text>
-                <Text style={{ fontSize: 16 * scaleFactor, color: mutedColor }}>
+                <Text style={{ fontSize: 16 * scaleFactor, color: mutedColor }} numberOfLines={1}>
                   10:30 AM - 2 miles away
                 </Text>
               </View>
@@ -82,7 +103,7 @@ export default function PreviewScreen({ navigation }) {
             </View>
           </CareCard>
 
-          <View style={{ height: 12 }} />
+          <View style={{ height: itemSpacing }} />
 
           <CareCard backgroundColor={cardBg} borderColor={cardBorder}>
             <View style={styles.sampleRow}>
@@ -90,10 +111,10 @@ export default function PreviewScreen({ navigation }) {
                 <Ionicons name="notifications" size={24} color={Colors.warningDark} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 18 * scaleFactor, fontWeight: '700', color: textColor }}>
+                <Text style={{ fontSize: 18 * scaleFactor, fontWeight: '700', color: textColor }} numberOfLines={2}>
                   Medicine Reminder
                 </Text>
-                <Text style={{ fontSize: 16 * scaleFactor, color: mutedColor }}>
+                <Text style={{ fontSize: 16 * scaleFactor, color: mutedColor }} numberOfLines={1}>
                   Take 1 Vitamin at Noon
                 </Text>
               </View>
@@ -131,7 +152,7 @@ const styles = StyleSheet.create({
   sizeText: { fontSize: 16, fontWeight: '700', color: Colors.heading },
   sizeTextActive: { color: Colors.primaryAction },
   previewContainer: { borderRadius: 24, padding: 16, marginBottom: 24 },
-  sampleRow: { flexDirection: 'row', alignItems: 'center' },
+  sampleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
   sampleIcon: {
     width: 44, height: 44, borderRadius: 14,
     justifyContent: 'center', alignItems: 'center', marginRight: 16,

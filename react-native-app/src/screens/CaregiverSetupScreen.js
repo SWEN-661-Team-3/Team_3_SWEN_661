@@ -20,6 +20,9 @@ export default function CaregiverSetupScreen({ navigation }) {
   const [permissions, setPermissions] = useState(new Set(['appointments', 'reminders', 'help']));
 
   const nameValid = name.trim().length > 0;
+  const phoneDigits = phone.replace(/\D/g, '');
+  const phoneValid = phoneDigits.length >= 7;
+  const formValid = nameValid && phoneValid;
 
   const togglePermission = (key) => {
     const next = new Set(permissions);
@@ -109,13 +112,16 @@ export default function CaregiverSetupScreen({ navigation }) {
 
         <View style={styles.actions}>
           <TouchableOpacity
-            style={[styles.primaryButton, !nameValid && styles.disabledButton]}
+            style={[styles.primaryButton, !formValid && styles.disabledButton]}
             onPress={handleAdd}
-            disabled={!nameValid}
+            disabled={!formValid}
             accessibilityRole="button"
           >
-            <Text style={[styles.primaryText, !nameValid && styles.disabledText]}>Add Caregiver</Text>
+            <Text style={[styles.primaryText, !formValid && styles.disabledText]}>Add Caregiver</Text>
           </TouchableOpacity>
+          {!phoneValid && phone.length > 0 && (
+            <Text style={styles.validationHint}>Phone number must have at least 7 digits</Text>
+          )}
           <TouchableOpacity
             style={styles.secondaryButton}
             onPress={() => navigation.navigate('Confirmation')}
@@ -153,6 +159,7 @@ const styles = StyleSheet.create({
   },
   permLabel: { fontSize: 18, fontWeight: '500', color: Colors.heading, marginLeft: 12, flex: 1 },
   actions: { gap: 12 },
+  validationHint: { fontSize: 14, color: Colors.emergency, textAlign: 'center' },
   primaryButton: {
     backgroundColor: Colors.primaryAction, borderRadius: 20,
     paddingVertical: 18, alignItems: 'center',

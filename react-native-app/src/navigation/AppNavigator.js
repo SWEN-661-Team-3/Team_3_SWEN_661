@@ -1,4 +1,5 @@
 import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAppState } from '../context/AppContext';
 
@@ -30,10 +31,18 @@ const Stack = createNativeStackNavigator();
 export default function AppNavigator() {
   const { state } = useAppState();
 
+  if (!state.initialized) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <Stack.Navigator
-      screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
-      initialRouteName={state.isOnboarded ? 'Home' : 'Welcome'}
+      screenOptions={{ headerShown: false }}
+      initialRouteName={state.isOnboarded === true ? 'Home' : 'Welcome'}
     >
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Setup" component={SetupScreen} />

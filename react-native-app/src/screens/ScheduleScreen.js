@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.pageBg },
   scroll: { padding: 24 },
   itemWrapper: { marginBottom: 12 },
-  row: { flexDirection: 'row', alignItems: 'center' },
+  row: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
   icon: { width: 56, height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
   title: { fontSize: 18, fontWeight: '700', color: Colors.heading },
   titleDone: { color: Colors.mutedText, textDecorationLine: 'line-through' },

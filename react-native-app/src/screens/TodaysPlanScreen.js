@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CareCard from '../components/CareCard';
+import CareBottomNavBar from '../components/CareBottomNavBar';
 import Colors from '../theme/colors';
 import { useAppState, getCompletedCount } from '../context/AppContext';
 
@@ -21,8 +22,8 @@ export default function TodaysPlanScreen({ navigation }) {
           <Ionicons name="home" size={28} color={Colors.heading} />
         </TouchableOpacity>
         <View style={{ flex: 1 }} />
-        <TouchableOpacity onPress={() => navigation.navigate('Setup')} accessibilityLabel="Settings">
-          <Ionicons name="settings-outline" size={28} color={Colors.heading} />
+        <TouchableOpacity onPress={() => navigation.navigate('Emergency')} accessibilityLabel="Emergency help">
+          <Ionicons name="warning" size={28} color={Colors.emergency} />
         </TouchableOpacity>
       </View>
 
@@ -51,17 +52,20 @@ export default function TodaysPlanScreen({ navigation }) {
 
         <View style={{ height: 24 }} />
         <View style={styles.helperRow}>
-          <CareCard borderRadius={24} padding={20}>
-            <Ionicons name="list" size={32} color={Colors.primaryAction} />
-            <Text style={styles.helperTitle}>{completed}/{total}</Text>
-            <Text style={styles.helperLabel}>Tasks Done</Text>
-          </CareCard>
-          <View style={{ width: 12 }} />
-          <CareCard borderRadius={24} padding={20}>
-            <Ionicons name="time" size={32} color={Colors.warning} />
-            <Text style={styles.helperTitle}>{pending}</Text>
-            <Text style={styles.helperLabel}>Pending</Text>
-          </CareCard>
+          <View style={{ flex: 1, minWidth: 120 }}>
+            <CareCard borderRadius={24} padding={20}>
+              <Ionicons name="list" size={32} color={Colors.primaryAction} />
+              <Text style={styles.helperTitle}>{completed}/{total}</Text>
+              <Text style={styles.helperLabel}>Tasks Done</Text>
+            </CareCard>
+          </View>
+          <View style={{ flex: 1, minWidth: 120 }}>
+            <CareCard borderRadius={24} padding={20}>
+              <Ionicons name="time" size={32} color={Colors.warning} />
+              <Text style={styles.helperTitle}>{pending}</Text>
+              <Text style={styles.helperLabel}>Pending</Text>
+            </CareCard>
+          </View>
         </View>
 
         <View style={{ height: 24 }} />
@@ -73,6 +77,10 @@ export default function TodaysPlanScreen({ navigation }) {
           <Text style={styles.shortcutText}>Accessibility Shortcuts</Text>
         </TouchableOpacity>
       </ScrollView>
+      <CareBottomNavBar
+        onFullPlan={() => navigation.navigate('ExpandedPlan')}
+        onSettings={() => navigation.navigate('Setup')}
+      />
     </SafeAreaView>
   );
 }
@@ -93,7 +101,7 @@ const styles = StyleSheet.create({
   heroTitle: { fontSize: 28, fontWeight: '900', color: Colors.white },
   heroTime: { fontSize: 20, fontWeight: '700', color: 'rgba(255,255,255,0.85)', marginTop: 4 },
   heroHint: { fontSize: 16, fontWeight: '700', color: 'rgba(255,255,255,0.85)', marginTop: 12 },
-  helperRow: { flexDirection: 'row' },
+  helperRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   helperTitle: { fontSize: 28, fontWeight: '900', color: Colors.heading, marginTop: 8 },
   helperLabel: { fontSize: 16, fontWeight: '700', color: Colors.mutedText },
   shortcutButton: {
