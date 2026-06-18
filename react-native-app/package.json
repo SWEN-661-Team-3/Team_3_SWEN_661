@@ -8,7 +8,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:integration": "jest src/__tests__/integration"
   },
   "jest": {
     "preset": "jest-expo",
@@ -26,7 +27,15 @@
       "App.js",
       "!src/**/*.test.{js,jsx}",
       "!src/**/__tests__/**"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 75,
+        "branches": 60,
+        "functions": 55,
+        "lines": 75
+      }
+    }
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",

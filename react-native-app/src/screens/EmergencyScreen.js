@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../theme/colors';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function EmergencyScreen({ navigation }) {
   const [counting, setCounting] = useState(false);
@@ -44,19 +45,18 @@ export default function EmergencyScreen({ navigation }) {
             <TouchableOpacity
               style={styles.helpButton}
               onPress={handleStart}
-              accessibilityRole="button"
-              accessibilityLabel="I Need Help"
+              {...buttonA11y('I Need Help', 'Starts a 10 second countdown to alert your care circle')}
             >
               <Text style={styles.helpText}>I Need Help</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelLink} onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={styles.cancelLink} onPress={() => navigation.goBack()} {...buttonA11y('Cancel', 'Returns without sending an alert')}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
           </>
         ) : (
           <>
             <Text style={styles.countdownLabel}>Sending alert in</Text>
-            <Text style={styles.countdownNumber}>{countdown}</Text>
+            <Text style={styles.countdownNumber} accessibilityLiveRegion="polite" accessibilityLabel={`Sending alert in ${countdown} seconds`}>{countdown}</Text>
             <Text style={styles.countdownSub}>seconds</Text>
 
             <View style={styles.contactsSection}>
@@ -65,7 +65,7 @@ export default function EmergencyScreen({ navigation }) {
               <ContactRow name="Dr. Miller's Office" relationship="Doctor" />
             </View>
 
-            <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+            <TouchableOpacity style={styles.cancelButton} onPress={handleCancel} {...buttonA11y('Cancel emergency alert', 'Stops the countdown without notifying contacts')}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
           </>

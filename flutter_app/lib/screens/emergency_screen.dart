@@ -165,12 +165,16 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
               ],
             ),
             alignment: Alignment.center,
-            child: Text(
-              '$_countdown',
-              style: const TextStyle(
-                fontSize: 72,
-                fontWeight: FontWeight.w900,
-                color: AppColors.white,
+            child: Semantics(
+              liveRegion: true,
+              label: 'Sending alert in $_countdown seconds',
+              child: Text(
+                '$_countdown',
+                style: const TextStyle(
+                  fontSize: 72,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.white,
+                ),
               ),
             ),
           ),
@@ -189,7 +193,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             height: 72,
             child: OutlinedButton.icon(
               onPressed: _cancelCountdown,
-              icon: const Icon(Icons.close, size: 28),
+              icon: const Icon(Icons.close, size: 28, semanticLabel: 'Cancel emergency alert'),
               label: const Text(
                 'Cancel',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),

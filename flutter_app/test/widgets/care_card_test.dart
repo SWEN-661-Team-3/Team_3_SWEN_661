@@ -42,18 +42,20 @@ void main() {
       expect(find.byType(GestureDetector), findsNothing);
     });
 
-    testWidgets('has Semantics button when tappable', (tester) async {
+    testWidgets('has Semantics label when provided', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: CareCard(
               onTap: () {},
+              semanticsLabel: 'Open activity log',
               child: const Text('Button card'),
             ),
           ),
         ),
       );
-      expect(find.byType(Semantics), findsWidgets);
+      final semantics = tester.getSemantics(find.text('Button card'));
+      expect(semantics.label, contains('Open activity log'));
     });
   });
 }

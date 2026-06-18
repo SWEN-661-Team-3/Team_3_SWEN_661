@@ -6,6 +6,7 @@ import CareCard from '../components/CareCard';
 import CareBottomNavBar from '../components/CareBottomNavBar';
 import Colors from '../theme/colors';
 import { useAppState, getCompletedCount } from '../context/AppContext';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function HomeScreen({ navigation }) {
   const { state } = useAppState();
@@ -33,8 +34,7 @@ export default function HomeScreen({ navigation }) {
             <TouchableOpacity
               style={styles.emergencyBtn}
               onPress={() => navigation.navigate('Emergency')}
-              accessibilityRole="button"
-              accessibilityLabel="Emergency help"
+              {...buttonA11y('Emergency help', 'Opens the emergency alert screen')}
             >
               <Ionicons name="warning" size={28} color={Colors.emergency} />
             </TouchableOpacity>
@@ -53,6 +53,7 @@ export default function HomeScreen({ navigation }) {
             borderColor={Colors.primaryActionDark}
             borderRadius={40}
             onTap={() => navigation.navigate('Details', { id: nextAppt.id })}
+            accessibilityLabel={`Next appointment: ${nextAppt.title} at ${nextAppt.time}. View details.`}
           >
             <View style={styles.apptHeader}>
               <View style={styles.apptBadge}>
@@ -141,7 +142,7 @@ function renderSectionHeading(text, barColor) {
 
 function renderReminderItem(navigation, icon, iconBg, iconColor, title, subtitle, reminderId) {
   return (
-    <CareCard onTap={() => navigation.navigate('Notification', { reminderId })}>
+    <CareCard onTap={() => navigation.navigate('Notification', { reminderId })} accessibilityLabel={`${title}. ${subtitle}. Open reminder.`}>
       <View style={styles.reminderRow}>
         <View style={[styles.reminderIcon, { backgroundColor: iconBg }]}>
           <Ionicons name={icon} size={28} color={iconColor} />
@@ -173,7 +174,7 @@ function renderTaskItem(label, completed) {
 
 function renderQuickLink(navigation, icon, label, route) {
   return (
-    <CareCard onTap={() => navigation.navigate(route)} padding={16}>
+    <CareCard onTap={() => navigation.navigate(route)} padding={16} accessibilityLabel={label}>
       <View style={styles.quickRow}>
         <Ionicons name={icon} size={24} color={Colors.primaryAction} />
         <Text style={styles.quickLabel}>{label}</Text>
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
   },
   apptBadgeText: { fontSize: 16, fontWeight: '900', letterSpacing: 1.5, color: Colors.white, flexShrink: 1 },
   apptTitle: { fontSize: 36, fontWeight: '900', color: Colors.white, marginTop: 16, flexShrink: 1 },
-  apptSubtitle: { fontSize: 20, fontWeight: '700', color: 'rgba(255,255,255,0.75)', flexShrink: 1 },
+  apptSubtitle: { fontSize: 20, fontWeight: '700', color: Colors.white, flexShrink: 1 },
   apptAction: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     backgroundColor: 'rgba(30,64,175,0.5)', borderRadius: 20,

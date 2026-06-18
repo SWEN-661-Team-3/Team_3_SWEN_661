@@ -6,6 +6,7 @@ import CareHeader from '../components/CareHeader';
 import CareCard from '../components/CareCard';
 import Colors from '../theme/colors';
 import { useAppState } from '../context/AppContext';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function ReminderDetailScreen({ navigation, route }) {
   const { state, dismissReminder } = useAppState();
@@ -58,7 +59,7 @@ export default function ReminderDetailScreen({ navigation, route }) {
         )}
 
         <View style={{ height: 32 }} />
-        <TouchableOpacity style={styles.primaryButton} onPress={handleComplete}>
+        <TouchableOpacity style={styles.primaryButton} onPress={handleComplete} {...buttonA11y('Mark Complete', 'Marks this reminder as done')}>
           <Ionicons name="checkmark-circle" size={24} color={Colors.white} />
           <Text style={styles.primaryText}>Mark Complete</Text>
         </TouchableOpacity>
@@ -66,6 +67,7 @@ export default function ReminderDetailScreen({ navigation, route }) {
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => navigation.navigate('SnoozeOptions')}
+          {...buttonA11y('Snooze Reminder', 'Postpone this reminder')}
         >
           <Ionicons name="time" size={24} color={Colors.primaryAction} />
           <Text style={styles.secondaryText}>Snooze Reminder</Text>

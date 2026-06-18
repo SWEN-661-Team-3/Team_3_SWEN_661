@@ -8,6 +8,7 @@ class CareCard extends StatelessWidget {
   final Color backgroundColor;
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
+  final String? semanticsLabel;
 
   const CareCard({
     super.key,
@@ -17,6 +18,7 @@ class CareCard extends StatelessWidget {
     this.backgroundColor = AppColors.white,
     this.padding = const EdgeInsets.all(24),
     this.onTap,
+    this.semanticsLabel,
   });
 
   @override
@@ -41,6 +43,7 @@ class CareCard extends StatelessWidget {
     if (onTap != null) {
       return Semantics(
         button: true,
+        label: semanticsLabel,
         child: GestureDetector(
           onTap: onTap,
           child: card,

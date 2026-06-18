@@ -1,0 +1,7 @@
+appId: com.example.flutter_app
+---
+- launchApp
+- tapOn:
+    id: "emergency-help"
+- assertVisible: "Emergency Help"
+- assertVisible: "I Need Help"

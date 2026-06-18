@@ -201,6 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: AppColors.primaryAction,
           borderRadius: 40,
           onTap: () => context.push('/details'),
+          semanticsLabel: 'Next appointment: Eye Exam at 2:00 PM. View details.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -312,6 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     return CareCard(
       onTap: () => context.push('/notification'),
+      semanticsLabel: '$title. $subtitle. Open reminder.',
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
@@ -440,6 +442,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _quickLinkTile(BuildContext context, IconData icon, String label, String route) {
     return CareCard(
       onTap: () => context.push(route),
+      semanticsLabel: label,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
         children: [

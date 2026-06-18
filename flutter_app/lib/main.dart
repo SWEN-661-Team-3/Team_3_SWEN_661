@@ -32,18 +32,42 @@ class CareConnectApp extends StatelessWidget {
             _ => 1.0,
           };
           final isHighContrast = state.settings.contrast == 'high';
+          final isDark = state.settings.theme == 'dark';
+          final wideSpacing = state.settings.spacing == 'wide';
+          final reduceMotion = state.settings.motion == 'reduced';
+
+          final theme = isHighContrast
+              ? AppTheme.highContrast
+              : isDark
+                  ? AppTheme.dark
+                  : AppTheme.light;
 
           return MaterialApp.router(
             title: 'CareConnect',
             debugShowCheckedModeBanner: false,
-            theme: isHighContrast ? AppTheme.highContrast : AppTheme.light,
+            theme: theme,
             routerConfig: _router,
             builder: (context, child) {
+              var mediaQuery = MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(textScale),
+                disableAnimations: reduceMotion,
+              );
+              if (wideSpacing) {
+                mediaQuery = mediaQuery.copyWith(
+                  padding: mediaQuery.padding.copyWith(
+                    left: mediaQuery.padding.left + 8,
+                    right: mediaQuery.padding.right + 8,
+                  ),
+                );
+              }
               return MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                  textScaler: TextScaler.linear(textScale),
-                ),
-                child: child!,
+                data: mediaQuery,
+                child: state.settings.screenReader == 'on'
+                    ? Semantics(
+                        label: 'CareConnect health companion',
+                        child: child!,
+                      )
+                    : child!,
               );
             },
           );

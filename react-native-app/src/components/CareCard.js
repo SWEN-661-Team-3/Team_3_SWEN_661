@@ -22,7 +22,7 @@ export default function CareCard({
         style={containerStyle}
         onPress={onTap}
         accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel}
+        accessibilityLabel={accessibilityLabel || 'Open item'}
         activeOpacity={0.7}
       >
         {children}

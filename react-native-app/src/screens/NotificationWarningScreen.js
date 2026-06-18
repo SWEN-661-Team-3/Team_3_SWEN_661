@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CareHeader from '../components/CareHeader';
 import Colors from '../theme/colors';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function NotificationWarningScreen({ navigation }) {
   return (
@@ -38,6 +39,7 @@ export default function NotificationWarningScreen({ navigation }) {
             Alert.alert('Notifications', 'Notifications enabled (simulated)');
             navigation.goBack();
           }}
+          {...buttonA11y('Enable Notifications', 'Turns on medication and health alerts')}
         >
           <Text style={styles.primaryText}>Enable Notifications</Text>
         </TouchableOpacity>
@@ -45,6 +47,7 @@ export default function NotificationWarningScreen({ navigation }) {
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => navigation.goBack()}
+          {...buttonA11y('Keep Turned Off', 'Returns without enabling notifications')}
         >
           <Text style={styles.secondaryText}>Keep Turned Off</Text>
         </TouchableOpacity>

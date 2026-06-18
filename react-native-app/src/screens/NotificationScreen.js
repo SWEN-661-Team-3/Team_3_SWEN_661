@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import CareCard from '../components/CareCard';
 import Colors from '../theme/colors';
 import { useAppState } from '../context/AppContext';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function NotificationScreen({ navigation, route }) {
   const { state, dismissReminder } = useAppState();
@@ -44,6 +45,7 @@ export default function NotificationScreen({ navigation, route }) {
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={() => navigation.navigate('ReminderDetail', { reminderId: reminder?.id })}
+          {...buttonA11y('View Details', 'Opens full reminder information')}
         >
           <Ionicons name="eye" size={24} color={Colors.white} />
           <Text style={styles.primaryText}>View Details</Text>
@@ -52,12 +54,13 @@ export default function NotificationScreen({ navigation, route }) {
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => navigation.navigate('SnoozeOptions')}
+          {...buttonA11y('Snooze', 'Postpone this reminder')}
         >
           <Ionicons name="time" size={24} color={Colors.primaryAction} />
           <Text style={styles.secondaryText}>Snooze</Text>
         </TouchableOpacity>
         <View style={{ height: 12 }} />
-        <TouchableOpacity style={styles.doneButton} onPress={handleDismiss}>
+        <TouchableOpacity style={styles.doneButton} onPress={handleDismiss} {...buttonA11y('Mark Done', 'Marks reminder complete and returns to plan')}>
           <Ionicons name="checkmark-circle" size={24} color={Colors.success} />
           <Text style={styles.doneText}>Mark Done</Text>
         </TouchableOpacity>

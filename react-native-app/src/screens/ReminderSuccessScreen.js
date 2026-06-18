@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CareCard from '../components/CareCard';
 import Colors from '../theme/colors';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function ReminderSuccessScreen({ navigation }) {
   const completedAt = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
@@ -29,6 +30,7 @@ export default function ReminderSuccessScreen({ navigation }) {
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={() => navigation.reset({ index: 0, routes: [{ name: 'TodaysPlan' }] })}
+          {...buttonA11y("Return to Today's Plan", 'Navigates to your daily plan')}
         >
           <Text style={styles.primaryText}>Return to Today's Plan</Text>
         </TouchableOpacity>

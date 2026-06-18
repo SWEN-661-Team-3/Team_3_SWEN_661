@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Colors from '../theme/colors';
 import { useAppState } from '../context/AppContext';
 import { getActiveLabels } from '../models/AccessibilitySettings';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function ConfirmationScreen({ navigation }) {
   const { state, markOnboarded } = useAppState();
@@ -51,7 +52,7 @@ export default function ConfirmationScreen({ navigation }) {
           )}
         </View>
 
-        <TouchableOpacity style={styles.ctaButton} onPress={handleContinue} accessibilityRole="button">
+        <TouchableOpacity style={styles.ctaButton} onPress={handleContinue} {...buttonA11y("Go to Today's Plan", 'Completes onboarding and opens your daily plan')}>
           <Text style={styles.ctaText}>Go to Today's Plan</Text>
         </TouchableOpacity>
       </ScrollView>

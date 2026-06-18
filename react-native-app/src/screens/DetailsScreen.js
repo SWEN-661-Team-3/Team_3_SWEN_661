@@ -6,6 +6,7 @@ import CareHeader from '../components/CareHeader';
 import CareCard from '../components/CareCard';
 import Colors from '../theme/colors';
 import { useAppState } from '../context/AppContext';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function DetailsScreen({ navigation, route }) {
   const { state, completeTask } = useAppState();
@@ -68,7 +69,7 @@ export default function DetailsScreen({ navigation, route }) {
         </View>
 
         <View style={{ height: 32 }} />
-        <TouchableOpacity style={styles.primaryButton} onPress={handleComplete}>
+        <TouchableOpacity style={styles.primaryButton} onPress={handleComplete} {...buttonA11y('Mark Complete', 'Marks this item as done')}>
           <Ionicons name="checkmark-circle" size={24} color={Colors.white} />
           <Text style={styles.primaryText}>Mark Complete</Text>
         </TouchableOpacity>
@@ -76,6 +77,7 @@ export default function DetailsScreen({ navigation, route }) {
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => navigation.navigate('Success', { type: 'snooze', title: appointment.title })}
+          {...buttonA11y('Snooze for 1 Hour', 'Postpones this reminder for one hour')}
         >
           <Ionicons name="time" size={24} color={Colors.primaryAction} />
           <Text style={styles.secondaryText}>Snooze for 1 Hour</Text>
@@ -84,6 +86,7 @@ export default function DetailsScreen({ navigation, route }) {
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => Alert.alert('Edit', 'Edit functionality coming soon')}
+          {...buttonA11y('Edit Details', 'Opens edit form for this item')}
         >
           <Ionicons name="create" size={24} color={Colors.primaryAction} />
           <Text style={styles.secondaryText}>Edit Details</Text>
@@ -92,6 +95,7 @@ export default function DetailsScreen({ navigation, route }) {
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => navigation.navigate('CaregiverHelp')}
+          {...buttonA11y('Ask Caregiver', 'Notifies your caregiver for help')}
         >
           <Ionicons name="people" size={24} color={Colors.primaryAction} />
           <Text style={styles.secondaryText}>Ask Caregiver</Text>

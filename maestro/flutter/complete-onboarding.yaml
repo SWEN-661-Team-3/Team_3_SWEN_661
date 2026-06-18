@@ -1,0 +1,8 @@
+appId: com.example.flutter_app
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: onboarding-flow.yaml
+- tapOn: "Go to Today's Plan"
+- assertVisible: "Today's Plan"

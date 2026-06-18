@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../theme/colors';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function CareHeader({ title, subtitle, onBack, onEmergency }) {
   return (
@@ -11,22 +12,20 @@ export default function CareHeader({ title, subtitle, onBack, onEmergency }) {
           <TouchableOpacity
             onPress={onBack}
             style={styles.iconButton}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
+            {...buttonA11y('Go back', 'Returns to the previous screen')}
           >
             <Ionicons name="chevron-back" size={28} color={Colors.heading} />
           </TouchableOpacity>
         )}
-        <View style={styles.titleContainer}>
-          <Text style={styles.title} numberOfLines={1}>{title}</Text>
+        <View style={styles.titleContainer} accessibilityRole="header">
+          <Text style={styles.title} numberOfLines={1} accessibilityRole="header">{title}</Text>
           {subtitle && <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>}
         </View>
         {onEmergency && (
           <TouchableOpacity
             onPress={onEmergency}
             style={styles.iconButton}
-            accessibilityRole="button"
-            accessibilityLabel="Emergency help"
+            {...buttonA11y('Emergency help', 'Opens the emergency alert screen')}
           >
             <Ionicons name="warning" size={24} color={Colors.emergency} />
           </TouchableOpacity>

@@ -1,0 +1,8 @@
+appId: host.exp.exponent
+---
+- launchApp
+- tapOn:
+    text: "Afternoon Medication"
+- assertVisible: "Reminder"
+- tapOn: "Mark Done"
+- assertVisible: "Reminder Complete!"
