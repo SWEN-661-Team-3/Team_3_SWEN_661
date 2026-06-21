@@ -16,7 +16,7 @@ void main() async {
 
 class CareConnectApp extends StatelessWidget {
   final AppState appState;
-  late final GoRouter _router = createAppRouter(appState);
+  late final GoRouter router = createAppRouter(appState);
 
   CareConnectApp({super.key, required this.appState});
 
@@ -46,7 +46,7 @@ class CareConnectApp extends StatelessWidget {
             title: 'CareConnect',
             debugShowCheckedModeBanner: false,
             theme: theme,
-            routerConfig: _router,
+            routerConfig: router,
             builder: (context, child) {
               var mediaQuery = MediaQuery.of(context).copyWith(
                 textScaler: TextScaler.linear(textScale),

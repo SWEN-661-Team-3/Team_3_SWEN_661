@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CareCard from '../components/CareCard';
 import CareBottomNavBar from '../components/CareBottomNavBar';
+import IconBadge from '../components/IconBadge';
 import Colors from '../theme/colors';
 import { useAppState, getCompletedCount } from '../context/AppContext';
 import { buttonA11y } from '../utils/accessibility';
@@ -20,7 +21,9 @@ export default function HomeScreen({ navigation }) {
   const formattedDate = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const formattedTime = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
-  const nextAppt = state.todaysPlan.find((a) => a.status !== 'done');
+  const nextAppt =
+    state.todaysPlan.find((a) => a.status === 'todo' && a.type === 'appointment') ||
+    state.todaysPlan.find((a) => a.status === 'todo');
   const completedCount = getCompletedCount(state.todaysPlan);
   const pendingReminders = state.reminders.filter((r) => r.status === 'pending');
 
@@ -36,7 +39,7 @@ export default function HomeScreen({ navigation }) {
               onPress={() => navigation.navigate('Emergency')}
               {...buttonA11y('Emergency help', 'Opens the emergency alert screen')}
             >
-              <Ionicons name="warning" size={28} color={Colors.emergency} />
+              <IconBadge icon="warning" color={Colors.emergency} size={28} padding={10} borderRadius={16} />
             </TouchableOpacity>
           </View>
           <View style={styles.dateRow}>
@@ -86,7 +89,6 @@ export default function HomeScreen({ navigation }) {
             {renderReminderItem(
               navigation,
               r.type === 'hydration' ? 'water' : 'medical',
-              r.type === 'hydration' ? Colors.blueLight : Colors.warningLight,
               r.type === 'hydration' ? Colors.primaryAction : Colors.warningDark,
               r.title,
               r.dueTime.toUpperCase(),
@@ -140,14 +142,12 @@ function renderSectionHeading(text, barColor) {
   );
 }
 
-function renderReminderItem(navigation, icon, iconBg, iconColor, title, subtitle, reminderId) {
+function renderReminderItem(navigation, icon, iconColor, title, subtitle, reminderId) {
   return (
     <CareCard onTap={() => navigation.navigate('Notification', { reminderId })} accessibilityLabel={`${title}. ${subtitle}. Open reminder.`}>
       <View style={styles.reminderRow}>
-        <View style={[styles.reminderIcon, { backgroundColor: iconBg }]}>
-          <Ionicons name={icon} size={28} color={iconColor} />
-        </View>
-        <View style={{ flex: 1 }}>
+        <IconBadge icon={icon} color={iconColor} size={28} padding={12} borderRadius={20} />
+        <View style={{ flex: 1, marginLeft: 16 }}>
           <Text style={styles.reminderTitle}>{title}</Text>
           <Text style={styles.reminderSubtitle}>{subtitle}</Text>
         </View>
@@ -176,7 +176,7 @@ function renderQuickLink(navigation, icon, label, route) {
   return (
     <CareCard onTap={() => navigation.navigate(route)} padding={16} accessibilityLabel={label}>
       <View style={styles.quickRow}>
-        <Ionicons name={icon} size={24} color={Colors.primaryAction} />
+        <IconBadge icon={icon} color={Colors.primaryAction} size={24} padding={8} borderRadius={12} />
         <Text style={styles.quickLabel}>{label}</Text>
         <Ionicons name="chevron-forward" size={24} color={Colors.disabledText} />
       </View>
@@ -191,7 +191,6 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
   appTitle: { fontSize: 24, fontWeight: '900', color: Colors.heading, flex: 1, marginLeft: 12 },
   emergencyBtn: {
-    width: 48, height: 48, borderRadius: 16, backgroundColor: Colors.blueBg,
     justifyContent: 'center', alignItems: 'center',
   },
   dateRow: { flexDirection: 'row', alignItems: 'center', marginTop: 16 },
@@ -215,9 +214,6 @@ const styles = StyleSheet.create({
   sectionBar: { width: 4, height: 24, borderRadius: 4, marginRight: 12 },
   sectionText: { fontSize: 22, fontWeight: '900', color: Colors.heading, flex: 1 },
   reminderRow: { flexDirection: 'row', alignItems: 'center' },
-  reminderIcon: {
-    padding: 12, borderRadius: 20, marginRight: 16,
-  },
   reminderTitle: { fontSize: 18, fontWeight: '900', color: Colors.heading },
   reminderSubtitle: { fontSize: 16, fontWeight: '700', letterSpacing: 1.5, color: Colors.mutedText },
   taskItem: {

@@ -60,7 +60,11 @@ void main() {
 
       expect(find.text('Emergency Help'), findsOneWidget);
       expect(
-        find.bySemanticsLabel('I need help. Tap to alert your care circle.'),
+        find.bySemanticsLabel('I need help, alert care circle'),
+        findsOneWidget,
+      );
+      expect(
+        find.bySemanticsLabel('Alerts your care circle when you need help'),
         findsOneWidget,
       );
     });

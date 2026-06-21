@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CareCard from '../components/CareCard';
+import IconBadge from '../components/IconBadge';
 import Colors from '../theme/colors';
 import { useAppState } from '../context/AppContext';
 import { buttonA11y } from '../utils/accessibility';
@@ -11,8 +12,8 @@ export default function NotificationScreen({ navigation, route }) {
   const { state, dismissReminder } = useAppState();
   const reminderId = route?.params?.reminderId;
   const reminder = reminderId
-    ? state.reminders.find((r) => r.id === reminderId) || state.reminders[0]
-    : state.reminders[0];
+    ? state.reminders.find((r) => r.id === reminderId)
+    : state.reminders.find((r) => r.status === 'pending');
 
   const handleDismiss = () => {
     if (reminder) dismissReminder(reminder.id);
@@ -23,9 +24,7 @@ export default function NotificationScreen({ navigation, route }) {
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
-          <View style={styles.iconCircle}>
-            <Ionicons name="notifications" size={48} color={Colors.warningDark} />
-          </View>
+          <IconBadge icon="notifications" color={Colors.warningDark} size={48} padding={24} borderRadius={48} />
           <Text style={styles.heading}>Reminder</Text>
           <Text style={styles.title}>{reminder?.title || 'Medication Reminder'}</Text>
           <Text style={styles.time}>{reminder?.dueTime || '12:30 PM'}</Text>
@@ -53,7 +52,7 @@ export default function NotificationScreen({ navigation, route }) {
         <View style={{ height: 12 }} />
         <TouchableOpacity
           style={styles.secondaryButton}
-          onPress={() => navigation.navigate('SnoozeOptions')}
+          onPress={() => navigation.navigate('SnoozeOptions', { reminderId: reminder?.id })}
           {...buttonA11y('Snooze', 'Postpone this reminder')}
         >
           <Ionicons name="time" size={24} color={Colors.primaryAction} />
@@ -73,10 +72,6 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.pageBg },
   scroll: { padding: 24, flexGrow: 1 },
   header: { alignItems: 'center', marginTop: 32, marginBottom: 32 },
-  iconCircle: {
-    width: 96, height: 96, borderRadius: 48, backgroundColor: Colors.warningBg,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 16,
-  },
   heading: { fontSize: 16, fontWeight: '700', letterSpacing: 2, color: Colors.mutedText, textTransform: 'uppercase' },
   title: { fontSize: 28, fontWeight: '900', color: Colors.heading, textAlign: 'center', marginTop: 8 },
   time: { fontSize: 20, fontWeight: '700', color: Colors.mutedText, marginTop: 4 },

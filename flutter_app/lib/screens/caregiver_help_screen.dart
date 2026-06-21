@@ -51,104 +51,110 @@ class _CaregiverHelpScreenState extends State<CaregiverHelpScreen> {
                   const SizedBox(height: 24),
                   ...caregivers.map((c) {
                     final isNotified = _notifiedCaregiverIds.contains(c.id);
+                    void notify() {
+                      setState(() => _notifiedCaregiverIds.add(c.id));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Notifying ${c.name}',
+                            style: const TextStyle(color: AppColors.white),
+                          ),
+                          backgroundColor: AppColors.primaryAction,
+                        ),
+                      );
+                    }
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
-                      child: CareCard(
-                        backgroundColor: isNotified
-                            ? AppColors.successBg
-                            : AppColors.white,
-                        borderColor: isNotified
-                            ? AppColors.success
-                            : AppColors.border,
-                        onTap: () {
-                          setState(() => _notifiedCaregiverIds.add(c.id));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Notifying ${c.name}',
-                                style: const TextStyle(color: AppColors.white),
-                              ),
-                              backgroundColor: AppColors.primaryAction,
-                            ),
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 56,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                color: AppColors.caregiver,
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                              child: const Icon(
-                                Icons.person,
-                                color: AppColors.purpleBg,
-                                size: 28,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    c.name,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: isNotified
-                                          ? AppColors.success
-                                          : AppColors.heading,
+                      child: Semantics(
+                        button: true,
+                        label: 'Notify ${c.name}, ${c.relationship}',
+                        child: GestureDetector(
+                          onTap: isNotified ? null : notify,
+                          child: CareCard(
+                            backgroundColor: isNotified
+                                ? AppColors.successBg
+                                : AppColors.white,
+                            borderColor: isNotified
+                                ? AppColors.success
+                                : AppColors.border,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 56,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.caregiver,
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                  child: const Icon(
+                                    Icons.person,
+                                    color: AppColors.purpleBg,
+                                    size: 28,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        c.name,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                          color: isNotified
+                                              ? AppColors.success
+                                              : AppColors.heading,
+                                        ),
+                                      ),
+                                      Text(
+                                        c.relationship,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: isNotified
+                                              ? AppColors.success
+                                              : AppColors.mutedText,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (!isNotified)
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryAction,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: const Icon(
+                                      Icons.send,
+                                      color: AppColors.white,
+                                      size: 20,
                                     ),
                                   ),
-                                  Text(
-                                    c.relationship,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: isNotified
-                                          ? AppColors.success
-                                          : AppColors.mutedText,
-                                      fontWeight: FontWeight.w500,
+                                if (isNotified)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.success,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: const Text(
+                                      'Notified',
+                                      style: TextStyle(
+                                        color: AppColors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
+                              ],
                             ),
-                            if (!isNotified)
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryAction,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: const Icon(
-                                  Icons.send,
-                                  color: AppColors.white,
-                                  size: 20,
-                                ),
-                              ),
-                            if (isNotified) ...[
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 10,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.success,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: const Text(
-                                  'Notified',
-                                  style: TextStyle(
-                                    color: AppColors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
+                          ),
                         ),
                       ),
                     );

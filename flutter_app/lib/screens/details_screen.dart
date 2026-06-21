@@ -4,8 +4,9 @@ import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../models/appointment.dart';
 import '../theme/app_colors.dart';
-import '../widgets/care_card.dart';
 import '../widgets/care_header.dart';
+import '../widgets/care_card.dart';
+import '../widgets/icon_badge.dart';
 
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({super.key});
@@ -23,6 +24,7 @@ class DetailsScreen extends StatelessWidget {
           CareHeader(
             title: 'Item Details',
             onBack: () => context.canPop() ? context.pop() : context.go('/home'),
+            onEmergency: () => context.push('/emergency'),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -44,14 +46,12 @@ class DetailsScreen extends StatelessWidget {
                           iconColor: AppColors.caregiver,
                           title: 'Visibility',
                           subtitle: 'Shared with Sarah (Caregiver)',
-                          backgroundColor: AppColors.purpleBg,
                         ),
                         _buildCompactInfoCard(
                           icon: Icons.notifications,
                           iconColor: AppColors.warningDark,
                           title: 'Reminders',
                           subtitle: 'Reminder set for 30 minutes before',
-                          backgroundColor: AppColors.amberBg,
                         ),
                       ];
                       if (constraints.maxWidth > 600) {
@@ -106,7 +106,7 @@ class DetailsScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.blueBg,
+              color: AppColors.primaryAction,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Text(
@@ -114,7 +114,7 @@ class DetailsScreen extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: AppColors.primaryAction,
+                color: AppColors.white,
                 letterSpacing: 1.5,
               ),
             ),
@@ -170,10 +170,10 @@ class DetailsScreen extends StatelessWidget {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: AppColors.subtleBg,
+            color: AppColors.heading,
             borderRadius: BorderRadius.circular(18),
           ),
-          child: Icon(icon, size: 28, color: AppColors.heading),
+          child: Icon(icon, size: 28, color: AppColors.white),
         ),
         const SizedBox(width: 18),
         Expanded(
@@ -250,19 +250,18 @@ class DetailsScreen extends StatelessWidget {
     required Color iconColor,
     required String title,
     required String subtitle,
-    required Color backgroundColor,
   }) {
     return CareCard(
         borderRadius: 36,
         borderColor: AppColors.border,
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.white,
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(icon, size: 28, color: iconColor),
+                IconBadge(icon: icon, color: iconColor, padding: 10, iconSize: 24, borderRadius: 14),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -291,6 +290,10 @@ class DetailsScreen extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, Appointment appointment) {
+    if (appointment.status == 'done' || appointment.status == 'snoozed') {
+      return const SizedBox.shrink();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -319,6 +322,7 @@ class DetailsScreen extends StatelessWidget {
         const SizedBox(height: 18),
         OutlinedButton.icon(
           onPressed: () {
+            context.read<AppState>().snoozeTask(appointment.id);
             context.go('/success?type=snooze&title=${Uri.encodeComponent(appointment.title)}');
           },
           icon: const Icon(Icons.alarm, size: 24, color: AppColors.warningDark),

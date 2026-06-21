@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_header.dart';
 import '../widgets/care_card.dart';
+import '../widgets/icon_badge.dart';
 import '../widgets/status_badge.dart';
 
 enum ActivityType { medication, appointment, alert }
@@ -90,25 +91,53 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
           CareHeader(
             title: 'Activity Log',
             onBack: () => context.canPop() ? context.pop() : context.go('/home'),
-            onAccessibility: () => context.push('/setup'),
+            onEmergency: () => context.push('/emergency'),
           ),
           _buildFilterRow(),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 24),
                   _buildDateGroup('Today, May 27', _filter(_todayEntries)),
                   const SizedBox(height: 24),
                   _buildDateGroup('Yesterday, May 26', _filter(_yesterdayEntries)),
-                  const SizedBox(height: 100),
                 ],
               ),
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: _buildSettingsFooter(context),
+    );
+  }
+
+  Widget _buildSettingsFooter(BuildContext context) {
+    return Material(
+      color: AppColors.white,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed: () => context.push('/setup'),
+              icon: const Icon(Icons.settings, color: AppColors.white),
+              label: const Text(
+                'Accessibility Settings',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryAction,
+                foregroundColor: AppColors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -128,30 +157,37 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
             final isActive = _activeFilter == filter;
             return Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: SizedBox(
-                height: 40,
-                child: FilterChip(
-                  selected: isActive,
-                  label: Text(
-                    filter,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      color: isActive ? AppColors.white : AppColors.heading,
+              child: Semantics(
+                label: 'Filter by $filter',
+                selected: isActive,
+                button: true,
+                excludeSemantics: true,
+                child: SizedBox(
+                  height: 48,
+                  child: FilterChip(
+                    materialTapTargetSize: MaterialTapTargetSize.padded,
+                    selected: isActive,
+                    label: Text(
+                      filter,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: isActive ? AppColors.white : AppColors.heading,
+                      ),
                     ),
+                    onSelected: (_) => setState(() => _activeFilter = filter),
+                    backgroundColor: AppColors.white,
+                    selectedColor: AppColors.primaryAction,
+                    side: BorderSide(
+                      color: isActive ? AppColors.primaryAction : AppColors.border,
+                      width: isActive ? 0 : 2,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    showCheckmark: false,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   ),
-                  onSelected: (_) => setState(() => _activeFilter = filter),
-                  backgroundColor: AppColors.white,
-                  selectedColor: AppColors.primaryAction,
-                  side: BorderSide(
-                    color: isActive ? AppColors.primaryAction : AppColors.border,
-                    width: isActive ? 0 : 2,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  showCheckmark: false,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
                 ),
               ),
             );
@@ -166,28 +202,33 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 4,
-              height: 24,
-              decoration: BoxDecoration(
-                color: AppColors.primaryAction,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.heading,
+        Semantics(
+          header: true,
+          child: Row(
+            children: [
+              ExcludeSemantics(
+                child: Container(
+                  width: 4,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryAction,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.heading,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 12),
         ...entries.map((entry) => Padding(
@@ -199,54 +240,56 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
   }
 
   Widget _buildEntryCard(ActivityEntry entry) {
-    final (icon, iconBg, iconColor) = switch (entry.type) {
-      ActivityType.medication => (Icons.medication, AppColors.warningLight, AppColors.warningDark),
-      ActivityType.appointment => (Icons.calendar_today, AppColors.blueLight, AppColors.primaryAction),
-      ActivityType.alert => (Icons.notifications, AppColors.emergencyBg, AppColors.emergency),
+    final (icon, iconColor) = switch (entry.type) {
+      ActivityType.medication => (Icons.medication, AppColors.warningDark),
+      ActivityType.appointment => (Icons.calendar_today, AppColors.primaryAction),
+      ActivityType.alert => (Icons.notifications, AppColors.emergency),
     };
-
-    return CareCard(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: iconBg,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, size: 28, color: iconColor),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  entry.title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.heading,
+    final statusLabel = switch (entry.status) {
+      BadgeType.done => 'Done',
+      BadgeType.missed => 'Missed',
+      BadgeType.sent => 'Sent',
+      BadgeType.todo => 'To Do',
+    };
+    return Semantics(
+      label: '${entry.title}. ${entry.time}. Status: $statusLabel.',
+      excludeSemantics: true,
+      child: CareCard(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ExcludeSemantics(child: IconBadge(icon: icon, color: iconColor)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.heading,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  entry.time,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.5,
-                    color: AppColors.mutedText,
+                  const SizedBox(height: 4),
+                  Text(
+                    entry.time,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.5,
+                      color: AppColors.mutedText,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                StatusBadge(type: entry.status),
-              ],
+                  const SizedBox(height: 8),
+                  StatusBadge(type: entry.status),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_card.dart';
+import '../widgets/icon_badge.dart';
 
 class TodaysPlanScreen extends StatelessWidget {
   const TodaysPlanScreen({super.key});
@@ -12,7 +13,7 @@ class TodaysPlanScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final nextTask = appState.todaysPlan.firstWhere(
-      (a) => a.status != 'done',
+      (a) => a.status == 'todo',
       orElse: () => appState.todaysPlan.first,
     );
 
@@ -28,19 +29,28 @@ class TodaysPlanScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    RichText(
-                      text: const TextSpan(
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.heading,
-                          height: 1.4,
-                        ),
-                        children: [
-                          TextSpan(text: 'Your setup is complete.\n'),
-                          TextSpan(
-                            text: "Here is today's plan.",
-                            style: TextStyle(color: AppColors.primaryAction),
+                    Semantics(
+                      header: true,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            'Your setup is complete.',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.heading,
+                              height: 1.4,
+                            ),
+                          ),
+                          Text(
+                            "Here is today's plan.",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryAction,
+                              height: 1.4,
+                            ),
                           ),
                         ],
                       ),
@@ -99,8 +109,9 @@ class TodaysPlanScreen extends StatelessWidget {
             child: const Icon(Icons.favorite, color: AppColors.primaryAction, size: 24),
           ),
           const SizedBox(width: 12),
-          const Expanded(
-            child: Text(
+          Semantics(
+            header: true,
+            child: const Text(
               'CareConnect',
               style: TextStyle(
                 fontSize: 24,
@@ -118,21 +129,31 @@ class TodaysPlanScreen extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
                 onTap: () => context.go('/home'),
-                child: const Icon(Icons.home, color: AppColors.primaryAction, size: 24),
+                child: Semantics(
+                  label: 'Go home',
+                  button: true,
+                  child: const Icon(Icons.home, color: AppColors.primaryAction, size: 24),
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          SizedBox(
+          Container(
             width: 48,
             height: 48,
-            child: Material(
-              color: AppColors.subtleBg,
+            decoration: BoxDecoration(
+              color: AppColors.emergency,
               borderRadius: BorderRadius.circular(16),
+            ),
+            child: Material(
+              color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
-                onTap: () => context.push('/setup'),
-                child: const Icon(Icons.settings, color: AppColors.heading, size: 24),
+                onTap: () => context.push('/emergency'),
+                child: Semantics(
+                  label: 'Emergency help',
+                  button: true,
+                  child: const Icon(Icons.emergency, color: AppColors.white, size: 24),
+                ),
               ),
             ),
           ),
@@ -142,9 +163,13 @@ class TodaysPlanScreen extends StatelessWidget {
   }
 
   Widget _buildHeroCard(BuildContext context, dynamic nextTask) {
-    return GestureDetector(
-      onTap: () => context.push('/details?id=${nextTask.id}'),
-      child: Container(
+    final location = nextTask.location.isEmpty ? 'Home' : nextTask.location;
+    return Semantics(
+      button: true,
+      label: 'Up next, ${nextTask.title}, ${nextTask.time}, $location. View details.',
+      child: GestureDetector(
+        onTap: () => context.push('/details?id=${nextTask.id}'),
+        child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -196,24 +221,25 @@ class TodaysPlanScreen extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              '${nextTask.time} \u2022 ${nextTask.location.isEmpty ? "Home" : nextTask.location}',
-              style: TextStyle(
+              '${nextTask.time} \u2022 $location',
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: AppColors.white.withValues(alpha: 0.8),
+                color: AppColors.white,
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              'Tap to see details',
+            const Text(
+              'View details',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.white.withValues(alpha: 0.85),
+                color: AppColors.white,
               ),
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -222,82 +248,81 @@ class TodaysPlanScreen extends StatelessWidget {
     final helper = appState.caregivers.isNotEmpty
         ? appState.caregivers.first.name
         : 'No helper';
-    return CareCard(
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.successBg,
-              borderRadius: BorderRadius.circular(14),
+    return Semantics(
+      label: '$helper is available. Helper.',
+      child: CareCard(
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.success,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(Icons.person, color: AppColors.white, size: 24),
             ),
-            child: const Icon(Icons.person, color: AppColors.success, size: 24),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$helper is available',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.heading,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$helper is available',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.heading,
+                    ),
                   ),
-                ),
-                const Text(
-                  'Helper',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.mutedText,
+                  const Text(
+                    'Helper',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.mutedText,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildTodayCard(AppState appState) {
-    final pending = appState.todaysPlan.where((a) => a.status != 'done').length;
-    return CareCard(
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.warningBg,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(Icons.calendar_today, color: AppColors.warningDark, size: 24),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$pending Appointments',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.heading,
+    final pending = appState.todaysPlan.where((a) => a.status == 'todo').length;
+    return Semantics(
+      label: '$pending Appointments. Today.',
+      child: CareCard(
+        child: Row(
+          children: [
+            IconBadge(icon: Icons.calendar_today, color: AppColors.warningDark, padding: 10, iconSize: 24, borderRadius: 14),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$pending Appointments',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.heading,
+                    ),
                   ),
-                ),
-                const Text(
-                  'Today',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.mutedText,
+                  const Text(
+                    'Today',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.mutedText,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -312,11 +337,11 @@ class TodaysPlanScreen extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         height: 56,
-        child: ElevatedButton(
+          child: ElevatedButton(
           onPressed: () => context.push('/setup'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.blueBg,
-            foregroundColor: AppColors.primaryAction,
+            backgroundColor: AppColors.primaryAction,
+            foregroundColor: AppColors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),

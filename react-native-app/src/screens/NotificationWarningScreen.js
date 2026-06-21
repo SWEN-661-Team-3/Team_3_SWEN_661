@@ -1,12 +1,16 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CareHeader from '../components/CareHeader';
+import IconBadge from '../components/IconBadge';
 import Colors from '../theme/colors';
+import { useAppState } from '../context/AppContext';
 import { buttonA11y } from '../utils/accessibility';
 
 export default function NotificationWarningScreen({ navigation }) {
+  const { setNotificationsEnabled } = useAppState();
+
   return (
     <SafeAreaView style={styles.safe}>
       <CareHeader
@@ -16,9 +20,7 @@ export default function NotificationWarningScreen({ navigation }) {
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
-          <View style={styles.iconCircle}>
-            <Ionicons name="notifications-off" size={48} color={Colors.warningDark} />
-          </View>
+          <IconBadge icon="notifications-off" color={Colors.warningDark} size={48} padding={24} borderRadius={48} />
           <Text style={styles.heading}>Notifications Are Off</Text>
           <Text style={styles.body}>
             Without notifications, you may miss important medication reminders and health alerts.
@@ -26,7 +28,7 @@ export default function NotificationWarningScreen({ navigation }) {
         </View>
 
         <View style={styles.warningBox}>
-          <Ionicons name="alert-circle" size={24} color={Colors.warningDark} />
+          <IconBadge icon="alert-circle" color={Colors.warningDark} size={24} padding={8} borderRadius={12} />
           <Text style={styles.warningText}>
             Turning on notifications helps ensure you never miss a medication dose or appointment.
           </Text>
@@ -35,8 +37,8 @@ export default function NotificationWarningScreen({ navigation }) {
         <View style={{ height: 32 }} />
         <TouchableOpacity
           style={styles.primaryButton}
-          onPress={() => {
-            Alert.alert('Notifications', 'Notifications enabled (simulated)');
+          onPress={async () => {
+            await setNotificationsEnabled(true);
             navigation.goBack();
           }}
           {...buttonA11y('Enable Notifications', 'Turns on medication and health alerts')}
@@ -60,15 +62,11 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.pageBg },
   scroll: { padding: 24, flexGrow: 1 },
   header: { alignItems: 'center', marginTop: 16, marginBottom: 24 },
-  iconCircle: {
-    width: 96, height: 96, borderRadius: 48, backgroundColor: Colors.warningBg,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 16,
-  },
-  heading: { fontSize: 28, fontWeight: '900', color: Colors.heading, textAlign: 'center' },
+  heading: { fontSize: 28, fontWeight: '900', color: Colors.heading, textAlign: 'center', marginTop: 16 },
   body: { fontSize: 18, color: Colors.mutedText, textAlign: 'center', lineHeight: 28, marginTop: 8 },
   warningBox: {
-    flexDirection: 'row', gap: 12, padding: 20,
-    backgroundColor: Colors.warningBg, borderRadius: 20,
+    flexDirection: 'row', gap: 12, padding: 20, alignItems: 'flex-start',
+    backgroundColor: Colors.white, borderRadius: 20,
     borderWidth: 2, borderColor: Colors.warningLight,
   },
   warningText: { fontSize: 16, color: Colors.warningDark, lineHeight: 24, flex: 1 },

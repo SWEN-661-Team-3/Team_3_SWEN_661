@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state.dart';
+import '../models/reminder.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_card.dart';
 import '../widgets/bottom_nav_bar.dart';
+import '../widgets/icon_badge.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -46,6 +50,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
+
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       body: Column(
@@ -64,24 +70,24 @@ class _HomeScreenState extends State<HomeScreen> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildNextAppointment(),
-                            const SizedBox(height: 32),
-                            _buildReminders(),
+                            _buildNextAppointment(appState),
+                            const SizedBox(height: 48),
+                            _buildReminders(appState),
                           ],
                         );
                       }
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: _buildNextAppointment()),
+                          Expanded(child: _buildNextAppointment(appState)),
                           const SizedBox(width: 24),
-                          Expanded(child: _buildReminders()),
+                          Expanded(child: _buildReminders(appState)),
                         ],
                       );
                     },
                   ),
                   const SizedBox(height: 32),
-                  _buildDailyTasks(),
+                  _buildDailyTasks(appState),
                   const SizedBox(height: 32),
                   _buildQuickLinks(context),
                   const SizedBox(height: 32),
@@ -137,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 48,
                       height: 48,
                       child: Material(
-                        color: AppColors.blueBg,
+                        color: AppColors.emergency,
                         borderRadius: BorderRadius.circular(16),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
@@ -145,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: const Icon(
                             Icons.emergency,
                             size: 28,
-                            color: AppColors.emergency,
+                            color: AppColors.white,
                             semanticLabel: 'Emergency help',
                           ),
                         ),
@@ -190,195 +196,153 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNextAppointment() {
+  Widget _buildNextAppointment(AppState appState) {
+    final nextAppt = appState.nextAppointment;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionHeading('Next Appointment', AppColors.primaryAction),
         const SizedBox(height: 16),
-        CareCard(
-          borderColor: AppColors.primaryActionDark,
-          backgroundColor: AppColors.primaryAction,
-          borderRadius: 40,
-          onTap: () => context.push('/details'),
-          semanticsLabel: 'Next appointment: Eye Exam at 2:00 PM. View details.',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryActionDark.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text(
-                        'TODAY @ 2:00 PM',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.5,
-                          color: AppColors.white,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+        if (nextAppt == null)
+          CareCard(
+            backgroundColor: AppColors.successBg,
+            borderColor: AppColors.success,
+            borderRadius: 40,
+            child: Row(
+              children: [
+                IconBadge(icon: Icons.check_circle, color: AppColors.success, padding: 10),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Text(
+                    'All Done!',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.success,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.medical_services, size: 32, color: AppColors.white),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Eye Exam',
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.white,
                 ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'City Health Center',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xBBFFFFFF),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.only(top: 12),
-                decoration: const BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Color(0x44FFFFFF), width: 2),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'View Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.white,
-                      ),
-                    ),
-                    Icon(Icons.chevron_right, size: 28, color: AppColors.white),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+          )
+        else
+          _buildNextAppointmentHero(context, nextAppt),
       ],
     );
   }
 
-  Widget _buildReminders() {
+  Widget _buildReminders(AppState appState) {
+    final reminders = appState.pendingReminders;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionHeading('Upcoming Reminders', AppColors.warning),
         const SizedBox(height: 16),
-        _reminderItem(
-          icon: Icons.medication,
-          iconBg: AppColors.warningLight,
-          iconColor: AppColors.warningDark,
-          title: 'Afternoon Medication',
-          subtitle: 'DUE AT 12:30 PM',
-        ),
-        const SizedBox(height: 12),
-        _reminderItem(
-          icon: Icons.water_drop,
-          iconBg: AppColors.blueLight,
-          iconColor: AppColors.primaryAction,
-          title: 'Hydration Check',
-          subtitle: 'EVERY 2 HOURS',
-        ),
+        if (reminders.isEmpty)
+          CareCard(
+            child: Text(
+              'No pending reminders',
+              style: TextStyle(fontSize: 18, color: AppColors.mutedText),
+            ),
+          )
+        else
+          ...reminders.asMap().entries.expand((entry) sync* {
+            if (entry.key > 0) yield const SizedBox(height: 12);
+            yield _reminderItem(entry.value);
+          }),
       ],
     );
   }
 
-  Widget _reminderItem({
-    required IconData icon,
-    required Color iconBg,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-  }) {
-    return CareCard(
-      onTap: () => context.push('/notification'),
-      semanticsLabel: '$title. $subtitle. Open reminder.',
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: iconBg,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: iconBg, width: 2),
-            ),
-            child: Icon(icon, size: 28, color: iconColor),
+  Widget _reminderItem(Reminder reminder) {
+    final isHydration = reminder.type == 'hydration';
+    final label =
+        '${reminder.title}. ${reminder.dueTime.toUpperCase()}. Open reminder.';
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => context.push('/notification?reminderId=${reminder.id}'),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 72),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(36),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.heading,
-                  ),
+          child: Row(
+            children: [
+              IconBadge(
+                icon: isHydration ? Icons.water_drop : Icons.medication,
+                color: isHydration ? AppColors.primaryAction : AppColors.warningDark,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      reminder.title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.heading,
+                      ),
+                    ),
+                    Text(
+                      reminder.dueTime.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.5,
+                        color: AppColors.mutedText,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.5,
-                    color: AppColors.mutedText,
-                  ),
-                ),
-              ],
-            ),
+              ),
+              const Icon(Icons.chevron_right, size: 24, color: AppColors.disabledText),
+            ],
           ),
-          const Icon(Icons.chevron_right, size: 24, color: AppColors.disabledText),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildDailyTasks() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _sectionHeading('Daily Health Tasks', AppColors.success),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.successBg,
-            borderRadius: BorderRadius.circular(36),
-            border: Border.all(color: AppColors.successLight, width: 4),
+  Widget _buildDailyTasks(AppState appState) {
+    final nextId = appState.nextAppointment?.id;
+    final tasks = appState.todaysPlan
+        .where((task) => task.id != nextId)
+        .take(3)
+        .toList();
+
+    return ExcludeSemantics(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHeading('Daily Health Tasks', AppColors.success),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(36),
+              border: Border.all(color: AppColors.success, width: 4),
+            ),
+            child: Column(
+              children: [
+                for (var i = 0; i < tasks.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 12),
+                  _taskItem(tasks[i].title, tasks[i].status == 'done'),
+                ],
+              ],
+            ),
           ),
-          child: Column(
-            children: [
-              _taskItem('Morning Vitamins', true),
-              const SizedBox(height: 12),
-              _taskItem('Blood Pressure Reading', false),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -396,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         children: [
           if (completed)
-            const Icon(Icons.check_circle, size: 28, color: AppColors.success)
+            IconBadge(icon: Icons.check_circle, color: AppColors.success, padding: 6, iconSize: 24)
           else
             Container(
               width: 28,
@@ -428,38 +392,49 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _sectionHeading('Quick Links', AppColors.caregiver),
         const SizedBox(height: 16),
-        _quickLinkTile(context, Icons.history, 'Activity Log', '/activity-log'),
+        _quickLinkTile(context, Icons.history, 'Activity Log', '/activity-log', AppColors.primaryAction),
         const SizedBox(height: 8),
-        _quickLinkTile(context, Icons.calendar_month, 'My Schedule', '/schedule'),
+        _quickLinkTile(context, Icons.calendar_month, 'My Schedule', '/schedule', AppColors.caregiver),
         const SizedBox(height: 8),
-        _quickLinkTile(context, Icons.tune, 'Reminder Preferences', '/reminder-preferences'),
+        _quickLinkTile(context, Icons.tune, 'Reminder Preferences', '/reminder-preferences', AppColors.primaryAction),
         const SizedBox(height: 8),
-        _quickLinkTile(context, Icons.notifications_off, 'Notification Settings', '/notification-warning'),
+        _quickLinkTile(context, Icons.notifications_off, 'Notification Settings', '/notification-warning', AppColors.warningDark),
       ],
     );
   }
 
-  Widget _quickLinkTile(BuildContext context, IconData icon, String label, String route) {
-    return CareCard(
-      onTap: () => context.push(route),
-      semanticsLabel: label,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        children: [
-          Icon(icon, size: 24, color: AppColors.primaryAction),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: AppColors.heading,
+  Widget _quickLinkTile(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String route,
+    Color iconColor,
+  ) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: () => context.push(route),
+        child: CareCard(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              IconBadge(icon: icon, color: iconColor, padding: 8, iconSize: 22, borderRadius: 12),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.heading,
+                  ),
+                ),
               ),
-            ),
+              const Icon(Icons.chevron_right, size: 24, color: AppColors.disabledText),
+            ],
           ),
-          const Icon(Icons.chevron_right, size: 24, color: AppColors.disabledText),
-        ],
+        ),
       ),
     );
   }
@@ -502,29 +477,86 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _sectionHeading(String text, Color barColor) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 24,
+  Widget _buildNextAppointmentHero(BuildContext context, dynamic nextAppt) {
+    final location = nextAppt.location.isEmpty ? 'Home' : nextAppt.location;
+    return Semantics(
+      button: true,
+      label:
+          'Next appointment, ${nextAppt.title}, ${nextAppt.time}, $location. View details.',
+      child: GestureDetector(
+        onTap: () => context.push('/details?id=${nextAppt.id}'),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: barColor,
-            borderRadius: BorderRadius.circular(4),
+            color: AppColors.primaryAction,
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: AppColors.primaryAction, width: 4),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'TODAY @ ${nextAppt.time}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.white,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                nextAppt.title,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.white,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${nextAppt.time} \u2022 $location',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.white,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'View details',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.white,
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              color: AppColors.heading,
-            ),
-          ),
+      ),
+    );
+  }
+
+  Widget _sectionHeading(String text, Color barColor) {
+    return Semantics(
+      header: true,
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w900,
+          color: AppColors.heading,
         ),
-      ],
+      ),
     );
   }
 }

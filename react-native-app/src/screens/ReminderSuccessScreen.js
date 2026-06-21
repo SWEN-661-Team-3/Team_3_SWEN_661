@@ -43,7 +43,7 @@ function InfoRow({ label, value }) {
   return (
     <View style={styles.infoRow}>
       <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue} numberOfLines={1}>{value}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
     </View>
   );
 }
@@ -57,9 +57,9 @@ const styles = StyleSheet.create({
   },
   heading: { fontSize: 30, fontWeight: '900', color: Colors.heading, textAlign: 'center' },
   body: { fontSize: 18, color: Colors.mutedText, textAlign: 'center', marginTop: 8, marginBottom: 32 },
-  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  infoLabel: { fontSize: 16, fontWeight: '700', color: Colors.mutedText, flex: 1 },
-  infoValue: { fontSize: 16, fontWeight: '700', color: Colors.heading, flex: 1, textAlign: 'right' },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 },
+  infoLabel: { fontSize: 16, fontWeight: '700', color: Colors.mutedText, flexShrink: 0 },
+  infoValue: { fontSize: 16, fontWeight: '700', color: Colors.heading, flex: 1, textAlign: 'right', flexWrap: 'wrap' },
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: 12 },
   primaryButton: {
     backgroundColor: Colors.primaryAction, borderRadius: 20,

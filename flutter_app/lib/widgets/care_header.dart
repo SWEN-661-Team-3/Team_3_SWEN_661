@@ -6,6 +6,7 @@ class CareHeader extends StatelessWidget implements PreferredSizeWidget {
   final String? subtitle;
   final VoidCallback? onBack;
   final VoidCallback? onAccessibility;
+  final VoidCallback? onEmergency;
 
   const CareHeader({
     super.key,
@@ -13,6 +14,7 @@ class CareHeader extends StatelessWidget implements PreferredSizeWidget {
     this.subtitle,
     this.onBack,
     this.onAccessibility,
+    this.onEmergency,
   });
 
   @override
@@ -85,7 +87,30 @@ class CareHeader extends StatelessWidget implements PreferredSizeWidget {
                   ],
                 ),
               ),
-              if (onAccessibility != null)
+              if (onEmergency != null)
+                SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: Material(
+                    color: AppColors.emergencyBg,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Semantics(
+                      label: 'Emergency help',
+                      button: true,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: onEmergency,
+                        child: const Icon(
+                          Icons.emergency,
+                          size: 28,
+                          color: AppColors.emergency,
+                          semanticLabel: 'Emergency help',
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              else if (onAccessibility != null)
                 SizedBox(
                   width: 48,
                   height: 48,

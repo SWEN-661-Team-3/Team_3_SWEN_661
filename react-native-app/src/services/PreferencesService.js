@@ -5,6 +5,7 @@ import { prefsFromJson } from '../models/ReminderPreferences';
 const SETTINGS_KEY = 'accessibility_settings';
 const REMINDER_PREFS_KEY = 'reminder_preferences';
 const ONBOARDED_KEY = 'is_onboarded';
+const NOTIFICATIONS_KEY = 'notifications_enabled';
 
 export async function saveAccessibilitySettings(settings) {
   await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
@@ -41,6 +42,19 @@ export async function saveOnboarded(value) {
 export async function loadOnboarded() {
   try {
     const raw = await AsyncStorage.getItem(ONBOARDED_KEY);
+    return raw === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export async function saveNotificationsEnabled(value) {
+  await AsyncStorage.setItem(NOTIFICATIONS_KEY, value ? 'true' : 'false');
+}
+
+export async function loadNotificationsEnabled() {
+  try {
+    const raw = await AsyncStorage.getItem(NOTIFICATIONS_KEY);
     return raw === 'true';
   } catch {
     return false;

@@ -23,9 +23,9 @@ void main() {
       expect(find.text('Next Appointment'), findsOneWidget);
     });
 
-    testWidgets('displays Eye Exam appointment', (tester) async {
+    testWidgets('displays next appointment from app state', (tester) async {
       await tester.pumpWidget(buildTestWidget());
-      expect(find.text('Eye Exam'), findsOneWidget);
+      expect(find.text('Eye Doctor Checkup'), findsWidgets);
     });
 
     testWidgets('displays Upcoming Reminders section', (tester) async {

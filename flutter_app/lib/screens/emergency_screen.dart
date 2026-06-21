@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_header.dart';
 import '../widgets/care_card.dart';
@@ -79,7 +81,8 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             onTap: _startCountdown,
             child: Semantics(
               button: true,
-              label: 'I need help. Tap to alert your care circle.',
+              label: 'I need help, alert care circle',
+              excludeSemantics: true,
               child: Container(
                 width: 200,
                 height: 200,
@@ -109,12 +112,15 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Tap to alert your care circle.',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.mutedText,
+          Semantics(
+            label: 'Alerts your care circle when you need help',
+            child: const Text(
+              'Alerts your care circle when you need help.',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.heading,
+              ),
             ),
           ),
           const SizedBox(height: 48),
@@ -265,6 +271,7 @@ class EmergencyConfirmedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
     final time = TimeOfDay.now();
     final formatted = '${time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod}:'
         '${time.minute.toString().padLeft(2, '0')} '
@@ -292,26 +299,46 @@ class EmergencyConfirmedScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              const Text(
-                'Help Is On The Way',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.heading,
+              Semantics(
+                header: true,
+                child: const Text(
+                  'Help Is On The Way',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.heading,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Sarah (Daughter) has been notified.',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.mutedText,
+              ExcludeSemantics(
+                child: const Text(
+                  'Your emergency contacts have been notified.',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.heading,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
+              ...appState.caregivers.map(
+                (c) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    '${c.name} (${c.relationship}) — Notified',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.heading,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
               CareCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import IconBadge from '../components/IconBadge';
 import CareCard from '../components/CareCard';
 import CareBottomNavBar from '../components/CareBottomNavBar';
 import Colors from '../theme/colors';
@@ -9,7 +10,7 @@ import { useAppState, getCompletedCount } from '../context/AppContext';
 
 export default function TodaysPlanScreen({ navigation }) {
   const { state } = useAppState();
-  const nextTask = state.todaysPlan.find((a) => a.status !== 'done');
+  const nextTask = state.todaysPlan.find((a) => a.status === 'todo');
   const firstName = state.caregivers.length > 0 ? state.caregivers[0].name : 'Friend';
   const completed = getCompletedCount(state.todaysPlan);
   const total = state.todaysPlan.length;
@@ -54,14 +55,14 @@ export default function TodaysPlanScreen({ navigation }) {
         <View style={styles.helperRow}>
           <View style={{ flex: 1, minWidth: 120 }}>
             <CareCard borderRadius={24} padding={20}>
-              <Ionicons name="list" size={32} color={Colors.primaryAction} />
+              <IconBadge icon="list" color={Colors.primaryAction} size={32} padding={8} borderRadius={12} />
               <Text style={styles.helperTitle}>{completed}/{total}</Text>
               <Text style={styles.helperLabel}>Tasks Done</Text>
             </CareCard>
           </View>
           <View style={{ flex: 1, minWidth: 120 }}>
             <CareCard borderRadius={24} padding={20}>
-              <Ionicons name="time" size={32} color={Colors.warning} />
+              <IconBadge icon="time" color={Colors.warning} size={32} padding={8} borderRadius={12} />
               <Text style={styles.helperTitle}>{pending}</Text>
               <Text style={styles.helperLabel}>Pending</Text>
             </CareCard>

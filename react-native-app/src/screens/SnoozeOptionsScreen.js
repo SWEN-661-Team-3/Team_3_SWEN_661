@@ -8,14 +8,17 @@ import { useAppState } from '../context/AppContext';
 
 const DURATIONS = ['5 minutes', '15 minutes', '30 minutes', '1 hour', '2 hours'];
 
-export default function SnoozeOptionsScreen({ navigation }) {
+export default function SnoozeOptionsScreen({ navigation, route }) {
   const { state, snoozeReminder } = useAppState();
   const [selected, setSelected] = useState('15 minutes');
-  const reminder = state.reminders.length > 0 ? state.reminders[0] : null;
+  const reminderId = route?.params?.reminderId;
+  const reminder = reminderId
+    ? state.reminders.find((r) => r.id === reminderId)
+    : state.reminders.find((r) => r.status === 'pending');
 
   const handleSnooze = () => {
     if (reminder) snoozeReminder(reminder.id);
-    navigation.navigate('Success', { type: 'snooze', title: 'Medication' });
+    navigation.navigate('Success', { type: 'snooze', title: reminder?.title || 'Medication' });
   };
 
   return (

@@ -72,7 +72,7 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
               builder: (context, constraints) {
                 final isWide = constraints.maxWidth > 600;
                 return SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -105,30 +105,20 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
                             )
                           : Column(
                               children: [
-                                _buildForm(),
-                                const SizedBox(height: 24),
                                 _buildPermissions(),
+                                const SizedBox(height: 16),
+                                _buildForm(),
                               ],
                             ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'You can change permissions at any time in Settings.',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontStyle: FontStyle.italic,
-                          color: AppColors.mutedText,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
                     ],
                   ),
                 );
               },
             ),
           ),
-          _buildFooter(),
         ],
       ),
+      bottomNavigationBar: _buildFooter(),
     );
   }
 
@@ -167,44 +157,32 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: AppColors.heading,
-          ),
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      style: const TextStyle(fontSize: 20, color: AppColors.heading),
+      decoration: InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        hintText: hint,
+        hintStyle: const TextStyle(color: AppColors.disabledText),
+        filled: true,
+        fillColor: AppColors.white,
+        prefixIcon: Icon(icon, color: AppColors.primaryAction, size: 24),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(24),
+          borderSide: const BorderSide(color: AppColors.border, width: 3),
         ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.border, width: 3),
-          ),
-          child: TextField(
-            controller: controller,
-            keyboardType: keyboardType,
-            style: const TextStyle(fontSize: 20, color: AppColors.heading),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(color: AppColors.disabledText),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(left: 16, right: 12),
-                child: Icon(icon, color: AppColors.primaryAction, size: 24),
-              ),
-              prefixIconConstraints: const BoxConstraints(minWidth: 0),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20, vertical: 18,
-              ),
-            ),
-          ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(24),
+          borderSide: const BorderSide(color: AppColors.border, width: 3),
         ),
-      ],
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(24),
+          borderSide: const BorderSide(color: AppColors.primaryAction, width: 3),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      ),
     );
   }
 
@@ -265,7 +243,11 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
 
   Widget _permissionTile(String key, String title, String desc, IconData icon) {
     final isOn = _permissions.contains(key);
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: '$title. $desc. ${isOn ? 'Enabled' : 'Disabled'}',
+      toggled: isOn,
+      excludeSemantics: true,
       onTap: () {
         setState(() {
           if (isOn) {
@@ -275,100 +257,114 @@ class _CaregiverSetupScreenState extends State<CaregiverSetupScreen> {
           }
         });
       },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isOn ? AppColors.blueBg : AppColors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isOn ? AppColors.primaryAction : AppColors.border,
-            width: 3,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: isOn ? AppColors.primaryAction : AppColors.mutedText, size: 24),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: isOn ? AppColors.primaryAction : AppColors.heading,
-                    ),
-                  ),
-                  Text(
-                    desc,
-                    style: const TextStyle(fontSize: 16, color: AppColors.mutedText),
-                  ),
-                ],
-              ),
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            if (isOn) {
+              _permissions.remove(key);
+            } else {
+              _permissions.add(key);
+            }
+          });
+        },
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 72),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isOn ? AppColors.blueBg : AppColors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isOn ? AppColors.primaryAction : AppColors.border,
+              width: 3,
             ),
-            if (isOn)
-              const Icon(Icons.check_circle, color: AppColors.primaryAction, size: 24),
-          ],
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: isOn ? AppColors.primaryAction : AppColors.mutedText, size: 24),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: isOn ? AppColors.primaryAction : AppColors.heading,
+                      ),
+                    ),
+                    Text(
+                      desc,
+                      style: const TextStyle(fontSize: 16, color: AppColors.mutedText),
+                    ),
+                  ],
+                ),
+              ),
+              if (isOn)
+                const ExcludeSemantics(
+                  child: Icon(Icons.check_circle, color: AppColors.primaryAction, size: 24),
+                ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildFooter() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.border, width: 4)),
-      ),
+    return Material(
+      color: AppColors.white,
       child: SafeArea(
         top: false,
-        child: Row(
-          children: [
-            Expanded(
-              child: SizedBox(
-                height: 60,
-                child: OutlinedButton(
-                  onPressed: () => context.go('/confirmation'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.heading,
-                    side: const BorderSide(color: AppColors.border, width: 3),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 60,
+                  child: OutlinedButton(
+                    onPressed: () => context.go('/confirmation'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.heading,
+                      side: const BorderSide(color: AppColors.border, width: 3),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Skip for Now',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.0),
+                    child: const Text(
+                      'Skip for Now',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.0),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: SizedBox(
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: _nameValid ? _addAndContinue : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryAction,
-                    foregroundColor: AppColors.white,
-                    disabledBackgroundColor: AppColors.border,
-                    disabledForegroundColor: AppColors.disabledText,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+              const SizedBox(width: 16),
+              Expanded(
+                child: SizedBox(
+                  height: 60,
+                  child: ElevatedButton(
+                    onPressed: _nameValid ? _addAndContinue : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryAction,
+                      foregroundColor: AppColors.white,
+                      disabledBackgroundColor: AppColors.subtleBg,
+                      disabledForegroundColor: AppColors.heading,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Add Caregiver',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.0),
+                    child: const Text(
+                      'Add Caregiver',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.0),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -30,35 +30,37 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.border, width: 4)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: AppColors.primaryAction,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(Icons.favorite, color: AppColors.white, size: 28),
-          ),
-          const SizedBox(width: 16),
-          const Flexible(
-            child: Text(
-              'CareConnect',
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-                color: AppColors.heading,
+    return ExcludeSemantics(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: AppColors.border, width: 4)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.primaryAction,
+                borderRadius: BorderRadius.circular(20),
               ),
-              overflow: TextOverflow.ellipsis,
+              child: const Icon(Icons.favorite, color: AppColors.white, size: 28),
             ),
-          ),
-        ],
+            const SizedBox(width: 16),
+            const Flexible(
+              child: Text(
+                'CareConnect',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.heading,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -140,7 +142,8 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   Widget _buildHeroImage() {
-    return Container(
+    return ExcludeSemantics(
+      child: Container(
       constraints: const BoxConstraints(maxHeight: 290),
       decoration: BoxDecoration(
         color: AppColors.blueLight,
@@ -179,6 +182,7 @@ class WelcomeScreen extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 

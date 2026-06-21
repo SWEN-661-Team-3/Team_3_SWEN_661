@@ -5,6 +5,7 @@ import '../providers/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_header.dart';
 import '../widgets/care_card.dart';
+import '../widgets/icon_badge.dart';
 
 class PreviewScreen extends StatefulWidget {
   const PreviewScreen({super.key});
@@ -177,8 +178,10 @@ class _PreviewScreenState extends State<PreviewScreen> {
   }
 
   Widget _buildSampleView(Color accent, Color textColor, Color mutedColor, Color bg) {
-    final cardBg = _highContrast ? const Color(0xFF2A2A2A) : AppColors.white;
-    final cardBorder = _highContrast ? Colors.white24 : AppColors.border;
+    final cardBg = AppColors.white;
+    final cardBorder = _highContrast ? Colors.white : AppColors.border;
+    final cardText = _highContrast ? Colors.black : textColor;
+    final cardMuted = _highContrast ? Colors.black87 : mutedColor;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,14 +210,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
           borderColor: cardBorder,
           child: Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(Icons.calendar_today, color: accent, size: 24),
-              ),
+              IconBadge(icon: Icons.calendar_today, color: accent, padding: 10, iconSize: 24, borderRadius: 14),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -225,14 +221,14 @@ class _PreviewScreenState extends State<PreviewScreen> {
                       style: TextStyle(
                         fontSize: 18 * _scaleFactor,
                         fontWeight: FontWeight.w700,
-                        color: textColor,
+                        color: cardText,
                       ),
                     ),
                     Text(
                       '10:30 AM \u2022 2 miles away',
                       style: TextStyle(
                         fontSize: 16 * _scaleFactor,
-                        color: mutedColor,
+                        color: cardMuted,
                       ),
                     ),
                   ],
@@ -242,7 +238,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.15),
+                    color: accent,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -250,9 +246,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
                     style: TextStyle(
                       fontSize: 16 * _scaleFactor,
                       fontWeight: FontWeight.w700,
-                      color: accent,
+                      color: _highContrast ? Colors.black : AppColors.white,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
@@ -265,14 +260,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
           borderColor: cardBorder,
           child: Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.warningBg,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Icon(Icons.notifications, color: AppColors.warningDark, size: 24),
-              ),
+              IconBadge(icon: Icons.notifications, color: AppColors.warningDark, padding: 10, iconSize: 24, borderRadius: 14),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -283,14 +271,14 @@ class _PreviewScreenState extends State<PreviewScreen> {
                       style: TextStyle(
                         fontSize: 18 * _scaleFactor,
                         fontWeight: FontWeight.w700,
-                        color: textColor,
+                        color: cardText,
                       ),
                     ),
                     Text(
                       'Take 1 Vitamin at Noon',
                       style: TextStyle(
                         fontSize: 16 * _scaleFactor,
-                        color: mutedColor,
+                        color: cardMuted,
                       ),
                     ),
                   ],

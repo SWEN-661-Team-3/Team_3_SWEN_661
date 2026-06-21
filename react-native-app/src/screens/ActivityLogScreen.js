@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CareHeader from '../components/CareHeader';
+import IconBadge from '../components/IconBadge';
 import CareCard from '../components/CareCard';
 import StatusBadge from '../components/StatusBadge';
 import Colors from '../theme/colors';
@@ -72,10 +73,8 @@ function DateGroup({ label, entries }) {
         <View key={i} style={styles.entryWrapper}>
           <CareCard padding={16} borderRadius={20}>
             <View style={styles.entryRow}>
-              <View style={[styles.entryIcon, { backgroundColor: `${TYPE_COLORS[entry.type]}15` }]}>
-                <Ionicons name={TYPE_ICONS[entry.type]} size={20} color={TYPE_COLORS[entry.type]} />
-              </View>
-              <View style={{ flex: 1 }}>
+              <IconBadge icon={TYPE_ICONS[entry.type]} color={TYPE_COLORS[entry.type]} size={20} padding={10} borderRadius={12} />
+              <View style={{ flex: 1, marginLeft: 12 }}>
                 <Text style={styles.entryTitle}>{entry.title}</Text>
                 <Text style={styles.entryTime}>{entry.time}</Text>
               </View>
@@ -105,10 +104,6 @@ const styles = StyleSheet.create({
   groupTitle: { fontSize: 20, fontWeight: '900', color: Colors.heading, flex: 1 },
   entryWrapper: { marginBottom: 8 },
   entryRow: { flexDirection: 'row', alignItems: 'center' },
-  entryIcon: {
-    width: 40, height: 40, borderRadius: 12,
-    justifyContent: 'center', alignItems: 'center', marginRight: 12,
-  },
   entryTitle: { fontSize: 16, fontWeight: '700', color: Colors.heading },
   entryTime: { fontSize: 16, color: Colors.mutedText, marginTop: 2 },
 });

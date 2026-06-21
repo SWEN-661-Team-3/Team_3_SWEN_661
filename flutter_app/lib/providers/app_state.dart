@@ -22,6 +22,9 @@ class AppState extends ChangeNotifier {
   bool _isOffline = false;
   bool get isOffline => _isOffline;
 
+  bool _notificationsEnabled = false;
+  bool get notificationsEnabled => _notificationsEnabled;
+
   AccessibilitySettings _settings = const AccessibilitySettings();
   AccessibilitySettings get settings => _settings;
 
@@ -47,8 +50,8 @@ class AppState extends ChangeNotifier {
       notes: 'Remember to bring your current glasses and the list of eye drops you use. Dr. Smith will check your intraocular pressure.',
     ),
     Appointment(
-      id: '3', title: 'Lunch & Afternoon Meds', date: 'Today',
-      time: '12:30 PM', type: 'medication', status: 'todo',
+      id: '3', title: 'Lunch and Afternoon Meds', date: 'Today',
+      time: '12:30 PM', type: 'health-task', status: 'todo',
       actionLabel: 'Log Medication',
     ),
     Appointment(
@@ -92,12 +95,24 @@ class AppState extends ChangeNotifier {
       _todaysPlan.where((a) => a.status == 'done').length;
   int get totalTaskCount => _todaysPlan.length;
 
+  List<Reminder> get pendingReminders =>
+      _reminders.where((r) => r.status == 'pending').toList();
+
+  Appointment? get nextAppointment {
+    final open = _todaysPlan.where((a) => a.status == 'todo');
+    final appointments = open.where((a) => a.type == 'appointment');
+    if (appointments.isNotEmpty) return appointments.first;
+    if (open.isNotEmpty) return open.first;
+    return null;
+  }
+
   // -- Initialization --
 
   Future<void> init() async {
     _settings = await _prefs.loadAccessibilitySettings();
     _reminderPrefs = await _prefs.loadReminderPreferences();
     _isOnboarded = await _prefs.loadOnboarded();
+    _notificationsEnabled = await _prefs.loadNotificationsEnabled();
     _initialized = true;
     notifyListeners();
   }
@@ -131,6 +146,19 @@ class AppState extends ChangeNotifier {
     _todaysPlan = _todaysPlan
         .map((a) => a.id == id ? a.copyWith(status: 'done') : a)
         .toList();
+    notifyListeners();
+  }
+
+  void snoozeTask(String id) {
+    _todaysPlan = _todaysPlan
+        .map((a) => a.id == id ? a.copyWith(status: 'snoozed') : a)
+        .toList();
+    notifyListeners();
+  }
+
+  Future<void> setNotificationsEnabled(bool value) async {
+    _notificationsEnabled = value;
+    await _prefs.saveNotificationsEnabled(value);
     notifyListeners();
   }
 
