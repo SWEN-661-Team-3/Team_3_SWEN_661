@@ -97,13 +97,6 @@ class ScheduleScreen extends StatelessWidget {
                         ),
                       );
 
-                      if (isClosed) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: card,
-                        );
-                      }
-
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Semantics(

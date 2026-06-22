@@ -23,9 +23,13 @@ export default function ScheduleScreen({ navigation }) {
           const isDone = item.status === 'done';
           const isSnoozed = item.status === 'snoozed';
           const isClosed = isDone || isSnoozed;
+          const statusLabel = isDone ? 'Done' : isSnoozed ? 'Snoozed' : 'To Do';
           return (
             <View key={item.id} style={styles.itemWrapper}>
-              <CareCard onTap={isClosed ? undefined : () => navigation.navigate('Details', { id: item.id })}>
+              <CareCard
+                onTap={() => navigation.navigate('Details', { id: item.id })}
+                accessibilityLabel={`${item.title}. ${item.time}. ${statusLabel}. View details.`}
+              >
                 <View style={styles.row}>
                   <IconBadge
                     icon={isDone ? 'checkmark-circle' : 'time'}
