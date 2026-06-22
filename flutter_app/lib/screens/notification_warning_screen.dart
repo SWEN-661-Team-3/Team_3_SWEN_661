@@ -17,7 +17,7 @@ class NotificationWarningScreen extends StatelessWidget {
         children: [
           CareHeader(
             title: 'Notifications',
-            onBack: () => context.pop(),
+            onBack: () => _leaveScreen(context),
             onEmergency: () => context.push('/emergency'),
           ),
           Expanded(
@@ -153,6 +153,14 @@ class NotificationWarningScreen extends StatelessWidget {
     );
   }
 
+  static void _leaveScreen(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/home');
+    }
+  }
+
   Widget _buildFooter(BuildContext context) {
     final appState = context.read<AppState>();
 
@@ -171,15 +179,14 @@ class NotificationWarningScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () async {
                   await appState.setNotificationsEnabled(true);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Notifications enabled'),
-                        backgroundColor: AppColors.success,
-                      ),
-                    );
-                    context.pop();
-                  }
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Notifications enabled'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                  context.go('/home');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryAction,
@@ -203,10 +210,7 @@ class NotificationWarningScreen extends StatelessWidget {
               width: double.infinity,
               height: 56,
               child: OutlinedButton(
-                onPressed: () async {
-                  await appState.setNotificationsEnabled(false);
-                  if (context.mounted) context.pop();
-                },
+                onPressed: () => context.go('/home'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.heading,
                   side: const BorderSide(color: AppColors.border, width: 3),

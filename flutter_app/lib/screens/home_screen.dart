@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../models/reminder.dart';
+import '../models/appointment.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_card.dart';
 import '../widgets/bottom_nav_bar.dart';
@@ -320,35 +321,35 @@ class _HomeScreenState extends State<HomeScreen> {
         .take(3)
         .toList();
 
-    return ExcludeSemantics(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeading('Daily Health Tasks', AppColors.success),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(36),
-              border: Border.all(color: AppColors.success, width: 4),
-            ),
-            child: Column(
-              children: [
-                for (var i = 0; i < tasks.length; i++) ...[
-                  if (i > 0) const SizedBox(height: 12),
-                  _taskItem(tasks[i].title, tasks[i].status == 'done'),
-                ],
-              ],
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeading('Daily Health Tasks', AppColors.success),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(36),
+            border: Border.all(color: AppColors.success, width: 4),
           ),
-        ],
-      ),
+          child: Column(
+            children: [
+              for (var i = 0; i < tasks.length; i++) ...[
+                if (i > 0) const SizedBox(height: 12),
+                _taskItem(context, tasks[i]),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _taskItem(String label, bool completed) {
-    return Container(
+  Widget _taskItem(BuildContext context, Appointment task) {
+    final completed = task.status == 'done';
+    final statusLabel = completed ? 'Done' : 'To Do';
+    final card = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: completed ? AppColors.white : AppColors.subtleBg.withValues(alpha: 0.5),
@@ -374,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              label,
+              task.title,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -383,6 +384,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+
+    return Semantics(
+      button: true,
+      excludeSemantics: true,
+      label: '${task.title}. $statusLabel. View details.',
+      onTap: () => context.push('/details?id=${task.id}'),
+      child: GestureDetector(
+        onTap: () => context.push('/details?id=${task.id}'),
+        child: card,
       ),
     );
   }

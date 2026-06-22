@@ -157,6 +157,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> setNotificationsEnabled(bool value) async {
+    if (_notificationsEnabled == value) return;
     _notificationsEnabled = value;
     await _prefs.saveNotificationsEnabled(value);
     notifyListeners();
