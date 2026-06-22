@@ -136,11 +136,10 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.border, width: 3),
         ),
-        child: SizedBox(
-          height: 72,
-          child: SwitchListTile(
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: SwitchListTile(
+          isThreeLine: true,
+          materialTapTargetSize: MaterialTapTargetSize.padded,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           secondary: Icon(icon, color: AppColors.primaryAction, size: 24),
           title: Text(
             title,
@@ -157,7 +156,6 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
           value: value,
           onChanged: onChanged,
           activeTrackColor: AppColors.primaryAction,
-          ),
         ),
       ),
     );
