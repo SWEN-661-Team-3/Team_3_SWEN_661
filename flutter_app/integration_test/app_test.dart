@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/providers/app_state.dart';
+
+Future<AppState> createFreshAppState({bool onboarded = false}) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+  final appState = AppState();
+  await appState.init();
+  if (onboarded) {
+    await appState.markOnboarded();
+  }
+  return appState;
+}
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('CareConnect integration flows', () {
     testWidgets('onboarding: welcome to setup to preview', (tester) async {
-      final appState = AppState();
-      await appState.init();
+      final appState = await createFreshAppState();
 
       await tester.pumpWidget(CareConnectApp(appState: appState));
       await tester.pumpAndSettle();
@@ -27,17 +38,15 @@ void main() {
     });
 
     testWidgets('home to details workflow', (tester) async {
-      final appState = AppState();
-      await appState.init();
-      await appState.markOnboarded();
+      final appState = await createFreshAppState(onboarded: true);
 
       await tester.pumpWidget(CareConnectApp(appState: appState));
       await tester.pumpAndSettle();
 
       expect(find.text('CareConnect'), findsWidgets);
-      expect(find.text('View Details'), findsOneWidget);
+      expect(find.text('View details'), findsOneWidget);
 
-      await tester.tap(find.text('View Details'));
+      await tester.tap(find.text('View details'));
       await tester.pumpAndSettle();
 
       expect(find.text('Item Details'), findsOneWidget);
@@ -45,9 +54,7 @@ void main() {
     });
 
     testWidgets('emergency help screen is reachable', (tester) async {
-      final appState = AppState();
-      await appState.init();
-      await appState.markOnboarded();
+      final appState = await createFreshAppState(onboarded: true);
 
       await tester.pumpWidget(CareConnectApp(appState: appState));
       await tester.pumpAndSettle();
@@ -64,15 +71,13 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.bySemanticsLabel('Alerts your care circle when you need help'),
+        find.text('Alerts your care circle when you need help.'),
         findsOneWidget,
       );
     });
 
     testWidgets('reminder notification workflow', (tester) async {
-      final appState = AppState();
-      await appState.init();
-      await appState.markOnboarded();
+      final appState = await createFreshAppState(onboarded: true);
 
       await tester.pumpWidget(CareConnectApp(appState: appState));
       await tester.pumpAndSettle();

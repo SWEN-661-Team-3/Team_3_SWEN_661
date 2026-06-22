@@ -2,7 +2,14 @@ appId: com.example.flutter_app
 ---
 - launchApp:
     clearState: true
-- runFlow:
-    file: onboarding-flow.yaml
+- assertVisible: "Start Setup"
+- tapOn: "Start Setup"
+- assertVisible: "Personalize your view"
+- tapOn: "Preview Settings"
+- assertVisible: "How does this look?"
+- tapOn: "Looks Good"
+- tapOn: "Skip for Now"
+- assertVisible: "You're all set!"
 - tapOn: "Go to Today's Plan"
-- assertVisible: "Today's Plan"
+- assertVisible:
+    id: "emergency-help"

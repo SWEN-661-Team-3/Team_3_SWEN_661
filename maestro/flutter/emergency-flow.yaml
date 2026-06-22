@@ -1,7 +1,8 @@
 appId: com.example.flutter_app
 ---
-- launchApp
+- runFlow:
+    file: complete-onboarding.yaml
 - tapOn:
     id: "emergency-help"
 - assertVisible: "Emergency Help"
-- assertVisible: "I Need Help"
+- assertVisible: "I need help, alert care circle"

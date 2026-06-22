@@ -35,7 +35,7 @@ function buildDefaultActivityLog() {
 }
 
 export const initialState = {
-  initialized: true,
+  initialized: false,
   isOnboarded: false,
   isOffline: false,
   notificationsEnabled: false,
@@ -150,15 +150,27 @@ export function AppProvider({ children }) {
   const actions = {
     updateSettings: async (settings) => {
       dispatch({ type: ACTION_TYPES.UPDATE_SETTINGS, payload: settings });
-      await Prefs.saveAccessibilitySettings(settings);
+      try {
+        await Prefs.saveAccessibilitySettings(settings);
+      } catch (e) {
+        console.warn('Failed to save accessibility settings:', e);
+      }
     },
     updateReminderPrefs: async (prefs) => {
       dispatch({ type: ACTION_TYPES.UPDATE_REMINDER_PREFS, payload: prefs });
-      await Prefs.saveReminderPreferences(prefs);
+      try {
+        await Prefs.saveReminderPreferences(prefs);
+      } catch (e) {
+        console.warn('Failed to save reminder preferences:', e);
+      }
     },
     markOnboarded: async () => {
       dispatch({ type: ACTION_TYPES.MARK_ONBOARDED });
-      await Prefs.saveOnboarded(true);
+      try {
+        await Prefs.saveOnboarded(true);
+      } catch (e) {
+        console.warn('Failed to save onboarded state:', e);
+      }
     },
     addCaregiver: (caregiver) => {
       dispatch({ type: ACTION_TYPES.ADD_CAREGIVER, payload: caregiver });
@@ -179,7 +191,11 @@ export function AppProvider({ children }) {
       dispatch({ type: ACTION_TYPES.TOGGLE_OFFLINE });
     },
     setNotificationsEnabled: async (value) => {
-      await Prefs.saveNotificationsEnabled(value);
+      try {
+        await Prefs.saveNotificationsEnabled(value);
+      } catch (e) {
+        console.warn('Failed to save notifications setting:', e);
+      }
       dispatch({ type: ACTION_TYPES.SET_NOTIFICATIONS_ENABLED, payload: value });
     },
   };

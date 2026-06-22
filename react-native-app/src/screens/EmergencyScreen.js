@@ -9,11 +9,24 @@ export default function EmergencyScreen({ navigation }) {
   const [counting, setCounting] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const timerRef = useRef(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      clearTimeout(timerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (counting && countdown > 0) {
-      timerRef.current = setTimeout(() => setCountdown(countdown - 1), 1000);
-    } else if (counting && countdown === 0) {
+      timerRef.current = setTimeout(() => {
+        if (mountedRef.current) {
+          setCountdown(countdown - 1);
+        }
+      }, 1000);
+    } else if (counting && countdown === 0 && mountedRef.current) {
       navigation.navigate('EmergencyConfirmed');
     }
     return () => clearTimeout(timerRef.current);
@@ -25,6 +38,7 @@ export default function EmergencyScreen({ navigation }) {
   };
 
   const handleCancel = () => {
+    clearTimeout(timerRef.current);
     setCounting(false);
     setCountdown(10);
     navigation.goBack();

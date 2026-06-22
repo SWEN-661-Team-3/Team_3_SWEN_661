@@ -97,14 +97,19 @@ class CareHeader extends StatelessWidget implements PreferredSizeWidget {
                     child: Semantics(
                       label: 'Emergency help',
                       button: true,
+                      identifier: 'emergency-help',
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
                         onTap: onEmergency,
-                        child: const Icon(
-                          Icons.emergency,
-                          size: 28,
-                          color: AppColors.emergency,
-                          semanticLabel: 'Emergency help',
+                        child: SizedBox(
+                          key: const Key('emergency-help'),
+                          width: 48,
+                          height: 48,
+                          child: Icon(
+                            Icons.emergency,
+                            size: 28,
+                            color: AppColors.emergency,
+                          ),
                         ),
                       ),
                     ),

@@ -39,11 +39,8 @@ export default function AppNavigator() {
     );
   }
 
-  const stackKey = state.isOnboarded ? 'main' : 'onboarding';
-
   return (
     <Stack.Navigator
-      key={stackKey}
       screenOptions={{ headerShown: false }}
       initialRouteName={state.isOnboarded ? 'Home' : 'Welcome'}
     >

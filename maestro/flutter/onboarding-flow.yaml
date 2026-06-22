@@ -1,7 +1,8 @@
 appId: com.example.flutter_app
 ---
-- launchApp
-- assertVisible: "CareConnect"
+- launchApp:
+    clearState: true
+- assertVisible: "Start Setup"
 - tapOn: "Start Setup"
 - assertVisible: "Personalize your view"
 - tapOn: "Preview Settings"

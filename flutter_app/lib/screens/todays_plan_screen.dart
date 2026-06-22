@@ -152,7 +152,13 @@ class TodaysPlanScreen extends StatelessWidget {
                 child: Semantics(
                   label: 'Emergency help',
                   button: true,
-                  child: const Icon(Icons.emergency, color: AppColors.white, size: 24),
+                  identifier: 'emergency-help',
+                  child: SizedBox(
+                    key: const Key('emergency-help'),
+                    width: 48,
+                    height: 48,
+                    child: const Icon(Icons.emergency, color: AppColors.white, size: 24),
+                  ),
                 ),
               ),
             ),

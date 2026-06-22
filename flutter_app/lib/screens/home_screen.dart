@@ -139,7 +139,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Semantics(
                     label: 'Emergency help',
                     button: true,
+                    identifier: 'emergency-help',
                     child: SizedBox(
+                      key: const Key('emergency-help'),
                       width: 48,
                       height: 48,
                       child: Material(
@@ -152,7 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             Icons.emergency,
                             size: 28,
                             color: AppColors.white,
-                            semanticLabel: 'Emergency help',
                           ),
                         ),
                       ),
