@@ -484,6 +484,7 @@ class _HomeScreenState extends State<HomeScreen> {
       button: true,
       label:
           'Next appointment, ${nextAppt.title}, ${nextAppt.time}, $location. View details.',
+      excludeSemantics: true,
       child: GestureDetector(
         onTap: () => context.push('/details?id=${nextAppt.id}'),
         child: Container(

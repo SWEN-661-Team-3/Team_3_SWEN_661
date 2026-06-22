@@ -44,6 +44,10 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
   void _onAlertSent() {
     _timer?.cancel();
+    SemanticsService.announce(
+      'Alert sent. Help is on the way.',
+      TextDirection.ltr,
+    );
     context.go('/emergency-confirmed');
   }
 
@@ -150,80 +154,62 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   }
 
   Widget _buildCountdown() {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 200,
-            height: 200,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.emergency,
-              border: Border.all(color: AppColors.emergencyDark, width: 4),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x44DC2626),
-                  blurRadius: 40,
-                  spreadRadius: 4,
+    return Semantics(
+      label: 'Sending alert in $_countdown seconds. Alert will be sent automatically when the timer reaches zero.',
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ExcludeSemantics(
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.emergency,
+                  border: Border.all(color: AppColors.emergencyDark, width: 4),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x44DC2626),
+                      blurRadius: 40,
+                      spreadRadius: 4,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: Semantics(
-              liveRegion: true,
-              label: 'Sending alert in $_countdown seconds',
-              child: Text(
-                '$_countdown',
-                style: const TextStyle(
-                  fontSize: 72,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.white,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Sending alert in $_countdown seconds...',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.mutedText,
-            ),
-          ),
-          const SizedBox(height: 40),
-          SizedBox(
-            width: double.infinity,
-            height: 72,
-            child: OutlinedButton.icon(
-              onPressed: _cancelCountdown,
-              icon: const Icon(Icons.close, size: 28, semanticLabel: 'Cancel emergency alert'),
-              label: const Text(
-                'Cancel',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.emergency,
-                side: const BorderSide(color: AppColors.emergency, width: 4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(36),
+                alignment: Alignment.center,
+                child: Text(
+                  '$_countdown',
+                  style: const TextStyle(
+                    fontSize: 72,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.white,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Alert will be sent automatically when the timer reaches zero.',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: AppColors.mutedText,
+            const SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              height: 72,
+              child: OutlinedButton.icon(
+                onPressed: _cancelCountdown,
+                icon: const Icon(Icons.close, size: 28, semanticLabel: 'Cancel emergency alert'),
+                label: const Text(
+                  'Cancel',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.emergency,
+                  side: const BorderSide(color: AppColors.emergency, width: 4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(36),
+                  ),
+                ),
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -266,8 +252,24 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   }
 }
 
-class EmergencyConfirmedScreen extends StatelessWidget {
+class EmergencyConfirmedScreen extends StatefulWidget {
   const EmergencyConfirmedScreen({super.key});
+
+  @override
+  State<EmergencyConfirmedScreen> createState() => _EmergencyConfirmedScreenState();
+}
+
+class _EmergencyConfirmedScreenState extends State<EmergencyConfirmedScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SemanticsService.announce(
+        'Help is on the way. Your emergency contacts have been notified.',
+        TextDirection.ltr,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -312,16 +314,14 @@ class EmergencyConfirmedScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              ExcludeSemantics(
-                child: const Text(
-                  'Your emergency contacts have been notified.',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.heading,
-                  ),
-                  textAlign: TextAlign.center,
+              const Text(
+                'Your emergency contacts have been notified.',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.heading,
                 ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               ...appState.caregivers.map(
