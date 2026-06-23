@@ -16,6 +16,7 @@ export default function StatusBadge({ type }) {
   return (
     <View
       style={[styles.container, { backgroundColor: config.bg }]}
+      accessibilityRole="text"
       accessibilityLabel={`Status: ${config.label}`}
     >
       <Ionicons name={config.icon} size={16} color={config.fg} />

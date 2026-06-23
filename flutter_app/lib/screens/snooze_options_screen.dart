@@ -53,10 +53,11 @@ class _SnoozeOptionsScreenState extends State<SnoozeOptionsScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.mutedText,
+                      color: AppColors.heading,
                     ),
                   ),
                   const SizedBox(height: 24),
+                  const SizedBox(height: 4),
                   ..._options.map((opt) => _buildOption(opt)),
                 ],
               ),
@@ -72,9 +73,15 @@ class _SnoozeOptionsScreenState extends State<SnoozeOptionsScreen> {
     final isSelected = _selected == opt['value'];
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: GestureDetector(
+      child: Semantics(
+        label: '${opt['label']}. ${opt['desc']}',
+        selected: isSelected,
+        button: true,
+        excludeSemantics: true,
         onTap: () => setState(() => _selected = opt['value']!),
-        child: Container(
+        child: GestureDetector(
+          onTap: () => setState(() => _selected = opt['value']!),
+          child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.blueBg : AppColors.white,
@@ -86,16 +93,18 @@ class _SnoozeOptionsScreenState extends State<SnoozeOptionsScreen> {
           ),
           child: Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primaryAction : AppColors.subtleBg,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  Icons.snooze,
-                  size: 24,
-                  color: isSelected ? AppColors.white : AppColors.mutedText,
+              ExcludeSemantics(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.primaryAction : AppColors.subtleBg,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    Icons.snooze,
+                    size: 24,
+                    color: isSelected ? AppColors.white : AppColors.mutedText,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -119,9 +128,16 @@ class _SnoozeOptionsScreenState extends State<SnoozeOptionsScreen> {
                 ),
               ),
               if (isSelected)
-                const Icon(Icons.check_circle, color: AppColors.primaryAction, size: 28),
+                ExcludeSemantics(
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: AppColors.primaryAction,
+                    size: 28,
+                  ),
+                ),
             ],
           ),
+        ),
         ),
       ),
     );
@@ -155,7 +171,7 @@ class _SnoozeOptionsScreenState extends State<SnoozeOptionsScreen> {
               ),
               textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             ),
-            child: const Text('Snooze Reminder'),
+            child: const Text('Confirm Snooze'),
           ),
         ),
       ),

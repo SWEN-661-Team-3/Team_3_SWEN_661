@@ -35,15 +35,6 @@ class _StubScreen extends StatelessWidget {
                     const Icon(Icons.construction, size: 64, color: AppColors.mutedText),
                     const SizedBox(height: 16),
                     Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.w900,
-                        color: AppColors.heading,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
                       subtitle,
                       style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w700,

@@ -76,7 +76,7 @@ class _SetupScreenState extends State<SetupScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.mutedText,
+                          color: AppColors.heading,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -90,9 +90,9 @@ class _SetupScreenState extends State<SetupScreen> {
               },
             ),
           ),
-          _buildFooter(),
         ],
       ),
+      bottomNavigationBar: _buildFooter(),
     );
   }
 
@@ -185,13 +185,15 @@ class _SetupScreenState extends State<SetupScreen> {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.blueBg,
-                  borderRadius: BorderRadius.circular(14),
+              ExcludeSemantics(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.blueBg,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, size: 24, color: AppColors.primaryAction),
                 ),
-                child: Icon(icon, size: 24, color: AppColors.primaryAction),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -212,34 +214,44 @@ class _SetupScreenState extends State<SetupScreen> {
             runSpacing: 12,
             children: List.generate(options.length, (i) {
               final isSelected = selected == options[i];
-              return GestureDetector(
+              return Semantics(
+                button: true,
+                excludeSemantics: true,
+                label: '${labels[i]}. $title option.',
+                selected: isSelected,
                 onTap: () => onSelect(options[i]),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.blueBg : AppColors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected ? AppColors.primaryAction : AppColors.border,
-                      width: 4,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        labels[i],
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: isSelected ? AppColors.primaryAction : AppColors.heading,
-                        ),
+                child: GestureDetector(
+                  onTap: () => onSelect(options[i]),
+                  child: Container(
+                    constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.blueBg : AppColors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isSelected ? AppColors.primaryAction : AppColors.border,
+                        width: 4,
                       ),
-                      if (isSelected) ...[
-                        const SizedBox(width: 8),
-                        const Icon(Icons.check_circle, color: AppColors.primaryAction, size: 22),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          labels[i],
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: isSelected ? AppColors.primaryAction : AppColors.heading,
+                          ),
+                        ),
+                        if (isSelected) ...[
+                          const SizedBox(width: 8),
+                          const ExcludeSemantics(
+                            child: Icon(Icons.check_circle, color: AppColors.primaryAction, size: 22),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               );
@@ -251,28 +263,27 @@ class _SetupScreenState extends State<SetupScreen> {
   }
 
   Widget _buildFooter() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.border, width: 4)),
-      ),
+    return Material(
+      color: AppColors.white,
       child: SafeArea(
         top: false,
-        child: SizedBox(
-          width: double.infinity,
-          height: 64,
-          child: ElevatedButton(
-            onPressed: _saveAndContinue,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryAction,
-              foregroundColor: AppColors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: SizedBox(
+            width: double.infinity,
+            height: 64,
+            child: ElevatedButton(
+              onPressed: _saveAndContinue,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryAction,
+                foregroundColor: AppColors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
-              textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              child: const Text('Preview Settings'),
             ),
-            child: const Text('Preview Settings'),
           ),
         ),
       ),

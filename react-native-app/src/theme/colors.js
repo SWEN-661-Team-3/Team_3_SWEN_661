@@ -9,7 +9,8 @@ const Colors = {
   border: '#E2E8F0',
   mutedText: '#383D7A',
   heading: '#0F172A',
-  disabledText: '#686F79',
+  disabledText: '#52525B',
+  selectedChipText: '#1E40AF',
 
   success: '#047857',
   successBg: '#ECFDF5',

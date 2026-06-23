@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_header.dart';
 import '../widgets/care_card.dart';
@@ -15,7 +17,8 @@ class NotificationWarningScreen extends StatelessWidget {
         children: [
           CareHeader(
             title: 'Notifications',
-            onBack: () => context.pop(),
+            onBack: () => _leaveScreen(context),
+            onEmergency: () => context.push('/emergency'),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -70,12 +73,15 @@ class NotificationWarningScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
-                    'What you might miss:',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.heading,
+                  Semantics(
+                    header: true,
+                    child: const Text(
+                      'What you might miss:',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.heading,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -104,9 +110,9 @@ class NotificationWarningScreen extends StatelessWidget {
               ),
             ),
           ),
-          _buildFooter(context),
         ],
       ),
+      bottomNavigationBar: _buildFooter(context),
     );
   }
 
@@ -117,10 +123,10 @@ class NotificationWarningScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: AppColors.white, size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -147,29 +153,40 @@ class NotificationWarningScreen extends StatelessWidget {
     );
   }
 
+  static void _leaveScreen(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/home');
+    }
+  }
+
   Widget _buildFooter(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.border, width: 4)),
-      ),
+    final appState = context.read<AppState>();
+
+    return Material(
+      color: AppColors.white,
       child: SafeArea(
         top: false,
-        child: Column(
-          children: [
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  await appState.setNotificationsEnabled(true);
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Notifications enabled'),
                       backgroundColor: AppColors.success,
                     ),
                   );
-                  context.pop();
+                  context.go('/home');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryAction,
@@ -178,9 +195,13 @@ class NotificationWarningScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                child: const Text(
-                  'Enable Notifications',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                child: Semantics(
+                  label: 'Enable notifications',
+                  button: true,
+                  child: const Text(
+                    'Enable Notifications',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                  ),
                 ),
               ),
             ),
@@ -189,7 +210,7 @@ class NotificationWarningScreen extends StatelessWidget {
               width: double.infinity,
               height: 56,
               child: OutlinedButton(
-                onPressed: () => context.pop(),
+                onPressed: () => context.go('/home'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.heading,
                   side: const BorderSide(color: AppColors.border, width: 3),
@@ -206,6 +227,7 @@ class NotificationWarningScreen extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

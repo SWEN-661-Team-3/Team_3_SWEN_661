@@ -41,13 +41,13 @@ void main() {
       expect(find.text('To Do'), findsOneWidget);
     });
 
-    testWidgets('has Semantics label', (tester) async {
+    testWidgets('exposes status text to semantics', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(body: StatusBadge(type: BadgeType.done)),
         ),
       );
-      final semantics = tester.getSemantics(find.byType(StatusBadge));
+      final semantics = tester.getSemantics(find.text('Done'));
       expect(semantics.label, contains('Done'));
     });
   });

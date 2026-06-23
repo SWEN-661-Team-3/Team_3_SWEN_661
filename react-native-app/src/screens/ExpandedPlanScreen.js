@@ -44,10 +44,12 @@ export default function ExpandedPlanScreen({ navigation }) {
               <Text style={styles.groupTitle}>{group}</Text>
               {items.map((item) => {
                 const isDone = item.status === 'done';
+                const isClosed = isDone || item.status === 'snoozed';
                 return (
                   <TouchableOpacity
                     key={item.id}
                     style={styles.planItem}
+                    disabled={isClosed}
                     onPress={() => navigation.navigate('Details', { id: item.id })}
                   >
                     <View style={styles.iconCol}>

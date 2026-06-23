@@ -1,0 +1,6 @@
+appId: host.exp.exponent
+---
+- launchApp
+- tapOn: "Emergency help"
+- assertVisible: "Emergency Help"
+- assertVisible: "I Need Help"

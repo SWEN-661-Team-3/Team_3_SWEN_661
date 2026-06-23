@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../theme/colors';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function EmergencyConfirmedScreen({ navigation }) {
   return (
@@ -25,6 +26,7 @@ export default function EmergencyConfirmedScreen({ navigation }) {
         <TouchableOpacity
           style={styles.homeButton}
           onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Home' }] })}
+          {...buttonA11y('Return Home', 'Returns to the home dashboard')}
         >
           <Text style={styles.homeText}>Return Home</Text>
         </TouchableOpacity>

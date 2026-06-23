@@ -68,7 +68,7 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -98,14 +98,13 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
                     _timingOption('5-before', '5 Min Before', 'Get a heads-up a few minutes early'),
                     _timingOption('15-before', '15 Min Before', 'Plenty of time to prepare'),
                   ]),
-                  const SizedBox(height: 24),
                 ],
               ),
             ),
           ),
-          _buildFooter(),
         ],
       ),
+      bottomNavigationBar: _buildFooter(),
     );
   }
 
@@ -131,42 +130,32 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
   Widget _toggle(String title, String desc, IconData icon, bool value, ValueChanged<bool> onChanged) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.border, width: 3),
         ),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.primaryAction, size: 24),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.heading,
-                    ),
-                  ),
-                  Text(
-                    desc,
-                    style: const TextStyle(fontSize: 16, color: AppColors.mutedText),
-                  ),
-                ],
-              ),
+        child: SwitchListTile(
+          isThreeLine: true,
+          materialTapTargetSize: MaterialTapTargetSize.padded,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          secondary: Icon(icon, color: AppColors.primaryAction, size: 24),
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.heading,
             ),
-            Switch(
-              value: value,
-              onChanged: onChanged,
-              activeTrackColor: AppColors.primaryAction,
-            ),
-          ],
+          ),
+          subtitle: Text(
+            desc,
+            style: const TextStyle(fontSize: 16, color: AppColors.mutedText),
+          ),
+          value: value,
+          onChanged: onChanged,
+          activeTrackColor: AppColors.primaryAction,
         ),
       ),
     );
@@ -176,9 +165,15 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
     final isSelected = _timing == value;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: GestureDetector(
+      child: Semantics(
+        label: '$label. $desc',
+        selected: isSelected,
+        button: true,
+        excludeSemantics: true,
         onTap: () => setState(() => _timing = value),
-        child: Container(
+        child: GestureDetector(
+          onTap: () => setState(() => _timing = value),
+          child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.blueBg : AppColors.white,
@@ -190,10 +185,12 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.schedule,
-                color: isSelected ? AppColors.primaryAction : AppColors.mutedText,
-                size: 24,
+              ExcludeSemantics(
+                child: Icon(
+                  Icons.schedule,
+                  color: isSelected ? AppColors.primaryAction : AppColors.mutedText,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -216,37 +213,39 @@ class _ReminderPreferencesScreenState extends State<ReminderPreferencesScreen> {
                 ),
               ),
               if (isSelected)
-                const Icon(Icons.check_circle, color: AppColors.primaryAction, size: 24),
+                ExcludeSemantics(
+                  child: const Icon(Icons.check_circle, color: AppColors.primaryAction, size: 24),
+                ),
             ],
           ),
+        ),
         ),
       ),
     );
   }
 
   Widget _buildFooter() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.border, width: 4)),
-      ),
+    return Material(
+      color: AppColors.white,
       child: SafeArea(
         top: false,
-        child: SizedBox(
-          width: double.infinity,
-          height: 64,
-          child: ElevatedButton(
-            onPressed: _save,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryAction,
-              foregroundColor: AppColors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          child: SizedBox(
+            width: double.infinity,
+            height: 64,
+            child: ElevatedButton(
+              onPressed: _save,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryAction,
+                foregroundColor: AppColors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
-              textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              child: const Text('Save Preferences'),
             ),
-            child: const Text('Save Preferences'),
           ),
         ),
       ),

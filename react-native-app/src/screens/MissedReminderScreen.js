@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../theme/colors';
+import { buttonA11y } from '../utils/accessibility';
 
 export default function MissedReminderScreen({ navigation }) {
   return (
@@ -20,6 +21,7 @@ export default function MissedReminderScreen({ navigation }) {
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={() => navigation.navigate('ReminderSuccess')}
+          {...buttonA11y('Complete Now', 'Marks the missed medication as taken')}
         >
           <Ionicons name="checkmark-circle" size={24} color={Colors.white} />
           <Text style={styles.primaryText}>Complete Now</Text>
@@ -28,6 +30,7 @@ export default function MissedReminderScreen({ navigation }) {
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => navigation.navigate('SnoozeOptions')}
+          {...buttonA11y('Snooze', 'Postpone this reminder')}
         >
           <Ionicons name="time" size={24} color={Colors.primaryAction} />
           <Text style={styles.secondaryText}>Snooze</Text>
@@ -36,6 +39,7 @@ export default function MissedReminderScreen({ navigation }) {
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => navigation.navigate('CaregiverHelp')}
+          {...buttonA11y('Ask for Help', 'Notifies your caregiver')}
         >
           <Ionicons name="people" size={24} color={Colors.primaryAction} />
           <Text style={styles.secondaryText}>Ask for Help</Text>

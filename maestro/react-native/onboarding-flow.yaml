@@ -1,0 +1,8 @@
+appId: host.exp.exponent
+---
+- launchApp
+- assertVisible: "CareConnect"
+- tapOn: "Start Setup"
+- assertVisible: "Personalize your view"
+- tapOn: "Preview Settings"
+- assertVisible: "Try Your Settings"

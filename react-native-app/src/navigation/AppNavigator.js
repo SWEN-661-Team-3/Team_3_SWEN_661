@@ -33,8 +33,8 @@ export default function AppNavigator() {
 
   if (!state.initialized) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} accessibilityLabel="Loading CareConnect" accessibilityRole="progressbar">
+        <ActivityIndicator size="large" accessibilityLabel="Loading CareConnect" />
       </View>
     );
   }
@@ -42,7 +42,7 @@ export default function AppNavigator() {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName={state.isOnboarded === true ? 'Home' : 'Welcome'}
+      initialRouteName={state.isOnboarded ? 'Home' : 'Welcome'}
     >
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Setup" component={SetupScreen} />

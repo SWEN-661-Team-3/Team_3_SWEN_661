@@ -1,0 +1,9 @@
+appId: com.example.flutter_app
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Start Setup"
+- tapOn: "Start Setup"
+- assertVisible: "Personalize your view"
+- tapOn: "Preview Settings"
+- assertVisible: "How does this look?"

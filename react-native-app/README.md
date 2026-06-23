@@ -28,8 +28,17 @@ npx expo start --ios     # Launch on iOS simulator
 ### Testing
 
 ```bash
-npm test                 # Run all tests
-npm run test:coverage    # Run tests with coverage report
+npm test                 # Run all unit/component tests
+npm run test:coverage    # Run tests with coverage report (75%+ threshold)
+npm run test:integration # Run multi-screen integration tests
+```
+
+### E2E Tests (Maestro)
+
+See `../maestro/README.md`. From repo root:
+
+```bash
+maestro test maestro/react-native/
 ```
 
 ## Architecture
@@ -92,8 +101,23 @@ src/
 4. **Layout overflow**: Flutter requires explicit Expanded/Flexible widgets; RN's flexbox handles overflow more naturally with `flex: 1`.
 5. **Persistence**: Both use key-value stores (SharedPreferences vs AsyncStorage) with similar JSON serialization patterns.
 
+## Accessibility (Week 6)
+
+WCAG 2.1 AA improvements for elderly/low-vision users:
+
+- **accessibilityLabel/Role/Hint** on buttons, cards, headers, and form controls via `src/utils/accessibility.js`
+- **ThemeProvider** applies saved dark mode, high contrast, text scale, and wide spacing globally
+- **Live regions** for emergency countdown
+- **Color contrast fixes** in `src/theme/colors.js`
+
+### Screen Reader Testing
+
+1. Enable TalkBack (Android) or VoiceOver (iOS)
+2. Navigate onboarding, home, emergency, and reminder flows
+3. Verify controls announce descriptive labels
+
 ## Test Coverage
 
-- 33 test suites, 133 tests
-- 72%+ statement coverage
-- Coverage areas: models (100%), components (100%), context/reducer, screens, services
+- 40+ test suites, 160+ tests
+- **75%+ statement coverage** (enforced via Jest coverageThreshold)
+- Coverage areas: models, components, context, screens, services, navigation, integration flows

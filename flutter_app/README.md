@@ -89,13 +89,43 @@ genhtml coverage/lcov.info -o coverage/html
 
 Then open `coverage/html/index.html` in a browser.
 
+### Run Integration Tests
+
+```bash
+flutter test integration_test/app_test.dart
+```
+
+### Run E2E Tests (Maestro)
+
+See `../maestro/README.md` for Maestro setup. From repo root:
+
+```bash
+maestro test maestro/flutter/
+```
+
 ### Coverage Summary
 
-- **101 tests** (36 unit tests for models/providers, 65 widget tests for screens/widgets)
-- **86.7% line coverage** on tested source files
+- **105+ tests** (unit, widget, and integration)
+- **86%+ line coverage** on tested source files
 - Test categories:
-  - Unit tests: all 6 data models, AppState provider (state mutations, listener notifications, computed properties)
+  - Unit tests: all 6 data models, AppState provider
   - Widget tests: HomeScreen, WelcomeScreen, ConfirmationScreen, SuccessScreen, CareCard, CareHeader, CareBottomNavBar, StatusBadge
+  - Integration tests: onboarding, home-to-details, emergency, reminder flows
+
+## Accessibility (Week 6)
+
+WCAG 2.1 AA improvements for elderly/low-vision users:
+
+- **Semantics labels** on all tappable CareCards, emergency controls, and navigation buttons
+- **Live regions** for emergency countdown timer announcements
+- **Global settings wiring**: text scaling, high-contrast theme, dark mode, wide spacing, reduced motion, screen reader landmark
+- **Color contrast fixes**: darker text on tinted backgrounds, improved high-contrast theme secondary text
+
+### Screen Reader Testing
+
+1. Enable TalkBack (Android) or VoiceOver (iOS)
+2. Navigate Home > Emergency, Home > Details, and reminder flows
+3. Verify buttons announce descriptive labels (e.g., "Emergency help", "Mark Complete")
 
 ## Known Issues and Limitations
 
@@ -103,7 +133,6 @@ Then open `coverage/html/index.html` in a browser.
 - SharedPreferences persistence for settings only; task/reminder state is in-memory
 - EmergencyCountdownScreen is a stub placeholder
 - iOS build not tested (Windows development environment)
-- No integration tests yet
 
 ## Team Member Contributions (Week 4)
 

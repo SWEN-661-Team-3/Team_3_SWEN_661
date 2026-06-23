@@ -11,7 +11,7 @@ describe('appReducer', () => {
     const reminderPrefs = { sound: false };
     const result = appReducer(initialState, {
       type: ACTION_TYPES.INIT,
-      payload: { settings, reminderPrefs, isOnboarded: true },
+      payload: { settings, reminderPrefs, isOnboarded: true, notificationsEnabled: false },
     });
     expect(result.initialized).toBe(true);
     expect(result.settings).toEqual(settings);

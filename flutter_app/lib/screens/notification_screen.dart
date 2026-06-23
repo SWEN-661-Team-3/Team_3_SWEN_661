@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../models/reminder.dart';
 import '../providers/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_card.dart';
+import '../widgets/icon_badge.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final reminderId = GoRouterState.of(context).uri.queryParameters['reminderId'];
     final appState = context.watch<AppState>();
-    final reminder = appState.reminders.isNotEmpty
-        ? appState.reminders.first
+    Reminder? reminder;
+    if (reminderId != null) {
+      for (final r in appState.reminders) {
+        if (r.id == reminderId) {
+          reminder = r;
+          break;
+        }
+      }
+    }
+    reminder ??= appState.pendingReminders.isNotEmpty
+        ? appState.pendingReminders.first
         : null;
 
     return Scaffold(
@@ -27,19 +39,12 @@ class NotificationScreen extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: AppColors.warningBg,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.warningLight, width: 6),
-                        ),
-                        child: const Icon(
-                          Icons.notifications_active,
-                          size: 48,
-                          color: AppColors.warningDark,
-                        ),
+                      IconBadge(
+                        icon: Icons.notifications_active,
+                        color: AppColors.warningDark,
+                        padding: 26,
+                        iconSize: 48,
+                        borderRadius: 50,
                       ),
                       const SizedBox(height: 24),
                       const Text(
@@ -52,9 +57,9 @@ class NotificationScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Medication Reminder',
-                        style: TextStyle(
+                      Text(
+                        reminder?.title ?? 'Medication Reminder',
+                        style: const TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
                           color: AppColors.heading,
@@ -112,14 +117,15 @@ class NotificationScreen extends StatelessWidget {
                 ),
               ),
             ),
-            _buildActions(context),
+            _buildActions(context, reminder),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildActions(BuildContext context) {
+  Widget _buildActions(BuildContext context, Reminder? reminder) {
+    final reminderId = reminder?.id;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: const BoxDecoration(
@@ -132,7 +138,9 @@ class NotificationScreen extends StatelessWidget {
             width: double.infinity,
             height: 60,
             child: ElevatedButton(
-              onPressed: () => context.push('/reminder-detail'),
+              onPressed: reminderId != null
+                  ? () => context.push('/reminder-detail?reminderId=$reminderId')
+                  : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryAction,
                 foregroundColor: AppColors.white,
@@ -153,7 +161,9 @@ class NotificationScreen extends StatelessWidget {
                 child: SizedBox(
                   height: 56,
                   child: OutlinedButton(
-                    onPressed: () => context.push('/snooze'),
+                    onPressed: reminderId != null
+                        ? () => context.push('/snooze?reminderId=$reminderId')
+                        : null,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.heading,
                       side: const BorderSide(color: AppColors.border, width: 3),
@@ -173,13 +183,12 @@ class NotificationScreen extends StatelessWidget {
                 child: SizedBox(
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () {
-                      final appState = context.read<AppState>();
-                      if (appState.reminders.isNotEmpty) {
-                        appState.dismissReminder(appState.reminders.first.id);
-                      }
-                      context.go('/reminder-success');
-                    },
+                    onPressed: reminderId != null
+                        ? () {
+                            context.read<AppState>().dismissReminder(reminderId);
+                            context.go('/reminder-success');
+                          }
+                        : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.success,
                       foregroundColor: AppColors.white,

@@ -7,6 +7,7 @@ class PreferencesService {
   static const _settingsKey = 'accessibility_settings';
   static const _reminderPrefsKey = 'reminder_preferences';
   static const _onboardedKey = 'is_onboarded';
+  static const _notificationsEnabledKey = 'notifications_enabled';
 
   Future<void> saveAccessibilitySettings(AccessibilitySettings settings) async {
     final prefs = await SharedPreferences.getInstance();
@@ -52,5 +53,15 @@ class PreferencesService {
   Future<bool> loadOnboarded() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_onboardedKey) ?? false;
+  }
+
+  Future<void> saveNotificationsEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_notificationsEnabledKey, value);
+  }
+
+  Future<bool> loadNotificationsEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_notificationsEnabledKey) ?? false;
   }
 }

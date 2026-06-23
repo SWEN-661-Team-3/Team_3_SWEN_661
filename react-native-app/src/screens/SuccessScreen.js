@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../theme/colors';
+import { buttonA11y } from '../utils/accessibility';
 
 const TYPE_CONFIG = {
   complete: { icon: 'checkmark-circle', color: Colors.success, bg: Colors.successBg, heading: 'Task Complete!', message: 'Great job! Your task has been marked as done.' },
@@ -29,12 +30,14 @@ export default function SuccessScreen({ navigation, route }) {
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Home' }] })}
+            {...buttonA11y('Return to Home', 'Navigates to the home dashboard')}
           >
             <Text style={styles.primaryText}>Return to Home</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.secondaryButton}
             onPress={() => navigation.reset({ index: 0, routes: [{ name: 'TodaysPlan' }] })}
+            {...buttonA11y("Return to Today's Plan", 'Navigates to your daily plan')}
           >
             <Text style={styles.secondaryText}>Return to Today's Plan</Text>
           </TouchableOpacity>

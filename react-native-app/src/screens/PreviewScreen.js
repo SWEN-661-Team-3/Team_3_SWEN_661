@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CareHeader from '../components/CareHeader';
 import CareCard from '../components/CareCard';
+import IconBadge from '../components/IconBadge';
 import Colors from '../theme/colors';
 import { useAppState } from '../context/AppContext';
 
@@ -15,8 +16,10 @@ export default function PreviewScreen({ navigation }) {
   const [wideSpacing, setWideSpacing] = useState(state.settings.spacing === 'wide');
 
   const scaleFactor = previewSize === 'extra-large' ? 1.3 : 1.15;
-  const cardBg = highContrast || darkMode ? '#1E1E1E' : Colors.white;
-  const cardBorder = highContrast || darkMode ? '#444' : Colors.border;
+  const cardBg = Colors.white;
+  const cardBorder = highContrast || darkMode ? Colors.white : Colors.border;
+  const cardText = Colors.heading;
+  const cardMuted = Colors.mutedText;
   const textColor = highContrast || darkMode ? Colors.white : Colors.heading;
   const mutedColor = highContrast || darkMode ? 'rgba(255,255,255,0.7)' : Colors.mutedText;
   const accent = highContrast ? '#FACC15' : Colors.primaryAction;
@@ -85,19 +88,17 @@ export default function PreviewScreen({ navigation }) {
         <View style={[styles.previewContainer, { backgroundColor: highContrast || darkMode ? '#000' : Colors.pageBg }]}>
           <CareCard backgroundColor={cardBg} borderColor={cardBorder}>
             <View style={styles.sampleRow}>
-              <View style={[styles.sampleIcon, { backgroundColor: Colors.blueBg }]}>
-                <Ionicons name="medical" size={24} color={accent} />
-              </View>
+              <IconBadge icon="medical" color={accent} size={24} padding={10} borderRadius={14} />
               <View style={styles.sampleText}>
-                <Text style={{ fontSize: 18 * scaleFactor, fontWeight: '700', color: textColor }} numberOfLines={2}>
+                <Text style={{ fontSize: 18 * scaleFactor, fontWeight: '700', color: cardText }}>
                   Eye Doctor Appt
                 </Text>
-                <Text style={{ fontSize: 16 * scaleFactor, color: mutedColor }} numberOfLines={1}>
+                <Text style={{ fontSize: 16 * scaleFactor, color: cardMuted }}>
                   10:30 AM - 2 miles away
                 </Text>
               </View>
-              <View style={[styles.badge, { backgroundColor: `${accent}25` }]}>
-                <Text style={{ fontSize: 16 * scaleFactor, fontWeight: '700', color: accent }}>
+              <View style={[styles.badge, { backgroundColor: accent }]}>
+                <Text style={{ fontSize: 16 * scaleFactor, fontWeight: '700', color: highContrast ? Colors.heading : Colors.white }}>
                   Confirmed
                 </Text>
               </View>
@@ -108,14 +109,12 @@ export default function PreviewScreen({ navigation }) {
 
           <CareCard backgroundColor={cardBg} borderColor={cardBorder}>
             <View style={styles.sampleRow}>
-              <View style={[styles.sampleIcon, { backgroundColor: Colors.warningBg }]}>
-                <Ionicons name="notifications" size={24} color={Colors.warningDark} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 18 * scaleFactor, fontWeight: '700', color: textColor }} numberOfLines={2}>
+              <IconBadge icon="notifications" color={Colors.warningDark} size={24} padding={10} borderRadius={14} />
+              <View style={{ flex: 1, marginLeft: 16 }}>
+                <Text style={{ fontSize: 18 * scaleFactor, fontWeight: '700', color: cardText }}>
                   Medicine Reminder
                 </Text>
-                <Text style={{ fontSize: 16 * scaleFactor, color: mutedColor }} numberOfLines={1}>
+                <Text style={{ fontSize: 16 * scaleFactor, color: cardMuted }}>
                   Take 1 Vitamin at Noon
                 </Text>
               </View>

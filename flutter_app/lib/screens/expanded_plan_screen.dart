@@ -5,6 +5,7 @@ import '../providers/app_state.dart';
 import '../models/appointment.dart';
 import '../theme/app_colors.dart';
 import '../widgets/care_header.dart';
+import '../widgets/icon_badge.dart';
 
 class ExpandedPlanScreen extends StatelessWidget {
   const ExpandedPlanScreen({super.key});
@@ -27,6 +28,7 @@ class ExpandedPlanScreen extends StatelessWidget {
             title: 'Your Full Plan',
             subtitle: 'Today',
             onBack: () => context.pop(),
+            onEmergency: () => context.push('/emergency'),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -91,94 +93,97 @@ class ExpandedPlanScreen extends StatelessWidget {
   Widget _buildPlanItem(Appointment item, BuildContext context) {
     final isDone = item.status == 'done';
     final typeColor = _typeColor(item.type);
-    final typeBg = _typeBg(item.type);
     final typeIcon = _typeIcon(item.type);
+
+    final card = Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.border, width: 3),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ExcludeSemantics(
+            child: IconBadge(icon: typeIcon, color: typeColor, padding: 10, iconSize: 24, borderRadius: 14),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDone ? AppColors.success : AppColors.primaryAction,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        item.time,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.white,
+                        ),
+                      ),
+                    ),
+                    _statusBadge(isDone),
+                    if (item.actionLabel != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: isDone ? AppColors.subtleBg : AppColors.blueBg,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          item.actionLabel!,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: isDone ? AppColors.mutedText : AppColors.heading,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  item.title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: isDone ? AppColors.mutedText : AppColors.heading,
+                    decoration: isDone ? TextDecoration.lineThrough : null,
+                    decorationColor: AppColors.heading,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: GestureDetector(
-        onTap: () => context.push('/details?id=${item.id}'),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.border, width: 3),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: typeBg,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(typeIcon, color: typeColor, size: 24),
+      child: isDone
+          ? card
+          : Semantics(
+              button: true,
+              label:
+                  '${item.title}. ${item.time}. ${item.actionLabel ?? 'View details'}.',
+              child: GestureDetector(
+                onTap: () => context.push('/details?id=${item.id}'),
+                child: card,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: typeBg,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            item.time,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: typeColor,
-                            ),
-                          ),
-                        ),
-                        _statusBadge(isDone),
-                        if (item.actionLabel != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: isDone ? AppColors.subtleBg : AppColors.blueBg,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              item.actionLabel!,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: isDone ? AppColors.mutedText : AppColors.primaryAction,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      item.title,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: isDone ? AppColors.mutedText : AppColors.heading,
-                        decoration: isDone ? TextDecoration.lineThrough : null,
-                        decorationColor: AppColors.heading,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -186,15 +191,15 @@ class ExpandedPlanScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isDone ? AppColors.successBg : AppColors.blueBg,
+        color: isDone ? AppColors.success : AppColors.primaryAction,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         isDone ? 'Done' : 'To Do',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,
-          color: isDone ? AppColors.success : AppColors.primaryAction,
+          color: AppColors.white,
         ),
       ),
     );
@@ -211,17 +216,6 @@ class ExpandedPlanScreen extends StatelessWidget {
     }
   }
 
-  Color _typeBg(String type) {
-    switch (type) {
-      case 'appointment':
-        return AppColors.purpleBg;
-      case 'health-task':
-        return AppColors.successBg;
-      default:
-        return AppColors.blueBg;
-    }
-  }
-
   IconData _typeIcon(String type) {
     switch (type) {
       case 'appointment':
@@ -234,42 +228,41 @@ class ExpandedPlanScreen extends StatelessWidget {
   }
 
   Widget _buildProgressFooter(int completed, int total) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.border, width: 4)),
-      ),
+    return Material(
+      color: AppColors.white,
       child: SafeArea(
         top: false,
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$completed of $total tasks',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.heading,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$completed of $total tasks',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.heading,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(
-                      value: total > 0 ? completed / total : 0,
-                      minHeight: 12,
-                      backgroundColor: AppColors.subtleBg,
-                      color: AppColors.primaryAction,
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: total > 0 ? completed / total : 0,
+                        minHeight: 12,
+                        backgroundColor: AppColors.subtleBg,
+                        color: AppColors.primaryAction,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

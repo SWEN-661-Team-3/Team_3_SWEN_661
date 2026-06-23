@@ -39,24 +39,29 @@ class SuccessScreen extends StatelessWidget {
                         child: Icon(config.icon, size: 64, color: config.iconColor),
                       ),
                       const SizedBox(height: 32),
-                      Text(
-                        config.status,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.5,
-                          color: config.iconBg,
+                      ExcludeSemantics(
+                        child: Text(
+                          config.status,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.5,
+                            color: config.iconBg,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        config.heading,
-                        style: const TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.heading,
+                      Semantics(
+                        header: true,
+                        child: Text(
+                          config.heading,
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.heading,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
                       Text(
@@ -110,7 +115,7 @@ class SuccessScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: config.iconColor.withValues(alpha: 0.7),
+                  color: type == 'snooze' ? AppColors.warningDark : AppColors.success,
                 ),
                 textAlign: TextAlign.center,
               ),
