@@ -3,36 +3,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Electron Hello World</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-    .container {
-      text-align: center;
-    }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-    }
-    p {
-      font-size: 1.2rem;
-      opacity: 0.9;
-    }
-  </style>
+  <title>CareConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Hello World!</h1>
-    <p>SWEN 661 - Electron Desktop App</p>
-    <p>Team 3</p>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="app-header" role="banner">
+    <div class="app-header__brand">
+      <span class="app-header__logo" aria-hidden="true">CC</span>
+      <h1 class="app-header__title">CareConnect</h1>
+    </div>
+
+    <nav class="toolbar" aria-label="CareConnect toolbar">
+      <button type="button" class="toolbar-btn" data-action="new-record" title="New appointment (Ctrl+N)">
+        New
+      </button>
+      <button type="button" class="toolbar-btn" data-action="save" title="Save (Ctrl+S)">
+        Save
+      </button>
+      <span class="toolbar-divider" aria-hidden="true"></span>
+      <button type="button" class="toolbar-btn" data-action="search" title="Search (Ctrl+F)">
+        Search
+      </button>
+      <button type="button" class="toolbar-btn toolbar-btn--active" data-action="view-todays-plan" title="Today's Plan (Ctrl+1)">
+        Today's Plan
+      </button>
+      <button type="button" class="toolbar-btn" data-action="open-settings" title="Settings (Ctrl+,)">
+        Settings
+      </button>
+      <span class="toolbar-divider" aria-hidden="true"></span>
+      <button type="button" class="toolbar-btn toolbar-btn--danger" data-action="emergency" title="Emergency help">
+        Emergency
+      </button>
+    </nav>
+  </header>
+
+  <div class="search-bar" id="search-bar" hidden>
+    <label for="search-input" class="search-bar__label">Search today's plan</label>
+    <input
+      type="search"
+      id="search-input"
+      class="search-bar__input"
+      placeholder="Search tasks and appointments..."
+      autocomplete="off"
+    />
+    <button type="button" class="search-bar__close" id="search-close" aria-label="Close search">Close</button>
   </div>
+
+  <div class="app-layout">
+    <aside class="sidebar" aria-label="Plan summary">
+      <section class="sidebar-section">
+        <h2 class="sidebar-heading">Helper</h2>
+        <div class="helper-card" id="helper-card">
+          <span class="helper-card__icon" aria-hidden="true">H</span>
+          <div>
+            <p class="helper-card__name" id="helper-name">Sarah is available</p>
+            <p class="helper-card__role">Helper</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="sidebar-section">
+        <h2 class="sidebar-heading">Today's tasks</h2>
+        <ul class="task-list" id="task-list" role="list"></ul>
+      </section>
+    </aside>
+
+    <main id="main-content" class="main-content" tabindex="-1">
+      <div class="page-header">
+        <h2 class="page-title">Your setup is complete.</h2>
+        <p class="page-subtitle">Here is today's plan.</p>
+      </div>
+
+      <div id="status-live" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+      <article class="hero-card" id="hero-card" tabindex="0" role="button" aria-labelledby="hero-title hero-time">
+        <div class="hero-card__badge">
+          <span>Up Next</span>
+        </div>
+        <h3 class="hero-card__title" id="hero-title">Loading...</h3>
+        <p class="hero-card__time" id="hero-time"></p>
+        <p class="hero-card__hint">Press Enter to view details</p>
+      </article>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-card__icon stat-card__icon--success" aria-hidden="true">✓</span>
+          <div>
+            <p class="stat-card__value" id="stat-done">0/0</p>
+            <p class="stat-card__label">Tasks done</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__icon stat-card__icon--warning" aria-hidden="true">◷</span>
+          <div>
+            <p class="stat-card__value" id="stat-pending">0</p>
+            <p class="stat-card__label">Pending</p>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="primary-btn" id="accessibility-btn">
+        Accessibility Shortcuts
+      </button>
+    </main>
+  </div>
+
+  <dialog class="dialog" id="detail-dialog" aria-labelledby="detail-dialog-title">
+    <form method="dialog" class="dialog__inner">
+      <header class="dialog__header">
+        <h2 id="detail-dialog-title">Task details</h2>
+        <button type="submit" class="dialog__close" value="cancel" aria-label="Close dialog">Close</button>
+      </header>
+      <div class="dialog__body" id="detail-dialog-body"></div>
+      <footer class="dialog__footer">
+        <button type="button" class="primary-btn" id="complete-task-btn">Mark complete</button>
+        <button type="submit" class="secondary-btn" value="cancel">Close</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="settings-dialog" aria-labelledby="settings-dialog-title">
+    <form method="dialog" class="dialog__inner">
+      <header class="dialog__header">
+        <h2 id="settings-dialog-title">Accessibility settings</h2>
+        <button type="submit" class="dialog__close" value="cancel" aria-label="Close settings">Close</button>
+      </header>
+      <div class="dialog__body">
+        <fieldset class="settings-fieldset">
+          <legend>Display</legend>
+          <label class="settings-row">
+            <input type="checkbox" id="setting-large-text" />
+            <span>Larger text (125%)</span>
+          </label>
+          <label class="settings-row">
+            <input type="checkbox" id="setting-high-contrast" />
+            <span>High contrast mode</span>
+          </label>
+          <label class="settings-row">
+            <input type="checkbox" id="setting-reduce-motion" checked />
+            <span>Reduce motion</span>
+          </label>
+        </fieldset>
+        <fieldset class="settings-fieldset">
+          <legend>Reading</legend>
+          <label class="settings-row">
+            <input type="checkbox" id="setting-dyslexia-font" checked disabled />
+            <span>Atkinson Hyperlegible font (always on)</span>
+          </label>
+        </fieldset>
+      </div>
+      <footer class="dialog__footer">
+        <button type="submit" class="primary-btn" value="default">Save settings</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog class="dialog dialog--help" id="help-dialog" aria-labelledby="help-dialog-title">
+    <form method="dialog" class="dialog__inner">
+      <header class="dialog__header">
+        <h2 id="help-dialog-title">CareConnect Help</h2>
+        <button type="submit" class="dialog__close" value="cancel" aria-label="Close help">Close</button>
+      </header>
+      <div class="dialog__body">
+        <p>Use the menu bar or toolbar for common actions. All primary actions work with the keyboard.</p>
+        <ul class="help-list">
+          <li><kbd>Ctrl</kbd>+<kbd>N</kbd> — New appointment</li>
+          <li><kbd>Ctrl</kbd>+<kbd>S</kbd> — Save plan</li>
+          <li><kbd>Ctrl</kbd>+<kbd>F</kbd> — Search tasks</li>
+          <li><kbd>Ctrl</kbd>+<kbd>,</kbd> — Open settings</li>
+          <li><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> — Move between panels</li>
+          <li><kbd>Esc</kbd> — Close dialog</li>
+          <li><kbd>F1</kbd> — This help panel</li>
+        </ul>
+      </div>
+      <footer class="dialog__footer">
+        <button type="submit" class="primary-btn" value="default">Got it</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>

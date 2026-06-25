@@ -21,7 +21,7 @@ An application providing mobile, desktop, and web customization for care recipie
 ```
 ├── flutter_app/          Flutter Hello World (mobile)
 ├── react-native-app/     React Native / Expo Hello World (mobile)
-├── electron-app/         Electron Hello World (desktop)
+├── electron-app/         CareConnect desktop (Electron)
 ├── react-vite-app/       React + Vite Hello World (web)
 └── screenshots/          Proof-of-setup screenshots
 ```
@@ -50,11 +50,13 @@ npm run dev
 # Opens at http://localhost:5173
 ```
 
-**Electron (Desktop):**
+**Electron (Desktop — CareConnect):**
 ```bash
 cd electron-app
 npm install
 npm start
+# Opens CareConnect desktop with Today's Plan screen
+# Menu bar: File, Edit, View, Help — see assignments/week-7/keyboard-shortcuts.md
 ```
 
 **React Native / Expo (Mobile):**
