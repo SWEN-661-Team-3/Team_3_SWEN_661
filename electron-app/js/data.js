@@ -1,6 +1,37 @@
 export const caregivers = [
-  { id: '1', name: 'Sarah', relationship: 'Daughter', phone: '555-0101' },
-  { id: '2', name: "Dr. Miller's Office", relationship: 'Doctor', phone: '555-0202' },
+  {
+    id: 'sarah',
+    name: 'Sarah Johnson',
+    relationship: 'Helper',
+    role: 'Helper',
+    availability: 'available',
+    phone: '(555) 234-5678',
+    notes: 'Available weekdays 8 am - 6 pm.',
+    initials: 'SJ',
+    colorIndex: 0,
+  },
+  {
+    id: 'drsmith',
+    name: 'Dr. Emily Smith',
+    relationship: 'Doctor',
+    role: 'Eye Doctor',
+    availability: 'busy',
+    phone: '(555) 891-2345',
+    notes: 'City Eye Clinic, 123 Vision Way. Call to reschedule.',
+    initials: 'ES',
+    colorIndex: 1,
+  },
+  {
+    id: 'robert',
+    name: 'Robert Chen',
+    relationship: 'Family',
+    role: 'Family',
+    availability: 'offline',
+    phone: '(555) 567-8901',
+    notes: 'Son. Available evenings and weekends.',
+    initials: 'RC',
+    colorIndex: 2,
+  },
 ];
 
 export const initialPlan = [

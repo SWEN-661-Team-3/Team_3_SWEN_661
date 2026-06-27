@@ -72,6 +72,11 @@ function buildMenu() {
           click: () => sendMenuAction('view-todays-plan'),
         },
         {
+          label: 'Care Team',
+          accelerator: 'CmdOrCtrl+2',
+          click: () => sendMenuAction('view-care-team'),
+        },
+        {
           label: 'Settings',
           accelerator: 'CmdOrCtrl+,',
           click: () => sendMenuAction('open-settings'),
