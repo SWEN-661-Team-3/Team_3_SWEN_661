@@ -1,7 +1,7 @@
 {
-  "name": "electron-hello-world",
+  "name": "careconnect-desktop",
   "version": "1.0.0",
-  "description": "SWEN 661 Electron Hello World",
+  "description": "CareConnect desktop app (SWEN 661 Week 7)",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
