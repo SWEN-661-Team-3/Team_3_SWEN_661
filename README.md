@@ -50,13 +50,22 @@ npm run dev
 # Opens at http://localhost:5173
 ```
 
-**Electron (Desktop — CareConnect):**
+**Electron + React (Desktop — CareConnect):**
 ```bash
 cd electron-app
 npm install
-npm start
-# Opens CareConnect desktop with Today's Plan screen
-# Menu bar: File, Edit, View, Help — see assignments/week-7/keyboard-shortcuts.md
+
+# Development (Vite dev server + Electron)
+npm run electron:dev
+
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Build and package for Windows
+npm run package
 ```
 
 **React Native / Expo (Mobile):**

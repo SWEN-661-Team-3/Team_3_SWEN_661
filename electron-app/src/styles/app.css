@@ -218,10 +218,6 @@ body.high-contrast {
   border-bottom: var(--stroke-width) solid var(--color-primary);
 }
 
-.search-bar[hidden] {
-  display: none;
-}
-
 .search-bar__label {
   font-weight: 700;
   color: var(--color-primary-dark);
@@ -1139,6 +1135,50 @@ body.reduce-motion *::after {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
+}
+
+/* Form elements for new appointment */
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-weight: 700;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  background: var(--color-surface);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 4rem;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+
+.form-error {
+  color: var(--color-emergency);
+  font-size: var(--font-size-xs);
+  margin-top: var(--space-1);
 }
 
 @media (max-width: 1024px) {

@@ -105,8 +105,8 @@ export const initialPlan = [
 ];
 
 export const statusLabels = {
-  done: { label: 'Done', icon: '✓' },
-  todo: { label: 'Pending', icon: '◷' },
+  done: { label: 'Done', icon: '\u2713' },
+  todo: { label: 'Pending', icon: '\u25F7' },
 };
 
 export const typeLabels = {
@@ -114,3 +114,9 @@ export const typeLabels = {
   appointment: { label: 'Appointment', icon: 'Cal' },
   'health-task': { label: 'Health task', icon: 'H' },
 };
+
+export const typeOptions = [
+  { value: 'appointment', label: 'Appointment' },
+  { value: 'medication', label: 'Medication' },
+  { value: 'health-task', label: 'Health Task' },
+];

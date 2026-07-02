@@ -3,6 +3,8 @@ const path = require('path');
 
 let mainWindow;
 
+const isDev = !app.isPackaged;
+
 function sendMenuAction(action) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('menu-action', action);
@@ -127,7 +129,11 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile('index.html');
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:5173');
+  } else {
+    mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
+  }
 }
 
 app.whenReady().then(() => {
