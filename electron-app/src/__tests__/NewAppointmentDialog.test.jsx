@@ -13,7 +13,7 @@ describe('NewAppointmentDialog', () => {
 
   it('renders the dialog title', () => {
     render(<NewAppointmentDialog open={true} onClose={onClose} onAdd={onAdd} />);
-    expect(screen.getByText('New Appointment')).toBeInTheDocument();
+    expect(screen.getByText('New Reminder')).toBeInTheDocument();
   });
 
   it('renders form fields', () => {
@@ -25,12 +25,21 @@ describe('NewAppointmentDialog', () => {
     expect(screen.getByLabelText(/notes/i)).toBeInTheDocument();
   });
 
-  it('shows validation errors when submitting empty form', async () => {
+  it('disables Save until Title, Time, and Location are complete', async () => {
     const user = userEvent.setup();
     render(<NewAppointmentDialog open={true} onClose={onClose} onAdd={onAdd} />);
-    await user.click(screen.getByText('Add Appointment'));
-    expect(screen.getByText('Title is required')).toBeInTheDocument();
-    expect(screen.getByText('Time is required')).toBeInTheDocument();
+
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    expect(saveButton).toBeDisabled();
+
+    await user.type(screen.getByLabelText(/title/i), 'Physical Therapy');
+    expect(saveButton).toBeDisabled();
+
+    await user.type(screen.getByLabelText(/^time$/i), '2:00 PM');
+    expect(saveButton).toBeDisabled();
+
+    await user.type(screen.getByLabelText(/location/i), 'PT Center');
+    expect(saveButton).toBeEnabled();
     expect(onAdd).not.toHaveBeenCalled();
   });
 
@@ -43,7 +52,7 @@ describe('NewAppointmentDialog', () => {
     await user.type(screen.getByLabelText(/location/i), 'PT Center');
     await user.type(screen.getByLabelText(/notes/i), 'Wear comfortable clothes');
 
-    await user.click(screen.getByText('Add Appointment'));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(onAdd).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -57,28 +66,42 @@ describe('NewAppointmentDialog', () => {
     );
   });
 
-  it('clears validation error when field is filled', async () => {
+  it('asks before closing when the form has unsaved data', async () => {
     const user = userEvent.setup();
     render(<NewAppointmentDialog open={true} onClose={onClose} onAdd={onAdd} />);
 
-    await user.click(screen.getByText('Add Appointment'));
-    expect(screen.getByText('Title is required')).toBeInTheDocument();
+    await user.type(screen.getByLabelText(/notes/i), 'Call when arriving');
+    const closeButton = screen.getByRole('button', { name: /^Close$/ });
+    expect(closeButton).toHaveTextContent('X');
+    await user.click(closeButton);
 
-    await user.type(screen.getByLabelText(/title/i), 'Test');
-    expect(screen.queryByText('Title is required')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Are you sure?' })).toBeInTheDocument();
+    expect(screen.getByText('This reminder has unsaved information. Close without saving?')).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'Close without saving' }));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onClose when Cancel is clicked', async () => {
+  it('keeps editing when the discard check is dismissed', async () => {
     const user = userEvent.setup();
     render(<NewAppointmentDialog open={true} onClose={onClose} onAdd={onAdd} />);
-    await user.click(screen.getByText('Cancel'));
-    expect(onClose).toHaveBeenCalledTimes(1);
+
+    await user.type(screen.getByLabelText(/notes/i), 'Call when arriving');
+    await user.click(screen.getByRole('button', { name: /^Close$/ }));
+    await user.click(screen.getByRole('button', { name: 'Continue editing' }));
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.queryByRole('heading', { name: 'Are you sure?' })).not.toBeInTheDocument();
+    expect(screen.getByDisplayValue('Call when arriving')).toBeInTheDocument();
   });
 
   it('calls onClose when close button is clicked', async () => {
     const user = userEvent.setup();
     render(<NewAppointmentDialog open={true} onClose={onClose} onAdd={onAdd} />);
-    await user.click(screen.getByLabelText(/close new appointment/i));
+    const closeButton = screen.getByRole('button', { name: /^Close$/ });
+    expect(closeButton).toHaveTextContent('X');
+    await user.click(closeButton);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -89,7 +112,8 @@ describe('NewAppointmentDialog', () => {
     await user.selectOptions(screen.getByLabelText(/type/i), 'medication');
     await user.type(screen.getByLabelText(/title/i), 'Evening Meds');
     await user.type(screen.getByLabelText(/^time$/i), '8:00 PM');
-    await user.click(screen.getByText('Add Appointment'));
+    await user.type(screen.getByLabelText(/location/i), 'Kitchen');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(onAdd).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'medication' }),
@@ -100,5 +124,6 @@ describe('NewAppointmentDialog', () => {
     render(<NewAppointmentDialog open={true} onClose={onClose} onAdd={onAdd} />);
     expect(screen.getByLabelText(/title/i)).toHaveAttribute('aria-required', 'true');
     expect(screen.getByLabelText(/^time$/i)).toHaveAttribute('aria-required', 'true');
+    expect(screen.getByLabelText(/location/i)).toHaveAttribute('aria-required', 'true');
   });
 });

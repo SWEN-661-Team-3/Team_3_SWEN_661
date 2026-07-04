@@ -11,8 +11,17 @@ const emptyForm = {
 
 export default function NewAppointmentDialog({ open, onClose, onAdd }) {
   const dialogRef = useRef(null);
+  const discardDialogRef = useRef(null);
   const [form, setForm] = useState({ ...emptyForm });
   const [errors, setErrors] = useState({});
+  const [discardOpen, setDiscardOpen] = useState(false);
+
+  const hasRequiredFields = Boolean(
+    form.title.trim() && form.time.trim() && form.location.trim(),
+  );
+  const hasUnsavedData = ['title', 'time', 'location', 'notes'].some(
+    (field) => form[field].trim(),
+  );
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -20,15 +29,27 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
     if (open && !dialog.open) {
       setForm({ ...emptyForm });
       setErrors({});
+      setDiscardOpen(false);
       dialog.showModal();
     }
-    if (!open && dialog.open) dialog.close();
+    if (!open && dialog.open) {
+      setDiscardOpen(false);
+      dialog.close();
+    }
   }, [open]);
+
+  useEffect(() => {
+    const dialog = discardDialogRef.current;
+    if (!dialog) return;
+    if (discardOpen && !dialog.open) dialog.showModal();
+    if (!discardOpen && dialog.open) dialog.close();
+  }, [discardOpen]);
 
   function validate() {
     const errs = {};
     if (!form.title.trim()) errs.title = 'Title is required';
     if (!form.time.trim()) errs.time = 'Time is required';
+    if (!form.location.trim()) errs.location = 'Location is required';
     return errs;
   }
 
@@ -52,6 +73,26 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
     });
   }
 
+  function requestClose() {
+    if (hasUnsavedData) {
+      setDiscardOpen(true);
+      return;
+    }
+    onClose();
+  }
+
+  function handleCancel(e) {
+    if (hasUnsavedData) {
+      e.preventDefault();
+      setDiscardOpen(true);
+    }
+  }
+
+  function confirmDiscard() {
+    setDiscardOpen(false);
+    onClose();
+  }
+
   function handleChange(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -64,24 +105,26 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
   }
 
   return (
-    <dialog
-      className="dialog"
-      ref={dialogRef}
-      aria-labelledby="new-appointment-title"
-      onClose={onClose}
-    >
-      <form className="dialog__inner" onSubmit={handleSubmit}>
-        <header className="dialog__header">
-          <h2 id="new-appointment-title">New Appointment</h2>
-          <button
-            type="button"
-            className="dialog__close"
-            aria-label="Close new appointment"
-            onClick={onClose}
-          >
-            Close
-          </button>
-        </header>
+    <>
+      <dialog
+        className="dialog"
+        ref={dialogRef}
+        aria-labelledby="new-reminder-title"
+        onCancel={handleCancel}
+        onClose={onClose}
+      >
+        <form className="dialog__inner" onSubmit={handleSubmit}>
+          <header className="dialog__header">
+            <h2 id="new-reminder-title">New Reminder</h2>
+            <button
+              type="button"
+              className="dialog__close"
+              aria-label="Close"
+              onClick={requestClose}
+            >
+              <span aria-hidden="true">X</span>
+            </button>
+          </header>
 
         <div className="dialog__body">
           <div className="form-group">
@@ -133,10 +176,12 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
               id="appt-location"
               className="form-input"
               type="text"
-              placeholder="Optional"
               value={form.location}
               onChange={(e) => handleChange('location', e.target.value)}
+              aria-required="true"
+              aria-invalid={!!errors.location}
             />
+            {errors.location && <p className="form-error" role="alert">{errors.location}</p>}
           </div>
 
           <div className="form-group">
@@ -152,18 +197,55 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
         </div>
 
         <footer className="dialog__footer">
-          <button type="submit" className="primary-btn">
-            Add Appointment
-          </button>
           <button
-            type="button"
-            className="secondary-btn"
-            onClick={onClose}
+            type="submit"
+            className="primary-btn"
+            disabled={!hasRequiredFields}
           >
-            Cancel
+            Save
           </button>
         </footer>
-      </form>
-    </dialog>
+        </form>
+      </dialog>
+
+      {discardOpen && (
+        <dialog
+          className="dialog dialog--discard-helper"
+          ref={discardDialogRef}
+          aria-labelledby="discard-reminder-title"
+          aria-describedby="discard-reminder-message"
+          onClose={() => setDiscardOpen(false)}
+        >
+          <form method="dialog" className="dialog__inner">
+            <header className="dialog__header">
+              <h2 id="discard-reminder-title">Are you sure?</h2>
+            </header>
+
+            <div className="dialog__body">
+              <p id="discard-reminder-message" className="discard-helper-message">
+                This reminder has unsaved information. Close without saving?
+              </p>
+            </div>
+
+            <footer className="dialog__footer">
+              <button
+                type="button"
+                className="danger-btn"
+                onClick={confirmDiscard}
+              >
+                Close without saving
+              </button>
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={() => setDiscardOpen(false)}
+              >
+                Continue editing
+              </button>
+            </footer>
+          </form>
+        </dialog>
+      )}
+    </>
   );
 }

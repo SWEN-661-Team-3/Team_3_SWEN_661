@@ -46,6 +46,17 @@ describe('TaskDetailDialog', () => {
     expect(screen.getByText('City Eye Clinic')).toBeInTheDocument();
   });
 
+  it('shows health task type without the icon prefix', () => {
+    const healthTask = { ...todoTask, type: 'health-task' };
+    const { container } = render(
+      <TaskDetailDialog task={healthTask} open={true} onClose={onClose} onComplete={onComplete} />,
+    );
+    const typeValue = container.querySelector('.detail-row:nth-of-type(2) .detail-row__value');
+
+    expect(typeValue).toHaveTextContent(/^Health Task$/);
+    expect(typeValue).not.toHaveTextContent(/^H Health Task$/);
+  });
+
   it('shows notes when present', () => {
     render(
       <TaskDetailDialog task={todoTask} open={true} onClose={onClose} onComplete={onComplete} />,
@@ -72,6 +83,15 @@ describe('TaskDetailDialog', () => {
       <TaskDetailDialog task={doneTask} open={true} onClose={onClose} onComplete={onComplete} />,
     );
     expect(screen.queryByText('Mark complete')).not.toBeInTheDocument();
+  });
+
+  it('shows one close button as X with a Close accessible label', () => {
+    render(
+      <TaskDetailDialog task={todoTask} open={true} onClose={onClose} onComplete={onComplete} />,
+    );
+    const closeButtons = screen.getAllByRole('button', { name: /^Close$/ });
+    expect(closeButtons).toHaveLength(1);
+    expect(closeButtons[0]).toHaveTextContent('X');
   });
 
   it('calls onComplete when Mark complete is clicked', async () => {

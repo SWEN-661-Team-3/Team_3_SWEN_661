@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 
@@ -15,7 +15,7 @@ describe('App', () => {
 
   it('renders the sidebar with helper info', () => {
     render(<App />);
-    expect(screen.getByText('Sarah is available')).toBeInTheDocument();
+    expect(screen.getByText('Sarah Johnson is available')).toBeInTheDocument();
   });
 
   it('renders the hero card with the next task', () => {
@@ -31,14 +31,14 @@ describe('App', () => {
     expect(screen.getByText('Pending')).toBeInTheDocument();
   });
 
-  it('renders accessibility shortcuts button', () => {
+  it('renders keyboard shortcuts button and removes accessibility shortcuts button', () => {
     render(<App />);
-    expect(screen.getByText('Accessibility Shortcuts')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Keyboard Shortcuts' })).toBeInTheDocument();
+    expect(screen.queryByText('Accessibility Shortcuts')).not.toBeInTheDocument();
   });
 
   it('shows page header text', () => {
     render(<App />);
-    expect(screen.getByText('Your setup is complete.')).toBeInTheDocument();
     expect(screen.getByText("Here is today's plan.")).toBeInTheDocument();
   });
 
@@ -47,6 +47,17 @@ describe('App', () => {
     render(<App />);
     await user.click(screen.getByTitle('Search (Ctrl+F)'));
     expect(screen.getByPlaceholderText(/search tasks/i)).toBeInTheDocument();
+  });
+
+  it("focuses today's plan without scrolling the window", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const main = document.getElementById('main-content');
+    const focusSpy = jest.spyOn(main, 'focus');
+
+    await user.click(screen.getByTitle("Today's Plan (Ctrl+1)"));
+
+    expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
   });
 
   it('closes search bar when Escape is pressed', async () => {
@@ -66,11 +77,11 @@ describe('App', () => {
     expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled();
   });
 
-  it('opens new appointment dialog from toolbar', async () => {
+  it('opens new reminder dialog from toolbar', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByTitle('New appointment (Ctrl+N)'));
-    expect(screen.getByText('New Appointment')).toBeInTheDocument();
+    await user.click(screen.getByTitle('New reminder (Ctrl+N)'));
+    expect(screen.getByText('New Reminder')).toBeInTheDocument();
   });
 
   it('opens settings dialog from toolbar', async () => {
@@ -80,23 +91,82 @@ describe('App', () => {
     expect(screen.getByText('Accessibility settings')).toBeInTheDocument();
   });
 
-  it('opens settings dialog from accessibility shortcuts button', async () => {
+  it('opens shortcuts dialog from keyboard shortcuts button', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByText('Accessibility Shortcuts'));
-    expect(screen.getByText('Accessibility settings')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Keyboard Shortcuts' }));
+    expect(screen.getByText('CareConnect Help')).toBeInTheDocument();
   });
 
-  it('can add a new appointment', async () => {
+  it('previews accessibility changes immediately and rolls them back on close', async () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('New appointment (Ctrl+N)'));
+    expect(document.body).not.toHaveClass('large-text');
+    expect(document.body).not.toHaveClass('dark-mode');
+    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    await user.click(screen.getByLabelText('Larger text (125%)'));
+    await user.click(screen.getByLabelText('Dark Theme'));
+
+    expect(document.body).toHaveClass('large-text');
+    expect(document.body).toHaveClass('dark-mode');
+
+    const settingsDialog = screen.getByLabelText('Accessibility settings');
+    await user.click(within(settingsDialog).getByRole('button', { name: /^Close$/ }));
+
+    expect(document.body).not.toHaveClass('large-text');
+    expect(document.body).not.toHaveClass('dark-mode');
+
+    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    expect(screen.getByLabelText('Larger text (125%)')).not.toBeChecked();
+    expect(screen.getByLabelText('Dark Theme')).not.toBeChecked();
+  });
+
+  it('keeps immediately applied accessibility changes when saved', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    await user.click(screen.getByLabelText('Dark Theme'));
+    expect(document.body).toHaveClass('dark-mode');
+
+    await user.click(screen.getByText('Save settings'));
+    expect(document.body).toHaveClass('dark-mode');
+
+    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    expect(screen.getByLabelText('Dark Theme')).toBeChecked();
+  });
+
+  it('combines dark theme and high contrast without a separate setting', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    expect(screen.queryByLabelText(/dark high contrast/i)).not.toBeInTheDocument();
+
+    await user.click(screen.getByLabelText('High contrast mode'));
+    await user.click(screen.getByLabelText('Dark Theme'));
+
+    expect(document.body).toHaveClass('high-contrast', 'dark-mode');
+  });
+
+  it('can save a new reminder', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTitle('New reminder (Ctrl+N)'));
     await user.type(screen.getByLabelText(/title/i), 'Physical Therapy');
     await user.type(screen.getByLabelText(/^time$/i), '4:00 PM');
-    await user.click(screen.getByText('Add Appointment'));
+    await user.type(screen.getByLabelText(/location/i), 'PT Center');
 
+    const reminderDialog = screen.getByRole('dialog', { name: 'New Reminder' });
+    await user.click(within(reminderDialog).getByRole('button', { name: 'Save' }));
+
+    const completionDialog = screen.getByRole('dialog', { name: 'Task complete' });
     expect(screen.getByText('Physical Therapy')).toBeInTheDocument();
+    expect(within(completionDialog).getByText('Physical Therapy saved!')).toBeInTheDocument();
+    await user.click(within(completionDialog).getByRole('button', { name: /^Close$/ }));
+    expect(screen.queryByRole('dialog', { name: 'Task complete' })).not.toBeInTheDocument();
   });
 
   it('can mark a task complete', async () => {
@@ -107,6 +177,10 @@ describe('App', () => {
     await user.click(taskBtn);
     await user.click(screen.getByText('Mark complete'));
 
+    const completionDialog = screen.getByRole('dialog', { name: 'Task complete' });
+    expect(within(completionDialog).getByText('Eye Doctor Checkup marked complete!')).toBeInTheDocument();
     expect(screen.getByText('2/6')).toBeInTheDocument();
+    await user.click(within(completionDialog).getByRole('button', { name: /^Close$/ }));
+    expect(screen.queryByRole('dialog', { name: 'Task complete' })).not.toBeInTheDocument();
   });
 });

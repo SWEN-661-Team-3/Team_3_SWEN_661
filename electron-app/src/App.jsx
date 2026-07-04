@@ -9,6 +9,14 @@ import TaskDetailDialog from './components/TaskDetailDialog';
 import SettingsDialog from './components/SettingsDialog';
 import HelpDialog from './components/HelpDialog';
 import NewAppointmentDialog from './components/NewAppointmentDialog';
+import CompletionDialog from './components/CompletionDialog';
+
+const initialAccessibilitySettings = {
+  largeText: false,
+  highContrast: false,
+  darkTheme: false,
+  reduceMotion: true,
+};
 
 export default function App() {
   const [plan, setPlan] = useState(() => structuredClone(initialPlan));
@@ -19,11 +27,12 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [newApptOpen, setNewApptOpen] = useState(false);
-  const [settings, setSettings] = useState({
-    largeText: false,
-    highContrast: false,
-    reduceMotion: true,
-  });
+  const [completionOpen, setCompletionOpen] = useState(false);
+  const [completionMessage, setCompletionMessage] = useState('');
+  const [settings, setSettings] = useState(() => ({ ...initialAccessibilitySettings }));
+  const [appliedSettings, setAppliedSettings] = useState(() => ({
+    ...initialAccessibilitySettings,
+  }));
 
   const statusRef = useRef(null);
   const mainRef = useRef(null);
@@ -35,9 +44,20 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    document.body.classList.toggle('large-text', settings.largeText);
-    document.body.classList.toggle('high-contrast', settings.highContrast);
-  }, [settings]);
+    document.body.classList.toggle('large-text', appliedSettings.largeText);
+    document.body.classList.toggle('high-contrast', appliedSettings.highContrast);
+    document.body.classList.toggle('dark-mode', appliedSettings.darkTheme);
+    document.body.classList.toggle('reduce-motion', appliedSettings.reduceMotion);
+
+    return () => {
+      document.body.classList.remove(
+        'large-text',
+        'high-contrast',
+        'dark-mode',
+        'reduce-motion',
+      );
+    };
+  }, [appliedSettings]);
 
   useEffect(() => {
     const cleanup = window.careConnect?.onMenuAction?.(handleMenuAction);
@@ -75,24 +95,56 @@ export default function App() {
   }
 
   function completeTask(id) {
+    const task = plan.find((t) => t.id === id);
     setPlan((prev) =>
       prev.map((t) => (t.id === id ? { ...t, status: 'done' } : t)),
     );
     setDetailOpen(false);
-    const task = plan.find((t) => t.id === id);
-    if (task) announce(`${task.title} marked complete`);
+    if (task) {
+      const message = `${task.title} marked complete!`;
+      setCompletionMessage(message);
+      setCompletionOpen(true);
+      announce(message);
+    }
+  }
+
+  function closeCompletionDialog() {
+    setCompletionOpen(false);
+    setCompletionMessage('');
   }
 
   function addAppointment(newItem) {
     setPlan((prev) => [...prev, newItem]);
     setNewApptOpen(false);
-    announce(`${newItem.title} added to today's plan`);
+    const message = `${newItem.title} saved!`;
+    setCompletionMessage(message);
+    setCompletionOpen(true);
+    announce(message);
+  }
+
+  function openSettingsDialog() {
+    setAppliedSettings(settings);
+    setSettingsOpen(true);
+  }
+
+  function openShortcutsDialog() {
+    setHelpOpen(true);
+  }
+
+  function handlePreviewSettings(newSettings) {
+    setAppliedSettings(newSettings);
   }
 
   function handleSaveSettings(newSettings) {
     setSettings(newSettings);
+    setAppliedSettings(newSettings);
     setSettingsOpen(false);
     announce('Settings saved');
+  }
+
+  function handleCloseSettings() {
+    setAppliedSettings(settings);
+    setSettingsOpen(false);
   }
 
   function handleMenuAction(action) {
@@ -107,15 +159,15 @@ export default function App() {
         openSearch();
         break;
       case 'view-todays-plan':
-        mainRef.current?.focus();
+        mainRef.current?.focus({ preventScroll: true });
         announce("Showing today's plan");
         break;
       case 'open-settings':
-        setSettingsOpen(true);
+        openSettingsDialog();
         break;
       case 'help':
       case 'shortcuts':
-        setHelpOpen(true);
+        openShortcutsDialog();
         break;
       case 'emergency':
         announce('Emergency help — alert sent to caregivers');
@@ -149,7 +201,6 @@ export default function App() {
 
         <main id="main-content" className="main-content" tabIndex={-1} ref={mainRef}>
           <div className="page-header">
-            <h2 className="page-title">Your setup is complete.</h2>
             <p className="page-subtitle">Here is today&apos;s plan.</p>
           </div>
 
@@ -162,16 +213,17 @@ export default function App() {
 
           <HeroCard task={nextTask} onClick={openTaskDetail} />
           <StatsRow tasks={plan} />
-
-          <button
-            type="button"
-            className="primary-btn"
-            onClick={() => setSettingsOpen(true)}
-          >
-            Accessibility Shortcuts
-          </button>
         </main>
       </div>
+
+      <button
+        type="button"
+        className="floating-shortcuts-btn"
+        aria-haspopup="dialog"
+        onClick={openShortcutsDialog}
+      >
+        Keyboard Shortcuts
+      </button>
 
       <TaskDetailDialog
         task={selectedTask}
@@ -183,8 +235,9 @@ export default function App() {
       <SettingsDialog
         open={settingsOpen}
         settings={settings}
+        onChange={handlePreviewSettings}
         onSave={handleSaveSettings}
-        onClose={() => setSettingsOpen(false)}
+        onClose={handleCloseSettings}
       />
 
       <HelpDialog
@@ -196,6 +249,12 @@ export default function App() {
         open={newApptOpen}
         onClose={() => setNewApptOpen(false)}
         onAdd={addAppointment}
+      />
+
+      <CompletionDialog
+        open={completionOpen}
+        message={completionMessage}
+        onClose={closeCompletionDialog}
       />
     </>
   );

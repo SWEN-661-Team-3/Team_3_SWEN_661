@@ -16,7 +16,7 @@ describe('Keyboard Navigation', () => {
 
     await user.tab(); // skip link
     await user.tab(); // first toolbar button (New)
-    expect(screen.getByTitle('New appointment (Ctrl+N)')).toHaveFocus();
+    expect(screen.getByTitle('New reminder (Ctrl+N)')).toHaveFocus();
   });
 
   it('can tab through all toolbar buttons', async () => {
@@ -88,11 +88,11 @@ describe('Keyboard Navigation', () => {
     expect(activeEl.closest('.sidebar') || activeEl.closest('.task-list')).toBeTruthy();
   });
 
-  it('new appointment form fields are navigable via Tab', async () => {
+  it('new reminder form fields are navigable via Tab', async () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('New appointment (Ctrl+N)'));
+    await user.click(screen.getByTitle('New reminder (Ctrl+N)'));
 
     const titleInput = screen.getByLabelText(/title/i);
     titleInput.focus();

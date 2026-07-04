@@ -15,7 +15,7 @@ describe('HelpDialog', () => {
 
   it('lists keyboard shortcuts', () => {
     render(<HelpDialog open={true} onClose={onClose} />);
-    expect(screen.getByText(/New appointment/)).toBeInTheDocument();
+    expect(screen.getByText(/New reminder/)).toBeInTheDocument();
     expect(screen.getByText(/Save plan/)).toBeInTheDocument();
     expect(screen.getByText(/Search tasks/)).toBeInTheDocument();
     expect(screen.getByText(/Open settings/)).toBeInTheDocument();
@@ -30,14 +30,17 @@ describe('HelpDialog', () => {
     ).toBeInTheDocument();
   });
 
-  it('has a Got it button', () => {
+  it('does not render a secondary dismissal button', () => {
     render(<HelpDialog open={true} onClose={onClose} />);
-    expect(screen.getByText('Got it')).toBeInTheDocument();
+    expect(screen.queryByText('Got it')).not.toBeInTheDocument();
   });
 
   it('has a close button with accessible label', () => {
     render(<HelpDialog open={true} onClose={onClose} />);
-    expect(screen.getByLabelText(/close help/i)).toBeInTheDocument();
+    const closeButtons = screen.getAllByRole('button', { name: /^Close$/ });
+    expect(closeButtons).toHaveLength(1);
+    const [closeButton] = closeButtons;
+    expect(closeButton).toHaveTextContent('X');
   });
 
   it('renders kbd elements for keyboard shortcuts', () => {

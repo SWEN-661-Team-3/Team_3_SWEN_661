@@ -62,7 +62,7 @@ describe('data module', () => {
     it('has medication, appointment, and health-task labels', () => {
       expect(typeLabels.medication.label).toBe('Medication');
       expect(typeLabels.appointment.label).toBe('Appointment');
-      expect(typeLabels['health-task'].label).toBe('Health task');
+      expect(typeLabels['health-task'].label).toBe('Health Task');
     });
   });
 

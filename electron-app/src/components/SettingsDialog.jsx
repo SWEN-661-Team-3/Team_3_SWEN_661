@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 
-export default function SettingsDialog({ open, settings, onSave, onClose }) {
+export default function SettingsDialog({ open, settings, onChange, onSave, onClose }) {
   const dialogRef = useRef(null);
   const [local, setLocal] = useState({ ...settings });
 
@@ -20,6 +20,12 @@ export default function SettingsDialog({ open, settings, onSave, onClose }) {
     onSave(local);
   }
 
+  function handleSettingChange(name, value) {
+    const nextSettings = { ...local, [name]: value };
+    setLocal(nextSettings);
+    onChange?.(nextSettings);
+  }
+
   return (
     <dialog
       className="dialog"
@@ -33,10 +39,10 @@ export default function SettingsDialog({ open, settings, onSave, onClose }) {
           <button
             type="button"
             className="dialog__close"
-            aria-label="Close settings"
+            aria-label="Close"
             onClick={onClose}
           >
-            Close
+            <span aria-hidden="true">X</span>
           </button>
         </header>
 
@@ -47,7 +53,7 @@ export default function SettingsDialog({ open, settings, onSave, onClose }) {
               <input
                 type="checkbox"
                 checked={local.largeText}
-                onChange={(e) => setLocal({ ...local, largeText: e.target.checked })}
+                onChange={(e) => handleSettingChange('largeText', e.target.checked)}
               />
               <span>Larger text (125%)</span>
             </label>
@@ -55,15 +61,23 @@ export default function SettingsDialog({ open, settings, onSave, onClose }) {
               <input
                 type="checkbox"
                 checked={local.highContrast}
-                onChange={(e) => setLocal({ ...local, highContrast: e.target.checked })}
+                onChange={(e) => handleSettingChange('highContrast', e.target.checked)}
               />
               <span>High contrast mode</span>
             </label>
             <label className="settings-row">
               <input
                 type="checkbox"
+                checked={local.darkTheme}
+                onChange={(e) => handleSettingChange('darkTheme', e.target.checked)}
+              />
+              <span>Dark Theme</span>
+            </label>
+            <label className="settings-row">
+              <input
+                type="checkbox"
                 checked={local.reduceMotion}
-                onChange={(e) => setLocal({ ...local, reduceMotion: e.target.checked })}
+                onChange={(e) => handleSettingChange('reduceMotion', e.target.checked)}
               />
               <span>Reduce motion</span>
             </label>

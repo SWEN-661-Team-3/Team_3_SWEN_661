@@ -33,7 +33,7 @@ export default function SearchBar({ visible, value, onChange, onClose }) {
         aria-label="Close search"
         onClick={onClose}
       >
-        Close
+        <span aria-hidden="true">X</span>
       </button>
     </div>
   );

@@ -42,7 +42,9 @@ describe('SearchBar', () => {
   it('calls onClose when close button is clicked', async () => {
     const user = userEvent.setup();
     render(<SearchBar {...defaultProps} />);
-    await user.click(screen.getByLabelText(/close search/i));
+    const closeButton = screen.getByLabelText(/close search/i);
+    expect(closeButton).toHaveTextContent('X');
+    await user.click(closeButton);
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
   });
 

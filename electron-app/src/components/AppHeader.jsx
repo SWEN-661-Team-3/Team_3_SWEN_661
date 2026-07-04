@@ -1,6 +1,6 @@
 export default function AppHeader({ onAction }) {
   const buttons = [
-    { action: 'new-record', label: 'New', title: 'New appointment (Ctrl+N)' },
+    { action: 'new-record', label: 'New', title: 'New reminder (Ctrl+N)' },
     { action: 'save', label: 'Save', title: 'Save (Ctrl+S)' },
     'divider',
     { action: 'search', label: 'Search', title: 'Search (Ctrl+F)' },

@@ -28,12 +28,12 @@ export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
         <header className="dialog__header">
           <h2 id="detail-dialog-title">{task.title}</h2>
           <button
-            type="submit"
+            type="button"
             className="dialog__close"
-            value="cancel"
-            aria-label="Close dialog"
+            aria-label="Close"
+            onClick={onClose}
           >
-            Close
+            <span aria-hidden="true">X</span>
           </button>
         </header>
 
@@ -49,10 +49,7 @@ export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
           </div>
           <div className="detail-row">
             <p className="detail-row__label">Type</p>
-            <p className="detail-row__value">
-              <span aria-hidden="true">{type.icon}</span>
-              {' '}{type.label}
-            </p>
+            <p className="detail-row__value">{type.label}</p>
           </div>
           <div className="detail-row">
             <p className="detail-row__label">Time</p>
@@ -70,8 +67,8 @@ export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
           )}
         </div>
 
-        <footer className="dialog__footer">
-          {task.status !== 'done' && (
+        {task.status !== 'done' && (
+          <footer className="dialog__footer">
             <button
               type="button"
               className="primary-btn"
@@ -79,11 +76,8 @@ export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
             >
               Mark complete
             </button>
-          )}
-          <button type="submit" className="secondary-btn" value="cancel">
-            Close
-          </button>
-        </footer>
+          </footer>
+        )}
       </form>
     </dialog>
   );

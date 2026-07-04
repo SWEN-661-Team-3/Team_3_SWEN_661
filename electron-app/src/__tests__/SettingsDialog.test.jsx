@@ -6,12 +6,15 @@ describe('SettingsDialog', () => {
   const defaultSettings = {
     largeText: false,
     highContrast: false,
+    darkTheme: false,
     reduceMotion: true,
   };
+  const onChange = jest.fn();
   const onSave = jest.fn();
   const onClose = jest.fn();
 
   beforeEach(() => {
+    onChange.mockClear();
     onSave.mockClear();
     onClose.mockClear();
   });
@@ -29,6 +32,7 @@ describe('SettingsDialog', () => {
     );
     expect(screen.getByText('Larger text (125%)')).toBeInTheDocument();
     expect(screen.getByText('High contrast mode')).toBeInTheDocument();
+    expect(screen.getByText('Dark Theme')).toBeInTheDocument();
     expect(screen.getByText('Reduce motion')).toBeInTheDocument();
   });
 
@@ -43,15 +47,20 @@ describe('SettingsDialog', () => {
     render(
       <SettingsDialog
         open={true}
-        settings={{ largeText: true, highContrast: true, reduceMotion: false }}
+        settings={{
+          largeText: true,
+          highContrast: true,
+          darkTheme: true,
+          reduceMotion: false,
+        }}
         onSave={onSave}
         onClose={onClose}
       />,
     );
-    const checkboxes = screen.getAllByRole('checkbox');
-    expect(checkboxes[0].checked).toBe(true);
-    expect(checkboxes[1].checked).toBe(true);
-    expect(checkboxes[2].checked).toBe(false);
+    expect(screen.getByLabelText('Larger text (125%)')).toBeChecked();
+    expect(screen.getByLabelText('High contrast mode')).toBeChecked();
+    expect(screen.getByLabelText('Dark Theme')).toBeChecked();
+    expect(screen.getByLabelText('Reduce motion')).not.toBeChecked();
   });
 
   it('calls onSave with updated settings on submit', async () => {
@@ -67,12 +76,32 @@ describe('SettingsDialog', () => {
     );
   });
 
+  it('calls onChange as soon as a setting is clicked', async () => {
+    const user = userEvent.setup();
+    render(
+      <SettingsDialog
+        open={true}
+        settings={defaultSettings}
+        onChange={onChange}
+        onSave={onSave}
+        onClose={onClose}
+      />,
+    );
+    await user.click(screen.getByLabelText('Dark Theme'));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ darkTheme: true }),
+    );
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
   it('calls onClose when close button is clicked', async () => {
     const user = userEvent.setup();
     render(
       <SettingsDialog open={true} settings={defaultSettings} onSave={onSave} onClose={onClose} />,
     );
-    await user.click(screen.getByLabelText(/close settings/i));
+    const closeButton = screen.getByRole('button', { name: /^Close$/ });
+    expect(closeButton).toHaveTextContent('X');
+    await user.click(closeButton);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 

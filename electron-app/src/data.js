@@ -112,7 +112,7 @@ export const statusLabels = {
 export const typeLabels = {
   medication: { label: 'Medication', icon: 'Rx' },
   appointment: { label: 'Appointment', icon: 'Cal' },
-  'health-task': { label: 'Health task', icon: 'H' },
+  'health-task': { label: 'Health Task', icon: 'H' },
 };
 
 export const typeOptions = [

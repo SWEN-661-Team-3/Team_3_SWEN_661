@@ -21,12 +21,12 @@ export default function HelpDialog({ open, onClose }) {
         <header className="dialog__header">
           <h2 id="help-dialog-title">CareConnect Help</h2>
           <button
-            type="submit"
+            type="button"
             className="dialog__close"
-            value="cancel"
-            aria-label="Close help"
+            aria-label="Close"
+            onClick={onClose}
           >
-            Close
+            <span aria-hidden="true">X</span>
           </button>
         </header>
 
@@ -36,7 +36,7 @@ export default function HelpDialog({ open, onClose }) {
             actions work with the keyboard.
           </p>
           <ul className="help-list">
-            <li><kbd>Ctrl</kbd>+<kbd>N</kbd> — New appointment</li>
+            <li><kbd>Ctrl</kbd>+<kbd>N</kbd> — New reminder</li>
             <li><kbd>Ctrl</kbd>+<kbd>S</kbd> — Save plan</li>
             <li><kbd>Ctrl</kbd>+<kbd>F</kbd> — Search tasks</li>
             <li><kbd>Ctrl</kbd>+<kbd>,</kbd> — Open settings</li>
@@ -46,11 +46,6 @@ export default function HelpDialog({ open, onClose }) {
           </ul>
         </div>
 
-        <footer className="dialog__footer">
-          <button type="submit" className="primary-btn" value="default">
-            Got it
-          </button>
-        </footer>
       </form>
     </dialog>
   );
