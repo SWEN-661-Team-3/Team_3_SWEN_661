@@ -34,7 +34,7 @@ describe('Keyboard Navigation', () => {
     await user.tab(); // Settings
     expect(screen.getByTitle('Settings (Ctrl+,)')).toHaveFocus();
     await user.tab(); // Emergency
-    expect(screen.getByTitle('Emergency help')).toHaveFocus();
+    expect(screen.getByTitle('Emergency help (F2)')).toHaveFocus();
   });
 
   it('hero card is focusable and activatable via keyboard', async () => {

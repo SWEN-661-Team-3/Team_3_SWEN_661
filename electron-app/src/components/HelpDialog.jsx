@@ -43,6 +43,7 @@ export default function HelpDialog({ open, onClose }) {
             <li><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> — Move between panels</li>
             <li><kbd>Esc</kbd> — Close dialog</li>
             <li><kbd>F1</kbd> — This help panel</li>
+            <li><kbd>F2</kbd> &mdash; Emergency help</li>
           </ul>
         </div>
 

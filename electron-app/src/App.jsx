@@ -8,6 +8,7 @@ import StatsRow from './components/StatsRow';
 import TaskDetailDialog from './components/TaskDetailDialog';
 import SettingsDialog from './components/SettingsDialog';
 import HelpDialog from './components/HelpDialog';
+import EmergencyDialog from './components/EmergencyDialog';
 import NewAppointmentDialog from './components/NewAppointmentDialog';
 import CompletionDialog from './components/CompletionDialog';
 
@@ -26,6 +27,7 @@ export default function App() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [emergencyOpen, setEmergencyOpen] = useState(false);
   const [newApptOpen, setNewApptOpen] = useState(false);
   const [completionOpen, setCompletionOpen] = useState(false);
   const [completionMessage, setCompletionMessage] = useState('');
@@ -66,6 +68,11 @@ export default function App() {
 
   useEffect(() => {
     function handleKeyDown(e) {
+      if (e.key === 'F2') {
+        e.preventDefault();
+        openEmergencyDialog();
+      }
+
       if (e.key === 'Escape' && searchVisible) {
         closeSearch();
       }
@@ -77,6 +84,7 @@ export default function App() {
   const nextTask = plan.find((t) => t.status === 'todo') ?? plan[0];
   const selectedTask = plan.find((t) => t.id === selectedId) ?? null;
   const helperName = caregivers[0]?.name ?? 'Helper';
+  const emergencyContacts = caregivers.slice(0, 2);
 
   function openSearch() {
     setSearchVisible(true);
@@ -131,6 +139,15 @@ export default function App() {
     setHelpOpen(true);
   }
 
+  function openEmergencyDialog() {
+    setEmergencyOpen(true);
+    announce('Emergency help opened');
+  }
+
+  function handleEmergencyAlertSent() {
+    announce('Alert sent. Help is on the way. Your emergency contacts have been notified.');
+  }
+
   function handlePreviewSettings(newSettings) {
     setAppliedSettings(newSettings);
   }
@@ -170,7 +187,7 @@ export default function App() {
         openShortcutsDialog();
         break;
       case 'emergency':
-        announce('Emergency help — alert sent to caregivers');
+        openEmergencyDialog();
         break;
       default:
         break;
@@ -243,6 +260,13 @@ export default function App() {
       <HelpDialog
         open={helpOpen}
         onClose={() => setHelpOpen(false)}
+      />
+
+      <EmergencyDialog
+        open={emergencyOpen}
+        contacts={emergencyContacts}
+        onClose={() => setEmergencyOpen(false)}
+        onAlertSent={handleEmergencyAlertSent}
       />
 
       <NewAppointmentDialog

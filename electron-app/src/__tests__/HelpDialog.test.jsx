@@ -21,6 +21,7 @@ describe('HelpDialog', () => {
     expect(screen.getByText(/Open settings/)).toBeInTheDocument();
     expect(screen.getByText(/Close dialog/)).toBeInTheDocument();
     expect(screen.getByText(/This help panel/)).toBeInTheDocument();
+    expect(screen.getByText(/Emergency help/)).toBeInTheDocument();
   });
 
   it('shows usage instructions', () => {

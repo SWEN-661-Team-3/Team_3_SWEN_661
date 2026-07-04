@@ -98,6 +98,25 @@ describe('App', () => {
     expect(screen.getByText('CareConnect Help')).toBeInTheDocument();
   });
 
+  it('opens emergency help from the toolbar', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByTitle('Emergency help (F2)'));
+
+    const emergencyDialog = screen.getByRole('dialog', { name: 'Emergency Help' });
+    expect(within(emergencyDialog).getByRole('button', { name: 'I Need Help' })).toBeInTheDocument();
+  });
+
+  it('opens emergency help with the F2 shortcut', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.keyboard('{F2}');
+
+    const emergencyDialog = screen.getByRole('dialog', { name: 'Emergency Help' });
+    expect(within(emergencyDialog).getByRole('button', { name: 'I Need Help' })).toBeInTheDocument();
+  });
+
   it('previews accessibility changes immediately and rolls them back on close', async () => {
     const user = userEvent.setup();
     render(<App />);

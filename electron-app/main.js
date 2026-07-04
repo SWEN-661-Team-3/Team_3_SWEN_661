@@ -95,6 +95,12 @@ function buildMenu() {
       label: 'Help',
       submenu: [
         {
+          label: 'Emergency Help',
+          accelerator: 'F2',
+          click: () => sendMenuAction('emergency'),
+        },
+        { type: 'separator' },
+        {
           label: 'CareConnect Help',
           accelerator: 'F1',
           click: () => sendMenuAction('help'),

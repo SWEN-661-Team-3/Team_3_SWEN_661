@@ -7,7 +7,7 @@ export default function AppHeader({ onAction }) {
     { action: 'view-todays-plan', label: "Today's Plan", title: "Today's Plan (Ctrl+1)", active: true },
     { action: 'open-settings', label: 'Settings', title: 'Settings (Ctrl+,)' },
     'divider',
-    { action: 'emergency', label: 'Emergency', title: 'Emergency help', danger: true },
+    { action: 'emergency', label: 'Emergency', title: 'Emergency help (F2)', danger: true },
   ];
 
   return (
