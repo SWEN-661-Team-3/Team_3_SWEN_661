@@ -18,6 +18,8 @@ describe('HelpDialog', () => {
     expect(screen.getByText(/New reminder/)).toBeInTheDocument();
     expect(screen.getByText(/Save plan/)).toBeInTheDocument();
     expect(screen.getByText(/Search tasks/)).toBeInTheDocument();
+    expect(screen.getByText(/Today's plan/)).toBeInTheDocument();
+    expect(screen.getByText(/Care Team/)).toBeInTheDocument();
     expect(screen.getByText(/Open settings/)).toBeInTheDocument();
     expect(screen.getByText(/Close dialog/)).toBeInTheDocument();
     expect(screen.getByText(/This help panel/)).toBeInTheDocument();

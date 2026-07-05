@@ -1,10 +1,21 @@
-export default function AppHeader({ onAction }) {
+export default function AppHeader({ activeView = 'today', onAction }) {
   const buttons = [
     { action: 'new-record', label: 'New', title: 'New reminder (Ctrl+N)' },
     { action: 'save', label: 'Save', title: 'Save (Ctrl+S)' },
     'divider',
     { action: 'search', label: 'Search', title: 'Search (Ctrl+F)' },
-    { action: 'view-todays-plan', label: "Today's Plan", title: "Today's Plan (Ctrl+1)", active: true },
+    {
+      action: 'view-todays-plan',
+      label: "Today's Plan",
+      title: "Today's Plan (Ctrl+1)",
+      active: activeView === 'today',
+    },
+    {
+      action: 'view-care-team',
+      label: 'Care Team',
+      title: 'Care Team (Ctrl+2)',
+      active: activeView === 'care-team',
+    },
     { action: 'open-settings', label: 'Settings', title: 'Settings (Ctrl+,)' },
     'divider',
     { action: 'emergency', label: 'Emergency', title: 'Emergency help (F2)', danger: true },

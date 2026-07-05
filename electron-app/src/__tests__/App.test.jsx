@@ -91,6 +91,39 @@ describe('App', () => {
     expect(screen.getByText('Accessibility settings')).toBeInTheDocument();
   });
 
+  it('opens the Care Team page from the toolbar', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
+
+    expect(screen.getByRole('heading', { name: 'Care Team' })).toBeInTheDocument();
+    expect(screen.getByText('3 helpers on your care team')).toBeInTheDocument();
+    expect(screen.getByRole('article', { name: 'Sarah Johnson' })).toBeInTheDocument();
+  });
+
+  it('opens the Care Team page with Ctrl+2', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.keyboard('{Control>}2{/Control}');
+
+    expect(screen.getByRole('heading', { name: 'Care Team' })).toBeInTheDocument();
+  });
+
+  it('keeps menu shortcuts available inside Care Team dialogs', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
+    await user.click(screen.getByRole('button', { name: 'Add Helper' }));
+    await user.type(screen.getByLabelText('Name'), 'Pat Lee');
+    await user.keyboard('{Control>}f{/Control}');
+
+    expect(screen.getByPlaceholderText(/search tasks/i)).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Add Helper' })).toBeInTheDocument();
+  });
+
   it('opens shortcuts dialog from keyboard shortcuts button', async () => {
     const user = userEvent.setup();
     render(<App />);

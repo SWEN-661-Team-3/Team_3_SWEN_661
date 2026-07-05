@@ -31,6 +31,8 @@ describe('Keyboard Navigation', () => {
     expect(screen.getByTitle('Search (Ctrl+F)')).toHaveFocus();
     await user.tab(); // Today's Plan
     expect(screen.getByTitle("Today's Plan (Ctrl+1)")).toHaveFocus();
+    await user.tab(); // Care Team
+    expect(screen.getByTitle('Care Team (Ctrl+2)')).toHaveFocus();
     await user.tab(); // Settings
     expect(screen.getByTitle('Settings (Ctrl+,)')).toHaveFocus();
     await user.tab(); // Emergency
@@ -80,7 +82,7 @@ describe('Keyboard Navigation', () => {
     render(<App />);
 
     await user.tab(); // skip link
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 7; i++) {
       await user.tab(); // toolbar buttons
     }
     await user.tab(); // first sidebar task

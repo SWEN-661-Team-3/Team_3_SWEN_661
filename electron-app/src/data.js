@@ -15,7 +15,7 @@ export const caregivers = [
     name: 'Dr. Emily Smith',
     relationship: 'Doctor',
     role: 'Eye Doctor',
-    availability: 'busy',
+    availability: 'away',
     phone: '(555) 891-2345',
     notes: 'City Eye Clinic, 123 Vision Way. Call to reschedule.',
     initials: 'ES',

@@ -859,7 +859,7 @@ body.dark-mode.high-contrast {
   color: var(--color-success);
 }
 
-.availability-badge--busy {
+.availability-badge--away {
   background: var(--color-warning-bg);
   color: var(--color-warning);
 }
@@ -1123,6 +1123,10 @@ body.dark-mode.high-contrast {
   font-weight: 700;
 }
 
+.form-row + .form-row {
+  margin-top: var(--space-4);
+}
+
 .form-control {
   width: 100%;
   min-height: 3rem;
@@ -1143,6 +1147,14 @@ body.dark-mode.high-contrast {
 
 .form-control::placeholder {
   color: var(--color-text-muted);
+}
+
+.form-helper {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  line-height: var(--line-height-body);
 }
 
 .remove-helper-message {

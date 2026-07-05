@@ -25,6 +25,7 @@ describe('AppHeader', () => {
     expect(screen.getByText('Save')).toBeInTheDocument();
     expect(screen.getByText('Search')).toBeInTheDocument();
     expect(screen.getByText("Today's Plan")).toBeInTheDocument();
+    expect(screen.getByText('Care Team')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
     expect(screen.getByText('Emergency')).toBeInTheDocument();
   });
@@ -41,6 +42,9 @@ describe('AppHeader', () => {
 
     await user.click(screen.getByText('Search'));
     expect(onAction).toHaveBeenCalledWith('search');
+
+    await user.click(screen.getByText('Care Team'));
+    expect(onAction).toHaveBeenCalledWith('view-care-team');
   });
 
   it('calls onAction with emergency when Emergency button is clicked', async () => {
@@ -65,6 +69,13 @@ describe('AppHeader', () => {
     render(<AppHeader onAction={onAction} />);
     const btn = screen.getByText("Today's Plan");
     expect(btn.className).toContain('toolbar-btn--active');
+  });
+
+  it('applies active class to Care Team button', () => {
+    render(<AppHeader activeView="care-team" onAction={onAction} />);
+    const btn = screen.getByText('Care Team');
+    expect(btn.className).toContain('toolbar-btn--active');
+    expect(screen.getByText("Today's Plan").className).not.toContain('toolbar-btn--active');
   });
 
   it('applies danger class to Emergency button', () => {

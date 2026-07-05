@@ -11,6 +11,7 @@ import HelpDialog from './components/HelpDialog';
 import EmergencyDialog from './components/EmergencyDialog';
 import NewAppointmentDialog from './components/NewAppointmentDialog';
 import CompletionDialog from './components/CompletionDialog';
+import CareTeamPage from './components/CareTeamPage';
 
 const initialAccessibilitySettings = {
   largeText: false,
@@ -21,6 +22,8 @@ const initialAccessibilitySettings = {
 
 export default function App() {
   const [plan, setPlan] = useState(() => structuredClone(initialPlan));
+  const [helpers, setHelpers] = useState(() => structuredClone(caregivers));
+  const [activeView, setActiveView] = useState('today');
   const [selectedId, setSelectedId] = useState(null);
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,9 +71,48 @@ export default function App() {
 
   useEffect(() => {
     function handleKeyDown(e) {
+      const hasMenuModifier = e.ctrlKey || e.metaKey;
+      const key = e.key.toLowerCase();
+
       if (e.key === 'F2') {
         e.preventDefault();
         openEmergencyDialog();
+      }
+
+      if (e.key === 'F1') {
+        e.preventDefault();
+        openShortcutsDialog();
+      }
+
+      if (hasMenuModifier) {
+        switch (key) {
+          case 'n':
+            e.preventDefault();
+            setNewApptOpen(true);
+            break;
+          case 's':
+            e.preventDefault();
+            announce("Today's plan saved");
+            break;
+          case 'f':
+            e.preventDefault();
+            openSearch();
+            break;
+          case '1':
+            e.preventDefault();
+            showTodaysPlan();
+            break;
+          case '2':
+            e.preventDefault();
+            showCareTeam();
+            break;
+          case ',':
+            e.preventDefault();
+            openSettingsDialog();
+            break;
+          default:
+            break;
+        }
       }
 
       if (e.key === 'Escape' && searchVisible) {
@@ -79,12 +121,12 @@ export default function App() {
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [searchVisible]);
+  }, [searchVisible, settings]);
 
   const nextTask = plan.find((t) => t.status === 'todo') ?? plan[0];
   const selectedTask = plan.find((t) => t.id === selectedId) ?? null;
-  const helperName = caregivers[0]?.name ?? 'Helper';
-  const emergencyContacts = caregivers.slice(0, 2);
+  const helperName = helpers[0]?.name ?? 'Helper';
+  const emergencyContacts = helpers.slice(0, 2);
 
   function openSearch() {
     setSearchVisible(true);
@@ -93,6 +135,18 @@ export default function App() {
   function closeSearch() {
     setSearchVisible(false);
     setSearchQuery('');
+  }
+
+  function showTodaysPlan() {
+    setActiveView('today');
+    mainRef.current?.focus({ preventScroll: true });
+    announce("Showing today's plan");
+  }
+
+  function showCareTeam() {
+    setActiveView('care-team');
+    mainRef.current?.focus({ preventScroll: true });
+    announce('Showing Care Team');
   }
 
   function openTaskDetail(id) {
@@ -176,8 +230,10 @@ export default function App() {
         openSearch();
         break;
       case 'view-todays-plan':
-        mainRef.current?.focus({ preventScroll: true });
-        announce("Showing today's plan");
+        showTodaysPlan();
+        break;
+      case 'view-care-team':
+        showCareTeam();
         break;
       case 'open-settings':
         openSettingsDialog();
@@ -198,7 +254,7 @@ export default function App() {
     <>
       <a className="skip-link" href="#main-content">Skip to main content</a>
 
-      <AppHeader onAction={handleMenuAction} />
+      <AppHeader activeView={activeView} onAction={handleMenuAction} />
 
       <SearchBar
         visible={searchVisible}
@@ -207,19 +263,28 @@ export default function App() {
         onClose={closeSearch}
       />
 
-      <div className="app-layout">
-        <Sidebar
-          helperName={helperName}
-          tasks={plan}
-          selectedId={selectedId}
-          filter={searchQuery}
-          onSelectTask={openTaskDetail}
-        />
+      <div className={`app-layout ${activeView === 'care-team' ? 'app-layout--care-team' : ''}`}>
+        {activeView === 'today' && (
+          <Sidebar
+            helperName={helperName}
+            tasks={plan}
+            selectedId={selectedId}
+            filter={searchQuery}
+            onSelectTask={openTaskDetail}
+          />
+        )}
 
-        <main id="main-content" className="main-content" tabIndex={-1} ref={mainRef}>
-          <div className="page-header">
-            <p className="page-subtitle">Here is today&apos;s plan.</p>
-          </div>
+        <main
+          id="main-content"
+          className={`main-content ${activeView === 'care-team' ? 'main-content--wide' : ''}`}
+          tabIndex={-1}
+          ref={mainRef}
+        >
+          {activeView === 'today' && (
+            <div className="page-header">
+              <p className="page-subtitle">Here is today&apos;s plan.</p>
+            </div>
+          )}
 
           <div
             ref={statusRef}
@@ -228,8 +293,18 @@ export default function App() {
             aria-atomic="true"
           />
 
-          <HeroCard task={nextTask} onClick={openTaskDetail} />
-          <StatsRow tasks={plan} />
+          {activeView === 'today' ? (
+            <>
+              <HeroCard task={nextTask} onClick={openTaskDetail} />
+              <StatsRow tasks={plan} />
+            </>
+          ) : (
+            <CareTeamPage
+              helpers={helpers}
+              onHelpersChange={setHelpers}
+              onAnnounce={announce}
+            />
+          )}
         </main>
       </div>
 

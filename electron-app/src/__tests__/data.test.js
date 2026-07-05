@@ -15,6 +15,12 @@ describe('data module', () => {
         expect(c).toHaveProperty('phone');
       });
     });
+
+    it('uses supported availability statuses', () => {
+      caregivers.forEach((c) => {
+        expect(['available', 'away', 'offline']).toContain(c.availability);
+      });
+    });
   });
 
   describe('initialPlan', () => {

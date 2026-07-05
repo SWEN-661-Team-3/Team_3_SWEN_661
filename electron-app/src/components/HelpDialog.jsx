@@ -36,17 +36,18 @@ export default function HelpDialog({ open, onClose }) {
             actions work with the keyboard.
           </p>
           <ul className="help-list">
-            <li><kbd>Ctrl</kbd>+<kbd>N</kbd> — New reminder</li>
-            <li><kbd>Ctrl</kbd>+<kbd>S</kbd> — Save plan</li>
-            <li><kbd>Ctrl</kbd>+<kbd>F</kbd> — Search tasks</li>
-            <li><kbd>Ctrl</kbd>+<kbd>,</kbd> — Open settings</li>
-            <li><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> — Move between panels</li>
-            <li><kbd>Esc</kbd> — Close dialog</li>
-            <li><kbd>F1</kbd> — This help panel</li>
+            <li><kbd>Ctrl</kbd>+<kbd>N</kbd> &mdash; New reminder</li>
+            <li><kbd>Ctrl</kbd>+<kbd>S</kbd> &mdash; Save plan</li>
+            <li><kbd>Ctrl</kbd>+<kbd>F</kbd> &mdash; Search tasks</li>
+            <li><kbd>Ctrl</kbd>+<kbd>1</kbd> &mdash; Today&apos;s plan</li>
+            <li><kbd>Ctrl</kbd>+<kbd>2</kbd> &mdash; Care Team</li>
+            <li><kbd>Ctrl</kbd>+<kbd>,</kbd> &mdash; Open settings</li>
+            <li><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> &mdash; Move between panels</li>
+            <li><kbd>Esc</kbd> &mdash; Close dialog</li>
+            <li><kbd>F1</kbd> &mdash; This help panel</li>
             <li><kbd>F2</kbd> &mdash; Emergency help</li>
           </ul>
         </div>
-
       </form>
     </dialog>
   );
