@@ -9,7 +9,7 @@
     "start": "electron .",
     "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "test": "jest --verbose",
-    "test:coverage": "jest --coverage --verbose",
+    "test:coverage": "jest --coverage --runInBand --verbose",
     "package": "vite build && electron-builder --win",
     "package:dir": "vite build && electron-builder --win --dir"
   },

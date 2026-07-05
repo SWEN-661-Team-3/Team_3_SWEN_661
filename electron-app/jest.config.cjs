@@ -14,6 +14,8 @@ module.exports = {
     '!src/main.jsx',
     '!src/styles/**',
   ],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'html', 'lcov', 'json', 'clover'],
   coverageThreshold: {
     global: {
       statements: 60,
