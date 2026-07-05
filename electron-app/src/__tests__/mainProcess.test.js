@@ -1,3 +1,13 @@
+const path = require('path');
+const { pathToFileURL } = require('url');
+
+const trustedRendererUrl = pathToFileURL(
+  path.join(__dirname, '..', '..', 'dist', 'index.html'),
+).toString();
+
+const trustedIpcEvent = { senderFrame: { url: trustedRendererUrl } };
+const untrustedIpcEvent = { senderFrame: { url: 'https://attacker.example' } };
+
 const loadMainProcess = ({
   isPackaged = true,
   runReadyCallback = true,
@@ -14,13 +24,18 @@ const loadMainProcess = ({
   const appEvents = {};
   const ipcEvents = {};
   const ipcHandlers = {};
+  const webContentsEvents = {};
 
   const mockWindow = {
     isDestroyed: jest.fn(() => false),
     loadFile: mockLoadFile,
     loadURL: mockLoadURL,
     webContents: {
+      on: jest.fn((eventName, handler) => {
+        webContentsEvents[eventName] = handler;
+      }),
       send: mockWindowSend,
+      setWindowOpenHandler: jest.fn(),
     },
   };
 
@@ -46,6 +61,14 @@ const loadMainProcess = ({
     BrowserWindow: MockBrowserWindow,
     dialog: {
       showSaveDialog: jest.fn().mockResolvedValue(saveDialogResult),
+    },
+    session: {
+      defaultSession: {
+        setPermissionRequestHandler: jest.fn(),
+        webRequest: {
+          onHeadersReceived: jest.fn(),
+        },
+      },
     },
     ipcMain: {
       handle: jest.fn((channel, handler) => {
@@ -80,8 +103,21 @@ const loadMainProcess = ({
     mockLoadURL,
     mockWindow,
     mockWindowSend,
+    webContentsEvents,
     mockWriteFile,
   };
+};
+
+const createMockWebContents = () => {
+  const events = {};
+  const contents = {
+    on: jest.fn((eventName, handler) => {
+      events[eventName] = handler;
+    }),
+    setWindowOpenHandler: jest.fn(),
+  };
+
+  return { contents, events };
 };
 
 const findMenuItem = (template, label) => {
@@ -101,6 +137,120 @@ describe('main process IPC', () => {
     jest.dontMock('fs/promises');
   });
 
+  it('creates a hardened BrowserWindow', () => {
+    const { mockElectron } = loadMainProcess();
+
+    expect(mockElectron.BrowserWindow).toHaveBeenCalledWith(expect.objectContaining({
+      webPreferences: expect.objectContaining({
+        allowRunningInsecureContent: false,
+        contextIsolation: true,
+        nodeIntegration: false,
+        sandbox: true,
+        webSecurity: true,
+        webviewTag: false,
+      }),
+    }));
+  });
+
+  it('applies a restrictive Content Security Policy header', () => {
+    const { mockElectron } = loadMainProcess();
+    const headerHandler = mockElectron.session.defaultSession.webRequest.onHeadersReceived
+      .mock.calls[0][0];
+    const callback = jest.fn();
+
+    headerHandler({ responseHeaders: { 'X-Test': ['ok'] } }, callback);
+
+    expect(callback).toHaveBeenCalledWith({
+      responseHeaders: expect.objectContaining({
+        'Content-Security-Policy': [
+          expect.stringContaining("default-src 'self'"),
+        ],
+        'X-Test': ['ok'],
+      }),
+    });
+  });
+
+  it('uses the production CSP by default', () => {
+    const { mockElectron } = loadMainProcess();
+    const headerHandler = mockElectron.session.defaultSession.webRequest.onHeadersReceived
+      .mock.calls[0][0];
+    const callback = jest.fn();
+
+    headerHandler({ responseHeaders: {} }, callback);
+
+    const csp = callback.mock.calls[0][0].responseHeaders['Content-Security-Policy'][0];
+    expect(csp).toContain("script-src 'self';");
+    expect(csp).toContain("style-src 'self' 'unsafe-inline' https://fonts.googleapis.com");
+    expect(csp).not.toContain('ws://localhost:5173');
+  });
+
+  it('allows only the Vite development script and websocket requirements in dev CSP', () => {
+    const { mockElectron } = loadMainProcess({ isPackaged: false });
+    const headerHandler = mockElectron.session.defaultSession.webRequest.onHeadersReceived
+      .mock.calls[0][0];
+    const callback = jest.fn();
+
+    headerHandler({ responseHeaders: {} }, callback);
+
+    const csp = callback.mock.calls[0][0].responseHeaders['Content-Security-Policy'][0];
+    expect(csp).toContain("script-src 'self' 'unsafe-inline'");
+    expect(csp).toContain("connect-src 'self' ws://localhost:5173");
+  });
+
+  it('denies renderer permission requests by default', () => {
+    const { mockElectron } = loadMainProcess();
+    const permissionHandler = mockElectron.session.defaultSession.setPermissionRequestHandler
+      .mock.calls[0][0];
+    const callback = jest.fn();
+
+    permissionHandler({}, 'notifications', callback);
+
+    expect(callback).toHaveBeenCalledWith(false);
+  });
+
+  it('blocks unexpected navigation, new windows, and webviews', () => {
+    const { appEvents, mockElectron } = loadMainProcess({ isPackaged: false });
+    const { contents, events } = createMockWebContents();
+
+    appEvents['web-contents-created']({}, contents);
+
+    const blockedNavigation = { preventDefault: jest.fn() };
+    events['will-navigate'](blockedNavigation, 'https://attacker.example');
+    expect(blockedNavigation.preventDefault).toHaveBeenCalled();
+
+    const allowedNavigation = { preventDefault: jest.fn() };
+    events['will-navigate'](allowedNavigation, 'http://localhost:5173/care-team');
+    expect(allowedNavigation.preventDefault).not.toHaveBeenCalled();
+
+    const webviewEvent = { preventDefault: jest.fn() };
+    events['will-attach-webview'](webviewEvent);
+    expect(webviewEvent.preventDefault).toHaveBeenCalled();
+
+    const windowOpenHandler = contents.setWindowOpenHandler.mock.calls[0][0];
+    expect(windowOpenHandler({ url: 'https://attacker.example' })).toEqual({ action: 'deny' });
+    expect(mockElectron.shell.openExternal).not.toHaveBeenCalled();
+  });
+
+  it('opens only approved external URLs outside Electron', () => {
+    const { appEvents, mockElectron } = loadMainProcess({ isPackaged: false });
+    const { contents, events } = createMockWebContents();
+
+    appEvents['web-contents-created']({}, contents);
+
+    const phoneNavigation = { preventDefault: jest.fn() };
+    events['will-navigate'](phoneNavigation, 'tel:(555) 234-5678');
+    expect(phoneNavigation.preventDefault).toHaveBeenCalled();
+    expect(mockElectron.shell.openExternal).toHaveBeenCalledWith('tel:(555) 234-5678');
+
+    const windowOpenHandler = contents.setWindowOpenHandler.mock.calls[0][0];
+    expect(windowOpenHandler({
+      url: 'https://github.com/SWEN-661-Team-3/Team_3_SWEN_661',
+    })).toEqual({ action: 'deny' });
+    expect(mockElectron.shell.openExternal).toHaveBeenCalledWith(
+      'https://github.com/SWEN-661-Team-3/Team_3_SWEN_661',
+    );
+  });
+
   it('registers menu IPC actions and sends them to the renderer window', () => {
     const { mockElectron, mockWindowSend } = loadMainProcess();
     const menuTemplate = mockElectron.Menu.buildFromTemplate.mock.calls[0][0];
@@ -115,16 +265,24 @@ describe('main process IPC', () => {
   it('bridges show-help IPC events to the renderer menu action channel', () => {
     const { ipcEvents, mockWindowSend } = loadMainProcess();
 
-    ipcEvents['show-help']();
+    ipcEvents['show-help'](trustedIpcEvent);
 
     expect(mockWindowSend).toHaveBeenCalledWith('menu-action', 'help');
+  });
+
+  it('ignores show-help IPC events from untrusted senders', () => {
+    const { ipcEvents, mockWindowSend } = loadMainProcess();
+
+    ipcEvents['show-help'](untrustedIpcEvent);
+
+    expect(mockWindowSend).not.toHaveBeenCalled();
   });
 
   it('does not send menu actions when the main window has been destroyed', () => {
     const { ipcEvents, mockWindow, mockWindowSend } = loadMainProcess();
     mockWindow.isDestroyed.mockReturnValue(true);
 
-    ipcEvents['show-help']();
+    ipcEvents['show-help'](trustedIpcEvent);
 
     expect(mockWindowSend).not.toHaveBeenCalled();
   });
@@ -139,7 +297,7 @@ describe('main process IPC', () => {
       },
     });
 
-    await expect(ipcHandlers['save-plan-text']({}, "Today's Plan")).resolves.toEqual({
+    await expect(ipcHandlers['save-plan-text'](trustedIpcEvent, "Today's Plan")).resolves.toEqual({
       saved: true,
       filePath: 'C:\\Users\\CareConnect\\Documents\\todays-plan.txt',
     });
@@ -163,7 +321,7 @@ describe('main process IPC', () => {
       saveDialogResult: { canceled: true },
     });
 
-    await expect(ipcHandlers['save-plan-text']({}, "Today's Plan")).resolves.toEqual({
+    await expect(ipcHandlers['save-plan-text'](trustedIpcEvent, "Today's Plan")).resolves.toEqual({
       canceled: true,
     });
 
@@ -173,8 +331,16 @@ describe('main process IPC', () => {
   it('rejects non-string save-plan-text payloads', async () => {
     const { ipcHandlers } = loadMainProcess();
 
-    await expect(ipcHandlers['save-plan-text']({}, null)).rejects.toThrow(
+    await expect(ipcHandlers['save-plan-text'](trustedIpcEvent, null)).rejects.toThrow(
       'Plan text must be a string.',
+    );
+  });
+
+  it('rejects save-plan-text IPC messages from untrusted senders', async () => {
+    const { ipcHandlers } = loadMainProcess();
+
+    await expect(ipcHandlers['save-plan-text'](untrustedIpcEvent, "Today's Plan")).rejects.toThrow(
+      'Blocked IPC message from untrusted sender.',
     );
   });
 

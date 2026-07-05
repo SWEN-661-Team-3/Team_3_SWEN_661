@@ -23,6 +23,7 @@
       "dist/**/*",
       "main.js",
       "preload.js",
+      "securityPolicy.cjs",
       "package.json"
     ],
     "win": {
