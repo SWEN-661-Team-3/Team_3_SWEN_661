@@ -35,17 +35,18 @@ describe('CareTeamPage', () => {
     expect(within(doctorCard).getByText('away')).toBeInTheDocument();
   });
 
-  it('opens Add Helper with helper text and disables Add helper until name and phone are filled', async () => {
+  it('opens Add Helper with example placeholders and disables Add helper until name and phone are filled', async () => {
     const user = userEvent.setup();
     render(<CareTeamHarness />);
 
     await user.click(screen.getByRole('button', { name: 'Add Helper' }));
 
     expect(screen.getByRole('dialog', { name: 'Add Helper' })).toBeInTheDocument();
-    expect(screen.getByText('Full name')).toBeInTheDocument();
-    expect(screen.getByText('e.g. Family, Nurse, Doctor')).toBeInTheDocument();
-    expect(screen.getByText('(555)000-0000')).toBeInTheDocument();
-    expect(screen.getByText('e.g. Hours, location, or any other details')).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toHaveAttribute('placeholder', 'Full name');
+    expect(screen.getByLabelText('Role')).toHaveAttribute('placeholder', 'e.g. Family, nurse, doctor');
+    expect(screen.getByLabelText('Phone')).toHaveAttribute('placeholder', '(555)000-0000');
+    expect(screen.getByLabelText('Notes')).toHaveAttribute('placeholder', 'e.g. Hours, location, or any other details');
+    expect(screen.queryByText('Full name')).not.toBeInTheDocument();
 
     const addButton = screen.getByRole('button', { name: 'Add helper' });
     expect(addButton).toBeDisabled();

@@ -337,7 +337,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
               label="Name"
               value={form.name}
               onChange={(value) => handleChange('name', value)}
-              helperText={isAddMode ? 'Full name' : null}
+              placeholder={isAddMode ? 'Full name' : null}
               required={isAddMode}
             />
 
@@ -346,7 +346,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
               label="Role"
               value={form.role}
               onChange={(value) => handleChange('role', value)}
-              helperText={isAddMode ? 'e.g. Family, Nurse, Doctor' : null}
+              placeholder={isAddMode ? 'e.g. Family, nurse, doctor' : null}
             />
 
             <HelperField
@@ -354,7 +354,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
               label="Phone"
               value={form.phone}
               onChange={(value) => handleChange('phone', value)}
-              helperText={isAddMode ? '(555)000-0000' : null}
+              placeholder={isAddMode ? '(555)000-0000' : null}
               required={isAddMode}
             />
 
@@ -363,7 +363,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
               label="Notes"
               value={form.notes}
               onChange={(value) => handleChange('notes', value)}
-              helperText={isAddMode ? 'e.g. Hours, location, or any other details' : null}
+              placeholder={isAddMode ? 'e.g. Hours, location, or any other details' : null}
               multiline
             />
           </div>
@@ -427,17 +427,16 @@ function HelperField({
   label,
   value,
   onChange,
-  helperText,
+  placeholder,
   multiline = false,
   required = false,
 }) {
-  const helperId = helperText ? `${id}-help` : undefined;
   const inputProps = {
     id,
     className: multiline ? 'form-control form-control--textarea' : 'form-control',
+    placeholder,
     value,
     onChange: (event) => onChange(event.target.value),
-    'aria-describedby': helperId,
     'aria-required': required ? 'true' : undefined,
   };
 
@@ -445,11 +444,6 @@ function HelperField({
     <div className="form-row">
       <label htmlFor={id}>{label}</label>
       {multiline ? <textarea {...inputProps} /> : <input type="text" {...inputProps} />}
-      {helperText && (
-        <p id={helperId} className="form-helper">
-          {helperText}
-        </p>
-      )}
     </div>
   );
 }
