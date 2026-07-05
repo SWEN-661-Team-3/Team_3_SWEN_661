@@ -8,6 +8,8 @@ module.exports = {
   },
   setupFilesAfterEnv: ['./jest.setup.js'],
   collectCoverageFrom: [
+    'main.js',
+    'preload.js',
     'src/**/*.{js,jsx}',
     '!src/main.jsx',
     '!src/styles/**',
