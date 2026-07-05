@@ -19,3 +19,7 @@ HTMLDialogElement.prototype.close =
   });
 
 delete window.careConnect;
+
+afterEach(() => {
+  delete window.careConnect;
+});

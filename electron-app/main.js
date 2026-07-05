@@ -1,4 +1,5 @@
-const { app, BrowserWindow, Menu, shell, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, shell, ipcMain, dialog } = require('electron');
+const fs = require('fs/promises');
 const path = require('path');
 
 let mainWindow;
@@ -40,7 +41,7 @@ function buildMenu() {
           click: () => sendMenuAction('new-record'),
         },
         {
-          label: 'Save',
+          label: 'Save Plan',
           accelerator: 'CmdOrCtrl+S',
           click: () => sendMenuAction('save'),
         },
@@ -156,3 +157,25 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('show-help', () => sendMenuAction('help'));
+
+ipcMain.handle('save-plan-text', async (_event, planText) => {
+  if (typeof planText !== 'string') {
+    throw new Error('Plan text must be a string.');
+  }
+
+  const targetWindow = BrowserWindow.getFocusedWindow() ?? mainWindow;
+  const { canceled, filePath } = await dialog.showSaveDialog(targetWindow, {
+    title: "Save Today's Plan",
+    defaultPath: path.join(app.getPath('documents'), 'todays-plan.txt'),
+    filters: [
+      { name: 'Text Files', extensions: ['txt'] },
+    ],
+  });
+
+  if (canceled || !filePath) {
+    return { canceled: true };
+  }
+
+  await fs.writeFile(filePath, planText, 'utf8');
+  return { saved: true, filePath };
+});

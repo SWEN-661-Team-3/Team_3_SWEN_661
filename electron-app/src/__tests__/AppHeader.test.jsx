@@ -22,7 +22,7 @@ describe('AppHeader', () => {
   it('renders all toolbar buttons', () => {
     render(<AppHeader onAction={onAction} />);
     expect(screen.getByText('New')).toBeInTheDocument();
-    expect(screen.getByText('Save')).toBeInTheDocument();
+    expect(screen.getByText('Save Plan')).toBeInTheDocument();
     expect(screen.getByText('Search')).toBeInTheDocument();
     expect(screen.getByText("Today's Plan")).toBeInTheDocument();
     expect(screen.getByText('Care Team')).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe('AppHeader', () => {
     await user.click(screen.getByText('New'));
     expect(onAction).toHaveBeenCalledWith('new-record');
 
-    await user.click(screen.getByText('Save'));
+    await user.click(screen.getByText('Save Plan'));
     expect(onAction).toHaveBeenCalledWith('save');
 
     await user.click(screen.getByText('Search'));

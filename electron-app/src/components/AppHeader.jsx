@@ -1,7 +1,7 @@
 export default function AppHeader({ activeView = 'today', onAction }) {
   const buttons = [
     { action: 'new-record', label: 'New', title: 'New reminder (Ctrl+N)' },
-    { action: 'save', label: 'Save', title: 'Save (Ctrl+S)' },
+    { action: 'save', label: 'Save Plan', title: 'Save plan (Ctrl+S)' },
     'divider',
     { action: 'search', label: 'Search', title: 'Search (Ctrl+F)' },
     {

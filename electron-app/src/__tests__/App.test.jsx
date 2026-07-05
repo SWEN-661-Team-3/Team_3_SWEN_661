@@ -221,6 +221,40 @@ describe('App', () => {
     expect(screen.queryByRole('dialog', { name: 'Task complete' })).not.toBeInTheDocument();
   });
 
+  it("saves today's plan as a text file from the toolbar", async () => {
+    const user = userEvent.setup();
+    const savePlanText = jest.fn().mockResolvedValue({ saved: true, filePath: 'todays-plan.txt' });
+    window.careConnect = { savePlanText };
+    render(<App />);
+
+    await user.click(screen.getByTitle('New reminder (Ctrl+N)'));
+    await user.type(screen.getByLabelText(/title/i), 'Physical Therapy');
+    await user.type(screen.getByLabelText(/^time$/i), '4:00 PM');
+    await user.type(screen.getByLabelText(/location/i), 'PT Center');
+
+    const reminderDialog = screen.getByRole('dialog', { name: 'New Reminder' });
+    await user.click(within(reminderDialog).getByRole('button', { name: 'Save' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Task complete' }))
+        .getByRole('button', { name: /^Close$/ }),
+    );
+
+    await user.click(screen.getByTitle('Save plan (Ctrl+S)'));
+
+    expect(savePlanText).toHaveBeenCalledWith(expect.stringContaining("Today's Plan"));
+    expect(savePlanText).toHaveBeenCalledWith(expect.stringContaining(
+      'Appointment - Physical Therapy\n4:00 PM\nPT Center',
+    ));
+
+    const saveDialog = screen.getByRole('dialog', { name: 'Plan saved' });
+    expect(
+      within(saveDialog).getByText("Today's plan was saved as a text file."),
+    ).toBeInTheDocument();
+
+    await user.click(within(saveDialog).getByRole('button', { name: /^Close$/ }));
+    expect(screen.queryByRole('dialog', { name: 'Plan saved' })).not.toBeInTheDocument();
+  });
+
   it('can mark a task complete', async () => {
     const user = userEvent.setup();
     render(<App />);

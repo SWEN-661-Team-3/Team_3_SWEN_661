@@ -26,7 +26,7 @@ describe('Keyboard Navigation', () => {
     await user.tab(); // skip link
     await user.tab(); // New
     await user.tab(); // Save
-    expect(screen.getByTitle('Save (Ctrl+S)')).toHaveFocus();
+    expect(screen.getByTitle('Save plan (Ctrl+S)')).toHaveFocus();
     await user.tab(); // Search
     expect(screen.getByTitle('Search (Ctrl+F)')).toHaveFocus();
     await user.tab(); // Today's Plan

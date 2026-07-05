@@ -12,6 +12,8 @@ import EmergencyDialog from './components/EmergencyDialog';
 import NewAppointmentDialog from './components/NewAppointmentDialog';
 import CompletionDialog from './components/CompletionDialog';
 import CareTeamPage from './components/CareTeamPage';
+import SavePlanConfirmationDialog from './components/SavePlanConfirmationDialog';
+import { buildTodaysPlanText } from './planExport';
 
 const initialAccessibilitySettings = {
   largeText: false,
@@ -38,6 +40,7 @@ export default function App() {
   const [appliedSettings, setAppliedSettings] = useState(() => ({
     ...initialAccessibilitySettings,
   }));
+  const [savePlanConfirmationOpen, setSavePlanConfirmationOpen] = useState(false);
 
   const statusRef = useRef(null);
   const mainRef = useRef(null);
@@ -47,6 +50,31 @@ export default function App() {
       statusRef.current.textContent = message;
     }
   }, []);
+
+  const saveTodaysPlan = useCallback(async () => {
+    try {
+      const savePlanText = window.careConnect?.savePlanText;
+      if (!savePlanText) {
+        throw new Error('Save plan is unavailable.');
+      }
+
+      const result = await savePlanText(buildTodaysPlanText(plan));
+      if (result?.canceled) {
+        announce('Save canceled');
+        return;
+      }
+
+      if (result?.saved) {
+        setSavePlanConfirmationOpen(true);
+        announce('Plan saved');
+        return;
+      }
+
+      throw new Error('Plan save did not complete.');
+    } catch {
+      announce('Unable to save plan');
+    }
+  }, [announce, plan]);
 
   useEffect(() => {
     document.body.classList.toggle('large-text', appliedSettings.largeText);
@@ -92,7 +120,7 @@ export default function App() {
             break;
           case 's':
             e.preventDefault();
-            announce("Today's plan saved");
+            saveTodaysPlan();
             break;
           case 'f':
             e.preventDefault();
@@ -121,7 +149,7 @@ export default function App() {
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [searchVisible, settings]);
+  }, [saveTodaysPlan, searchVisible, settings]);
 
   const nextTask = plan.find((t) => t.status === 'todo') ?? plan[0];
   const selectedTask = plan.find((t) => t.id === selectedId) ?? null;
@@ -224,7 +252,7 @@ export default function App() {
         setNewApptOpen(true);
         break;
       case 'save':
-        announce("Today's plan saved");
+        saveTodaysPlan();
         break;
       case 'search':
         openSearch();
@@ -354,6 +382,11 @@ export default function App() {
         open={completionOpen}
         message={completionMessage}
         onClose={closeCompletionDialog}
+      />
+
+      <SavePlanConfirmationDialog
+        open={savePlanConfirmationOpen}
+        onClose={() => setSavePlanConfirmationOpen(false)}
       />
     </>
   );
