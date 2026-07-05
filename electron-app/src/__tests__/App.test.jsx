@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 
@@ -117,8 +117,8 @@ describe('App', () => {
 
     await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
     await user.click(screen.getByRole('button', { name: 'Add Helper' }));
-    await user.type(screen.getByLabelText('Name'), 'Pat Lee');
-    await user.keyboard('{Control>}f{/Control}');
+    await user.click(screen.getByLabelText('Name'));
+    fireEvent.keyDown(document, { key: 'f', ctrlKey: true });
 
     expect(screen.getByPlaceholderText(/search tasks/i)).toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'Add Helper' })).toBeInTheDocument();
