@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 
@@ -131,6 +131,15 @@ describe('App', () => {
     expect(screen.getByText('CareConnect Help')).toBeInTheDocument();
   });
 
+  it('opens shortcuts dialog with the F1 shortcut', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.keyboard('{F1}');
+
+    expect(screen.getByText('CareConnect Help')).toBeInTheDocument();
+  });
+
   it('opens emergency help from the toolbar', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -253,6 +262,40 @@ describe('App', () => {
 
     await user.click(within(saveDialog).getByRole('button', { name: /^Close$/ }));
     expect(screen.queryByRole('dialog', { name: 'Plan saved' })).not.toBeInTheDocument();
+  });
+
+  it('announces when saving is unavailable', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTitle('Save plan (Ctrl+S)'));
+
+    expect(await screen.findByText('Unable to save plan')).toBeInTheDocument();
+  });
+
+  it('announces when saving is canceled from the keyboard shortcut', async () => {
+    const user = userEvent.setup();
+    const savePlanText = jest.fn().mockResolvedValue({ canceled: true });
+    window.careConnect = { savePlanText };
+    render(<App />);
+
+    await user.keyboard('{Control>}s{/Control}');
+
+    await waitFor(() => expect(savePlanText).toHaveBeenCalled());
+    expect(await screen.findByText('Save canceled')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'Plan saved' })).not.toBeInTheDocument();
+  });
+
+  it('announces when saving does not complete', async () => {
+    const user = userEvent.setup();
+    const savePlanText = jest.fn().mockResolvedValue({ saved: false });
+    window.careConnect = { savePlanText };
+    render(<App />);
+
+    await user.click(screen.getByTitle('Save plan (Ctrl+S)'));
+
+    await waitFor(() => expect(savePlanText).toHaveBeenCalled());
+    expect(await screen.findByText('Unable to save plan')).toBeInTheDocument();
   });
 
   it('can mark a task complete', async () => {

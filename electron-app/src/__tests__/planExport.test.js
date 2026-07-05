@@ -29,4 +29,30 @@ describe('planExport', () => {
       + '9:00 PM',
     );
   });
+
+  it('uses fallback labels and ignores non-string values', () => {
+    const planText = buildTodaysPlanText([
+      {
+        title: '  Lab pickup  ',
+        time: '  ',
+        location: null,
+        notes: 42,
+        type: '  lab-work  ',
+      },
+      {
+        title: 123,
+        time: undefined,
+        location: '  Home  ',
+        notes: '',
+        type: undefined,
+      },
+    ]);
+
+    expect(planText).toBe(
+      "Today's Plan\n"
+      + 'lab-work - Lab pickup\n\n'
+      + 'Reminder - \n'
+      + 'Home',
+    );
+  });
 });
