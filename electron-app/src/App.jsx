@@ -92,10 +92,15 @@ export default function App() {
     };
   }, [appliedSettings]);
 
+  const handleMenuActionRef = useRef(handleMenuAction);
+  handleMenuActionRef.current = handleMenuAction;
+
   useEffect(() => {
-    const cleanup = window.careConnect?.onMenuAction?.(handleMenuAction);
+    const cleanup = window.careConnect?.onMenuAction?.((action) => {
+      handleMenuActionRef.current(action);
+    });
     return () => cleanup?.();
-  });
+  }, []);
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -149,7 +154,7 @@ export default function App() {
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [saveTodaysPlan, searchVisible, settings]);
+  }, [saveTodaysPlan, searchVisible, activeView]);
 
   const nextTask = plan.find((t) => t.status === 'todo') ?? plan[0];
   const selectedTask = plan.find((t) => t.id === selectedId) ?? null;
@@ -157,6 +162,9 @@ export default function App() {
   const emergencyContacts = helpers.slice(0, 2);
 
   function openSearch() {
+    if (activeView !== 'today') {
+      showTodaysPlan();
+    }
     setSearchVisible(true);
   }
 

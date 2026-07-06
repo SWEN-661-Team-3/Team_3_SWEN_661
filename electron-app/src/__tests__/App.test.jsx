@@ -111,17 +111,15 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'Care Team' })).toBeInTheDocument();
   });
 
-  it('keeps menu shortcuts available inside Care Team dialogs', async () => {
+  it('switches to today view and opens search when Ctrl+F is pressed from Care Team', async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
-    await user.click(screen.getByRole('button', { name: 'Add Helper' }));
-    await user.click(screen.getByLabelText('Name'));
     fireEvent.keyDown(document, { key: 'f', ctrlKey: true });
 
     expect(screen.getByPlaceholderText(/search tasks/i)).toBeInTheDocument();
-    expect(screen.getByRole('dialog', { name: 'Add Helper' })).toBeInTheDocument();
+    expect(screen.getByText('Up Next')).toBeInTheDocument();
   });
 
   it('opens shortcuts dialog from keyboard shortcuts button', async () => {

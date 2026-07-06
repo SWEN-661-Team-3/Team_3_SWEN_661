@@ -134,7 +134,7 @@ function buildMenu() {
       label: 'File',
       submenu: [
         {
-          label: 'New Appointment',
+          label: 'New Reminder',
           accelerator: 'CmdOrCtrl+N',
           click: () => sendMenuAction('new-record'),
         },

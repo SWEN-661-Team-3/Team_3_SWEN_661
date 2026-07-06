@@ -249,7 +249,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
   const initialForm = useMemo(() => helperToForm(helper), [helper]);
   const isAddMode = mode === 'add';
   const title = isAddMode ? 'Add Helper' : 'Edit Helper';
-  const canAddHelper = Boolean(form.name.trim() && form.phone.trim());
+  const canSaveHelper = Boolean(form.name.trim() && form.phone.trim());
   const hasAnyText = ['name', 'role', 'phone', 'notes'].some((field) => form[field].trim());
   const hasChanges = ['name', 'role', 'phone', 'notes'].some(
     (field) => form[field] !== initialForm[field],
@@ -305,7 +305,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    if (isAddMode && !canAddHelper) return;
+    if (!canSaveHelper) return;
     onSave(form);
   }
 
@@ -372,7 +372,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
             <button
               type="submit"
               className="primary-btn"
-              disabled={isAddMode && !canAddHelper}
+              disabled={!canSaveHelper}
             >
               {isAddMode ? 'Add helper' : 'Save'}
             </button>
