@@ -1,5 +1,4 @@
 :root {
-  /* CareConnect desktop mockup palette */
   --color-bg: #f0ebe2;
   --color-surface: #ffffff;
   --color-text: #141414;
@@ -8,25 +7,38 @@
   --color-focus: #1d4ed8;
   --color-focus-ring: #1d4ed8;
 
-  /* CareConnect brand */
   --color-primary: #1d4ed8;
   --color-primary-dark: #1e3a8a;
+  --color-primary-action: #1d4ed8;
+  --color-primary-action-hover: #1e3a8a;
+  --color-primary-action-border: #1e3a8a;
+  --color-on-primary: #ffffff;
   --color-success: #046c50;
   --color-success-bg: #cff5e3;
   --color-success-border: rgba(4, 108, 80, 0.27);
+  --color-success-action: #046c50;
+  --color-success-action-hover: #03543f;
+  --color-success-action-border: #046c50;
+  --color-on-success: #ffffff;
   --color-warning: #9a4708;
   --color-warning-bg: #fbeabf;
   --color-warning-border: rgba(154, 71, 8, 0.4);
-  --color-emergency: #c81e1e;
+  --color-emergency: #b91c1c;
   --color-emergency-bg: #fbcfcf;
   --color-emergency-border: rgba(200, 30, 30, 0.35);
+  --color-emergency-action: #b91c1c;
+  --color-emergency-action-hover: #991b1b;
+  --color-emergency-action-border: #c81e1e;
+  --color-on-emergency: #ffffff;
   --color-blue-bg: #dbeafe;
   --color-blue-light: #dbeafe;
+  --color-disabled-bg: #4b5563;
+  --color-disabled-text: #ffffff;
+  --color-disabled-border: #374151;
   --color-overlay: rgba(15, 23, 42, 0.6);
   --shadow-floating: 0 12px 28px rgba(29, 78, 216, 0.35);
   --shadow-dialog: 0 30px 80px rgba(0, 0, 0, 0.18);
 
-  /* Typography scale */
   --font-family: 'Atkinson Hyperlegible', Verdana, 'Segoe UI', sans-serif;
   --font-size-xs: 1rem;
   --font-size-sm: 1rem;
@@ -40,7 +52,6 @@
   --word-spacing-body: 0.06em;
   --paragraph-spacing: 2rem;
 
-  /* Spacing scale */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -51,7 +62,6 @@
   --space-10: 2.5rem;
   --space-12: 3rem;
 
-  /* Layout */
   --toolbar-height: 3rem;
   --sidebar-width: 22rem;
   --content-max-width: 47.5rem;

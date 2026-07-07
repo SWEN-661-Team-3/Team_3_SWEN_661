@@ -15,7 +15,7 @@ export const caregivers = [
     name: 'Dr. Emily Smith',
     relationship: 'Doctor',
     role: 'Eye Doctor',
-    availability: 'busy',
+    availability: 'away',
     phone: '(555) 891-2345',
     notes: 'City Eye Clinic, 123 Vision Way. Call to reschedule.',
     initials: 'ES',
@@ -105,12 +105,18 @@ export const initialPlan = [
 ];
 
 export const statusLabels = {
-  done: { label: 'Done', icon: '✓' },
-  todo: { label: 'Pending', icon: '◷' },
+  done: { label: 'Done', icon: '\u2713' },
+  todo: { label: 'Pending', icon: '\u25F7' },
 };
 
 export const typeLabels = {
   medication: { label: 'Medication', icon: 'Rx' },
   appointment: { label: 'Appointment', icon: 'Cal' },
-  'health-task': { label: 'Health task', icon: 'H' },
+  'health-task': { label: 'Health Task', icon: 'H' },
 };
+
+export const typeOptions = [
+  { value: 'appointment', label: 'Appointment' },
+  { value: 'medication', label: 'Medication' },
+  { value: 'health-task', label: 'Health Task' },
+];

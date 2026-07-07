@@ -6,4 +6,5 @@ contextBridge.exposeInMainWorld('careConnect', {
     ipcRenderer.on('menu-action', listener);
     return () => ipcRenderer.removeListener('menu-action', listener);
   },
+  savePlanText: (planText) => ipcRenderer.invoke('save-plan-text', planText),
 });
