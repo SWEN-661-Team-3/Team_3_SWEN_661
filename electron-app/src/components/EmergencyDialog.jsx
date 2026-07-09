@@ -139,7 +139,7 @@ export default function EmergencyDialog({
         )}
 
         {phase === 'confirmed' && (
-          <div className="emergency-panel emergency-panel--confirmed">
+          <div className="emergency-panel emergency-panel--confirmed" role="status">
             <div className="emergency-panel__icon emergency-panel__icon--success" aria-hidden="true">
               OK
             </div>

@@ -137,8 +137,9 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
               onChange={(e) => handleChange('title', e.target.value)}
               aria-required="true"
               aria-invalid={!!errors.title}
+              aria-describedby={errors.title ? 'appt-title-error' : undefined}
             />
-            {errors.title && <p className="form-error" role="alert">{errors.title}</p>}
+            {errors.title && <p id="appt-title-error" className="form-error" role="alert">{errors.title}</p>}
           </div>
 
           <div className="form-group">
@@ -166,8 +167,9 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
               onChange={(e) => handleChange('time', e.target.value)}
               aria-required="true"
               aria-invalid={!!errors.time}
+              aria-describedby={errors.time ? 'appt-time-error' : undefined}
             />
-            {errors.time && <p className="form-error" role="alert">{errors.time}</p>}
+            {errors.time && <p id="appt-time-error" className="form-error" role="alert">{errors.time}</p>}
           </div>
 
           <div className="form-group">
@@ -180,8 +182,9 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
               onChange={(e) => handleChange('location', e.target.value)}
               aria-required="true"
               aria-invalid={!!errors.location}
+              aria-describedby={errors.location ? 'appt-location-error' : undefined}
             />
-            {errors.location && <p className="form-error" role="alert">{errors.location}</p>}
+            {errors.location && <p id="appt-location-error" className="form-error" role="alert">{errors.location}</p>}
           </div>
 
           <div className="form-group">

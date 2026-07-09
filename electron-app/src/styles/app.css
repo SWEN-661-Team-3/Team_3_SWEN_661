@@ -256,8 +256,7 @@ body.dark-mode.high-contrast {
   background: var(--color-blue-bg);
   border-color: var(--color-primary);
   color: var(--color-primary);
-  outline: var(--focus-outline);
-  outline-offset: var(--focus-offset);
+  box-shadow: inset 0 -3px 0 var(--color-primary);
 }
 
 .toolbar-btn--danger {
@@ -457,6 +456,7 @@ body.dark-mode.high-contrast {
 }
 
 .task-list__title {
+  display: block;
   margin: 0;
   color: var(--color-text);
   font-weight: 700;
@@ -464,6 +464,7 @@ body.dark-mode.high-contrast {
 }
 
 .task-list__time {
+  display: block;
   margin: var(--space-1) 0 0;
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
@@ -1033,6 +1034,10 @@ body.dark-mode.high-contrast {
   border-top: var(--stroke-width) solid var(--color-border);
 }
 
+.detail-list {
+  margin: 0;
+}
+
 .detail-row {
   display: flex;
   gap: var(--space-4);
@@ -1057,6 +1062,7 @@ body.dark-mode.high-contrast {
   margin: 0;
   min-width: 0;
   font-size: var(--font-size-md);
+  font-weight: 400;
 }
 
 .status-badge {

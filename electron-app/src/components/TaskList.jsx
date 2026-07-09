@@ -34,8 +34,8 @@ export default function TaskList({ tasks, selectedId, filter, onSelectTask }) {
             >
               <span className="task-list__status" aria-hidden="true">{status.icon}</span>
               <span>
-                <p className="task-list__title">{item.title}</p>
-                <p className="task-list__time">{item.time} &middot; {type.label}</p>
+                <span className="task-list__title">{item.title}</span>
+                <span className="task-list__time">{item.time} &middot; {type.label}</span>
               </span>
             </button>
           </li>

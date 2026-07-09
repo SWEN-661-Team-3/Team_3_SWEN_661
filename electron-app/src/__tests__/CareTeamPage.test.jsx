@@ -28,8 +28,8 @@ describe('CareTeamPage', () => {
     expect(within(sarahCard).getByText('available')).toBeInTheDocument();
     expect(within(sarahCard).getByText('(555) 234-5678')).toBeInTheDocument();
     expect(within(sarahCard).getByText(/Available weekdays/)).toBeInTheDocument();
-    expect(within(sarahCard).getByRole('button', { name: 'Edit' })).toBeInTheDocument();
-    expect(within(sarahCard).getByRole('button', { name: 'Remove' })).toBeInTheDocument();
+    expect(within(sarahCard).getByRole('button', { name: 'Edit Sarah Johnson' })).toBeInTheDocument();
+    expect(within(sarahCard).getByRole('button', { name: 'Remove Sarah Johnson' })).toBeInTheDocument();
 
     const doctorCard = screen.getByRole('article', { name: 'Dr. Emily Smith' });
     expect(within(doctorCard).getByText('away')).toBeInTheDocument();
@@ -103,7 +103,7 @@ describe('CareTeamPage', () => {
     render(<CareTeamHarness />);
 
     const sarahCard = screen.getByRole('article', { name: 'Sarah Johnson' });
-    await user.click(within(sarahCard).getByRole('button', { name: 'Edit' }));
+    await user.click(within(sarahCard).getByRole('button', { name: 'Edit Sarah Johnson' }));
 
     expect(screen.getByRole('dialog', { name: 'Edit Helper' })).toBeInTheDocument();
     await user.clear(screen.getByLabelText('Phone'));
@@ -120,7 +120,7 @@ describe('CareTeamPage', () => {
     render(<CareTeamHarness />);
 
     const sarahCard = screen.getByRole('article', { name: 'Sarah Johnson' });
-    await user.click(within(sarahCard).getByRole('button', { name: 'Edit' }));
+    await user.click(within(sarahCard).getByRole('button', { name: 'Edit Sarah Johnson' }));
     await user.type(screen.getByLabelText('Notes'), ' Call before arriving');
     await user.click(screen.getByRole('button', { name: /^Close$/ }));
 
@@ -132,7 +132,7 @@ describe('CareTeamPage', () => {
     render(<CareTeamHarness />);
 
     const robertCard = screen.getByRole('article', { name: 'Robert Chen' });
-    await user.click(within(robertCard).getByRole('button', { name: 'Remove' }));
+    await user.click(within(robertCard).getByRole('button', { name: 'Remove Robert Chen' }));
 
     const removeDialog = screen.getByRole('dialog', { name: 'Are you sure?' });
     expect(within(removeDialog).getByText('Remove Robert Chen from your care team?')).toBeInTheDocument();

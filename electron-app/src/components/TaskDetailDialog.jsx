@@ -38,33 +38,35 @@ export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
         </header>
 
         <div className="dialog__body">
-          <div className="detail-row">
-            <p className="detail-row__label">Status</p>
-            <p className="detail-row__value">
-              <span className={`status-badge status-badge--${task.status}`}>
-                <span aria-hidden="true">{status.icon}</span>
-                {' '}{status.label}
-              </span>
-            </p>
-          </div>
-          <div className="detail-row">
-            <p className="detail-row__label">Type</p>
-            <p className="detail-row__value">{type.label}</p>
-          </div>
-          <div className="detail-row">
-            <p className="detail-row__label">Time</p>
-            <p className="detail-row__value">{task.time}</p>
-          </div>
-          <div className="detail-row">
-            <p className="detail-row__label">Location</p>
-            <p className="detail-row__value">{location}</p>
-          </div>
-          {task.notes && (
+          <dl className="detail-list">
             <div className="detail-row">
-              <p className="detail-row__label">Notes</p>
-              <p className="detail-row__value">{task.notes}</p>
+              <dt className="detail-row__label">Status</dt>
+              <dd className="detail-row__value">
+                <span className={`status-badge status-badge--${task.status}`}>
+                  <span aria-hidden="true">{status.icon}</span>
+                  {' '}{status.label}
+                </span>
+              </dd>
             </div>
-          )}
+            <div className="detail-row">
+              <dt className="detail-row__label">Type</dt>
+              <dd className="detail-row__value">{type.label}</dd>
+            </div>
+            <div className="detail-row">
+              <dt className="detail-row__label">Time</dt>
+              <dd className="detail-row__value">{task.time}</dd>
+            </div>
+            <div className="detail-row">
+              <dt className="detail-row__label">Location</dt>
+              <dd className="detail-row__value">{location}</dd>
+            </div>
+            {task.notes && (
+              <div className="detail-row">
+                <dt className="detail-row__label">Notes</dt>
+                <dd className="detail-row__value">{task.notes}</dd>
+              </div>
+            )}
+          </dl>
         </div>
 
         {task.status !== 'done' && (

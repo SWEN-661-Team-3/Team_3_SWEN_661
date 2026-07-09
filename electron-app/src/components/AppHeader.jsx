@@ -46,6 +46,7 @@ export default function AppHeader({ activeView = 'today', onAction }) {
               type="button"
               className={classes}
               title={btn.title}
+              aria-current={btn.active ? 'true' : undefined}
               onClick={() => onAction(btn.action)}
             >
               {btn.label}

@@ -92,6 +92,11 @@ export default function App() {
     };
   }, [appliedSettings]);
 
+  useEffect(() => {
+    const titles = { today: "Today's Plan", 'care-team': 'Care Team' };
+    document.title = `${titles[activeView] ?? 'CareConnect'} - CareConnect`;
+  }, [activeView]);
+
   const handleMenuActionRef = useRef(handleMenuAction);
   handleMenuActionRef.current = handleMenuAction;
 

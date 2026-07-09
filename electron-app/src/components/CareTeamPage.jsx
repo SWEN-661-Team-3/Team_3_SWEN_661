@@ -224,6 +224,7 @@ function HelperCard({ helper, color, onEdit, onRemove }) {
         <button
           type="button"
           className="care-helper-card__action care-helper-card__action--edit"
+          aria-label={`Edit ${helper.name}`}
           onClick={onEdit}
         >
           Edit
@@ -231,6 +232,7 @@ function HelperCard({ helper, color, onEdit, onRemove }) {
         <button
           type="button"
           className="care-helper-card__action care-helper-card__action--remove"
+          aria-label={`Remove ${helper.name}`}
           onClick={onRemove}
         >
           Remove
