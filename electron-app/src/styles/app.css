@@ -86,12 +86,12 @@ body.high-contrast {
   --color-warning: #7a3800;
   --color-warning-bg: #ffe6bf;
   --color-warning-border: #7a3800;
-  --color-emergency: #a50000;
+  --color-emergency: #7a0000;
   --color-emergency-bg: #ffcfcf;
-  --color-emergency-border: #a50000;
-  --color-emergency-action: #a50000;
-  --color-emergency-action-hover: #730000;
-  --color-emergency-action-border: #a50000;
+  --color-emergency-border: #7a0000;
+  --color-emergency-action: #7a0000;
+  --color-emergency-action-hover: #530000;
+  --color-emergency-action-border: #7a0000;
   --color-on-emergency: #ffffff;
   --color-disabled-bg: #d9d9d9;
   --color-disabled-text: #000000;
@@ -796,6 +796,15 @@ body.dark-mode.high-contrast {
 .care-helper-card__notes {
   margin: 0;
   line-height: var(--line-height-body);
+}
+
+.care-helper-card__phone a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.care-helper-card__phone a:hover {
+  color: var(--color-primary-dark);
 }
 
 .care-helper-card__meta-label {
