@@ -1,6 +1,6 @@
 import TaskList from './TaskList';
 
-export default function Sidebar({ helperName, tasks, selectedId, filter, onSelectTask }) {
+export default function Sidebar({ helperName, tasks, filter, onSelectTask }) {
   return (
     <aside className="sidebar" aria-label="Plan summary">
       <section className="sidebar-section">
@@ -18,7 +18,6 @@ export default function Sidebar({ helperName, tasks, selectedId, filter, onSelec
         <h2 className="sidebar-heading">Today&apos;s tasks</h2>
         <TaskList
           tasks={tasks}
-          selectedId={selectedId}
           filter={filter}
           onSelectTask={onSelectTask}
         />

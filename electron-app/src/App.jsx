@@ -13,6 +13,8 @@ import NewAppointmentDialog from './components/NewAppointmentDialog';
 import CompletionDialog from './components/CompletionDialog';
 import CareTeamPage from './components/CareTeamPage';
 import SavePlanConfirmationDialog from './components/SavePlanConfirmationDialog';
+import RemoveItemDialog from './components/RemoveItemDialog';
+import ConfirmationDialog from './components/ConfirmationDialog';
 import { buildTodaysPlanText } from './planExport';
 
 const initialAccessibilitySettings = {
@@ -34,6 +36,8 @@ export default function App() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [emergencyOpen, setEmergencyOpen] = useState(false);
   const [newApptOpen, setNewApptOpen] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [removeTaskId, setRemoveTaskId] = useState(null);
   const [completionOpen, setCompletionOpen] = useState(false);
   const [completionMessage, setCompletionMessage] = useState('');
   const [settings, setSettings] = useState(() => ({ ...initialAccessibilitySettings }));
@@ -41,6 +45,7 @@ export default function App() {
     ...initialAccessibilitySettings,
   }));
   const [savePlanConfirmationOpen, setSavePlanConfirmationOpen] = useState(false);
+  const [editConfirmation, setEditConfirmation] = useState(null);
 
   const statusRef = useRef(null);
   const mainRef = useRef(null);
@@ -126,7 +131,7 @@ export default function App() {
         switch (key) {
           case 'n':
             e.preventDefault();
-            setNewApptOpen(true);
+            openNewReminder();
             break;
           case 's':
             e.preventDefault();
@@ -163,6 +168,8 @@ export default function App() {
 
   const nextTask = plan.find((t) => t.status === 'todo') ?? plan[0];
   const selectedTask = plan.find((t) => t.id === selectedId) ?? null;
+  const editingTask = plan.find((t) => t.id === editingTaskId) ?? null;
+  const removeTask = plan.find((t) => t.id === removeTaskId) ?? null;
   const helperName = helpers[0]?.name ?? 'Helper';
   const emergencyContacts = helpers.slice(0, 2);
 
@@ -202,6 +209,7 @@ export default function App() {
     setPlan((prev) =>
       prev.map((t) => (t.id === id ? { ...t, status: 'done' } : t)),
     );
+    setSelectedId(null);
     setDetailOpen(false);
     if (task) {
       const message = `${task.title} marked complete!`;
@@ -218,11 +226,57 @@ export default function App() {
 
   function addAppointment(newItem) {
     setPlan((prev) => [...prev, newItem]);
-    setNewApptOpen(false);
+    closeReminderForm();
     const message = `${newItem.title} saved!`;
     setCompletionMessage(message);
     setCompletionOpen(true);
     announce(message);
+  }
+
+  function closeTaskDetail() {
+    setDetailOpen(false);
+    setSelectedId(null);
+  }
+
+  function openNewReminder() {
+    setEditingTaskId(null);
+    setNewApptOpen(true);
+  }
+
+  function openEditTask(id) {
+    setEditingTaskId(id);
+    setNewApptOpen(true);
+  }
+
+  function closeReminderForm() {
+    setNewApptOpen(false);
+    setEditingTaskId(null);
+  }
+
+  function updateTask(updatedTask) {
+    setPlan((current) =>
+      current.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
+    );
+    closeReminderForm();
+    setEditConfirmation({
+      title: 'Reminder updated',
+      message: `${updatedTask.title} was updated.`,
+    });
+    announce(`${updatedTask.title} was updated.`);
+  }
+
+  function requestRemoveTask(id) {
+    setRemoveTaskId(id);
+  }
+
+  function confirmRemoveTask() {
+    if (!removeTask) return;
+
+    setPlan((current) => current.filter((task) => task.id !== removeTask.id));
+    setSelectedId(null);
+    setDetailOpen(false);
+    setRemoveTaskId(null);
+    announce(`${removeTask.title} was removed.`);
   }
 
   function openSettingsDialog() {
@@ -262,7 +316,7 @@ export default function App() {
   function handleMenuAction(action) {
     switch (action) {
       case 'new-record':
-        setNewApptOpen(true);
+        openNewReminder();
         break;
       case 'save':
         saveTodaysPlan();
@@ -309,7 +363,6 @@ export default function App() {
           <Sidebar
             helperName={helperName}
             tasks={plan}
-            selectedId={selectedId}
             filter={searchQuery}
             onSelectTask={openTaskDetail}
           />
@@ -361,8 +414,10 @@ export default function App() {
       <TaskDetailDialog
         task={selectedTask}
         open={detailOpen}
-        onClose={() => setDetailOpen(false)}
+        onClose={closeTaskDetail}
         onComplete={completeTask}
+        onEdit={openEditTask}
+        onRemove={requestRemoveTask}
       />
 
       <SettingsDialog
@@ -387,8 +442,25 @@ export default function App() {
 
       <NewAppointmentDialog
         open={newApptOpen}
-        onClose={() => setNewApptOpen(false)}
+        task={editingTask}
+        onClose={closeReminderForm}
         onAdd={addAppointment}
+        onSave={updateTask}
+      />
+
+      <RemoveItemDialog
+        itemName={removeTask?.title}
+        itemType="reminder"
+        message={removeTask ? `Remove ${removeTask.title} from today's plan?` : ''}
+        confirmLabel="Remove reminder"
+        keepLabel="Keep reminder"
+        onClose={() => setRemoveTaskId(null)}
+        onConfirm={confirmRemoveTask}
+      />
+
+      <ConfirmationDialog
+        confirmation={editConfirmation}
+        onClose={() => setEditConfirmation(null)}
       />
 
       <CompletionDialog

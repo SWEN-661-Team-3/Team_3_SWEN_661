@@ -167,18 +167,22 @@ describe('WCAG 2.1 AA Accessibility', () => {
       ).toBeInTheDocument();
     });
 
-    it('helper card actions include the helper name', async () => {
+    it('helper cards and their detail actions include the helper name', async () => {
       const user = userEvent.setup();
       render(<App />);
 
       await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
 
-      const sarahCard = screen.getByRole('article', { name: 'Sarah Johnson' });
+      const sarahCard = screen.getByRole('button', { name: "View Sarah Johnson's details" });
+      expect(sarahCard).toBeInTheDocument();
+
+      await user.click(sarahCard);
+      const detailDialog = screen.getByRole('dialog', { name: 'Sarah Johnson' });
       expect(
-        within(sarahCard).getByRole('button', { name: 'Edit Sarah Johnson' }),
+        within(detailDialog).getByRole('button', { name: 'Edit Sarah Johnson' }),
       ).toBeInTheDocument();
       expect(
-        within(sarahCard).getByRole('button', { name: 'Remove Sarah Johnson' }),
+        within(detailDialog).getByRole('button', { name: 'Remove Sarah Johnson' }),
       ).toBeInTheDocument();
     });
   });

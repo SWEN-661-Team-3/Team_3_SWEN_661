@@ -1,8 +1,9 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { showModalWithInitialFocus } from '../dialogFocus';
 
-export default function CompletionDialog({ open, message, onClose }) {
+export default function ConfirmationDialog({ confirmation, onClose }) {
   const dialogRef = useRef(null);
+  const open = Boolean(confirmation);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -11,18 +12,18 @@ export default function CompletionDialog({ open, message, onClose }) {
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
-  if (!message) return null;
+  if (!confirmation) return null;
 
   return (
     <dialog
       className="dialog dialog--confirmation"
       ref={dialogRef}
-      aria-labelledby="completion-dialog-title"
+      aria-labelledby="confirmation-dialog-title"
       onClose={onClose}
     >
       <form method="dialog" className="dialog__inner">
         <header className="dialog__header">
-          <h2 id="completion-dialog-title">Task complete</h2>
+          <h2 id="confirmation-dialog-title">{confirmation.title}</h2>
           <button
             type="button"
             className="dialog__close"
@@ -35,9 +36,7 @@ export default function CompletionDialog({ open, message, onClose }) {
 
         <div className="confirmation-panel">
           <div className="confirmation-panel__icon" aria-hidden="true">OK</div>
-          <p className="confirmation-panel__title">
-            {message}
-          </p>
+          <p className="confirmation-panel__title">{confirmation.message}</p>
         </div>
       </form>
     </dialog>

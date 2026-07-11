@@ -1,6 +1,6 @@
 import { statusLabels, typeLabels } from '../data';
 
-export default function TaskList({ tasks, selectedId, filter, onSelectTask }) {
+export default function TaskList({ tasks, filter, onSelectTask }) {
   const query = (filter || '').trim().toLowerCase();
 
   const filtered = tasks.filter((item) => {
@@ -21,7 +21,6 @@ export default function TaskList({ tasks, selectedId, filter, onSelectTask }) {
         const classes = [
           'task-list__btn',
           item.status === 'done' && 'task-list__btn--done',
-          selectedId === item.id && 'task-list__btn--selected',
         ].filter(Boolean).join(' ');
 
         return (

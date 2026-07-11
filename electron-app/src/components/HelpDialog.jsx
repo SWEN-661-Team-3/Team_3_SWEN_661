@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { showModalWithInitialFocus } from '../dialogFocus';
 
 export default function HelpDialog({ open, onClose }) {
   const dialogRef = useRef(null);
@@ -6,7 +7,7 @@ export default function HelpDialog({ open, onClose }) {
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) showModalWithInitialFocus(dialog);
     if (!open && dialog.open) dialog.close();
   }, [open]);
 

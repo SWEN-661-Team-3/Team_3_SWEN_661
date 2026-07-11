@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { showModalWithInitialFocus } from '../dialogFocus';
 
 const INITIAL_COUNTDOWN = 10;
 
@@ -22,7 +23,7 @@ export default function EmergencyDialog({
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) showModalWithInitialFocus(dialog);
   }, [open]);
 
   useEffect(() => {

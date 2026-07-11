@@ -49,6 +49,33 @@ describe('Keyboard Navigation', () => {
 
     await user.keyboard('{Enter}');
     expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled();
+    expect(screen.getByRole('dialog', { name: 'Eye Doctor Checkup' })).toHaveFocus();
+  });
+
+  it('focuses a shortcut-opened dialog card instead of its close button', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.keyboard('{F1}');
+
+    const dialog = screen.getByRole('dialog', { name: 'CareConnect Help' });
+    expect(dialog).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Close' })).not.toHaveFocus();
+  });
+
+  it('removes the dialog card focus state after focus moves inside it', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.keyboard('{F1}');
+    const dialog = screen.getByRole('dialog', { name: 'CareConnect Help' });
+    expect(dialog).toHaveAttribute('tabindex', '-1');
+
+    await user.tab();
+
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus();
+    expect(dialog).not.toHaveAttribute('tabindex');
+    expect(dialog).not.toHaveFocus();
   });
 
   it('task list buttons are focusable', async () => {
@@ -56,6 +83,18 @@ describe('Keyboard Navigation', () => {
     const taskBtns = screen.getAllByRole('button', { name: /Daily Vitamin/i });
     taskBtns[0].focus();
     expect(taskBtns[0]).toHaveFocus();
+  });
+
+  it('does not retain focus on a task after its dialog receives keyboard focus', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const taskButton = screen.getAllByRole('button', { name: /Daily Vitamin/i })[0];
+
+    taskButton.focus();
+    await user.keyboard('{Enter}');
+
+    expect(screen.getByRole('dialog', { name: 'Daily Vitamin & Heart Med' })).toHaveFocus();
+    expect(taskButton).not.toHaveFocus();
   });
 
   it('Escape closes the search bar', async () => {

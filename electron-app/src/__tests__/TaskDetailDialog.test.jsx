@@ -23,10 +23,27 @@ const doneTask = {
 describe('TaskDetailDialog', () => {
   const onClose = jest.fn();
   const onComplete = jest.fn();
+  const onEdit = jest.fn();
+  const onRemove = jest.fn();
+
+  function renderDialog(task = todoTask) {
+    return render(
+      <TaskDetailDialog
+        task={task}
+        open={true}
+        onClose={onClose}
+        onComplete={onComplete}
+        onEdit={onEdit}
+        onRemove={onRemove}
+      />,
+    );
+  }
 
   beforeEach(() => {
     onClose.mockClear();
     onComplete.mockClear();
+    onEdit.mockClear();
+    onRemove.mockClear();
   });
 
   it('renders task title in heading', () => {
@@ -101,6 +118,38 @@ describe('TaskDetailDialog', () => {
     );
     await user.click(screen.getByText('Mark complete'));
     expect(onComplete).toHaveBeenCalledWith('2');
+  });
+
+  it('offers the same Edit and Remove actions for pending and completed tasks', () => {
+    const { rerender } = renderDialog();
+
+    expect(screen.getByRole('button', { name: 'Edit Eye Doctor Checkup' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Remove Eye Doctor Checkup' })).toBeInTheDocument();
+
+    rerender(
+      <TaskDetailDialog
+        task={doneTask}
+        open={true}
+        onClose={onClose}
+        onComplete={onComplete}
+        onEdit={onEdit}
+        onRemove={onRemove}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Edit Daily Vitamin' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Remove Daily Vitamin' })).toBeInTheDocument();
+  });
+
+  it('calls edit and remove handlers with the task id', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+
+    await user.click(screen.getByRole('button', { name: 'Edit Eye Doctor Checkup' }));
+    await user.click(screen.getByRole('button', { name: 'Remove Eye Doctor Checkup' }));
+
+    expect(onEdit).toHaveBeenCalledWith('2');
+    expect(onRemove).toHaveBeenCalledWith('2');
   });
 
   it('renders nothing when task is null', () => {

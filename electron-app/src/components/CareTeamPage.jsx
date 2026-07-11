@@ -1,4 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import ItemActions from './ItemActions';
+import RemoveItemDialog from './RemoveItemDialog';
+import ConfirmationDialog from './ConfirmationDialog';
+import { showModalWithInitialFocus } from '../dialogFocus';
 
 const emptyHelperForm = {
   name: '',
@@ -13,7 +17,7 @@ const availabilityLabels = {
   offline: 'offline',
 };
 
-const helperColors = ['#1d4ed8', '#047857', '#b45309', '#7c3aed', '#be123c'];
+const helperColors = ['#1C4CCE', '#046248', '#8A4500', '#6A1FEA', '#AD1037'];
 
 function getInitials(name) {
   const initials = name
@@ -41,8 +45,11 @@ export default function CareTeamPage({ helpers, onHelpersChange, onAnnounce }) {
   const [formMode, setFormMode] = useState('add');
   const [editingHelper, setEditingHelper] = useState(null);
   const [helperDialogOpen, setHelperDialogOpen] = useState(false);
+  const [selectedHelperId, setSelectedHelperId] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [removeTarget, setRemoveTarget] = useState(null);
   const [confirmation, setConfirmation] = useState(null);
+  const selectedHelper = helpers.find((helper) => helper.id === selectedHelperId) ?? null;
 
   function openAddDialog() {
     setFormMode('add');
@@ -54,6 +61,11 @@ export default function CareTeamPage({ helpers, onHelpersChange, onAnnounce }) {
     setFormMode('edit');
     setEditingHelper(helper);
     setHelperDialogOpen(true);
+  }
+
+  function openHelperDetail(helper) {
+    setSelectedHelperId(helper.id);
+    setDetailOpen(true);
   }
 
   function closeHelperDialog() {
@@ -84,9 +96,9 @@ export default function CareTeamPage({ helpers, onHelpersChange, onAnnounce }) {
       closeHelperDialog();
       setConfirmation({
         title: 'Helper updated',
-        message: `${normalized.name}'s details were updated.`,
+        message: `${normalized.name} was updated.`,
       });
-      onAnnounce?.(`${normalized.name}'s details were updated.`);
+      onAnnounce?.(`${normalized.name} was updated.`);
       return;
     }
 
@@ -115,6 +127,8 @@ export default function CareTeamPage({ helpers, onHelpersChange, onAnnounce }) {
       current.filter((helper) => helper.id !== removeTarget.id),
     );
     onAnnounce?.(`${removeTarget.name} was removed from your care team.`);
+    setSelectedHelperId(null);
+    setDetailOpen(false);
     setRemoveTarget(null);
   }
 
@@ -146,8 +160,7 @@ export default function CareTeamPage({ helpers, onHelpersChange, onAnnounce }) {
                 key={helper.id}
                 helper={helper}
                 color={helperColors[(helper.colorIndex ?? index) % helperColors.length]}
-                onEdit={() => openEditDialog(helper)}
-                onRemove={() => setRemoveTarget(helper)}
+                onOpen={() => openHelperDetail(helper)}
               />
             ))}
           </div>
@@ -167,13 +180,25 @@ export default function CareTeamPage({ helpers, onHelpersChange, onAnnounce }) {
         onSave={saveHelper}
       />
 
-      <RemoveHelperDialog
-        helper={removeTarget}
+      <RemoveItemDialog
+        itemName={removeTarget?.name}
+        itemType="helper"
+        message={removeTarget ? `Remove ${removeTarget.name} from your care team?` : ''}
+        confirmLabel="Remove helper"
+        keepLabel="Keep helper"
         onClose={() => setRemoveTarget(null)}
         onConfirm={confirmRemove}
       />
 
-      <HelperConfirmationDialog
+      <HelperDetailDialog
+        helper={selectedHelper}
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        onEdit={() => openEditDialog(selectedHelper)}
+        onRemove={() => setRemoveTarget(selectedHelper)}
+      />
+
+      <ConfirmationDialog
         confirmation={confirmation}
         onClose={() => setConfirmation(null)}
       />
@@ -181,64 +206,124 @@ export default function CareTeamPage({ helpers, onHelpersChange, onAnnounce }) {
   );
 }
 
-function HelperCard({ helper, color, onEdit, onRemove }) {
+function HelperCard({ helper, color, onOpen }) {
+  const availability = helper.availability ?? 'offline';
+  const availabilityLabel = availabilityLabels[availability] ?? availabilityLabels.offline;
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onOpen();
+    }
+  }
+
+  return (
+    <article
+      className="care-helper-card"
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${helper.name}'s details`}
+      onClick={onOpen}
+      onKeyDown={handleKeyDown}
+    >
+        <div className="care-helper-card__header">
+          <span
+            className="care-helper-card__avatar"
+            aria-hidden="true"
+            style={{ '--helper-color': color }}
+          >
+            {helper.initials ?? getInitials(helper.name)}
+          </span>
+          <div>
+            <h3 id={`helper-${helper.id}-name`} className="care-helper-card__name">
+              {helper.name}
+            </h3>
+            <p className="care-helper-card__role">{helper.role ?? 'Helper'}</p>
+          </div>
+        </div>
+
+        <span className={`availability-badge availability-badge--${availability}`}>
+          {availabilityLabel}
+        </span>
+
+        <div className="care-helper-card__details">
+          <p className="care-helper-card__phone">
+            <span className="care-helper-card__meta-label">Phone: </span>
+            {helper.phone}
+          </p>
+          {helper.notes && (
+            <p className="care-helper-card__notes">
+              <span className="care-helper-card__meta-label">Notes: </span>
+              {helper.notes}
+            </p>
+          )}
+        </div>
+        <span className="care-helper-card__hint">Open details</span>
+    </article>
+  );
+}
+function HelperDetailDialog({ helper, open, onClose, onEdit, onRemove }) {
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (open && !dialog.open) showModalWithInitialFocus(dialog);
+    if (!open && dialog.open) dialog.close();
+  }, [open]);
+
+  if (!helper) return null;
+
   const availability = helper.availability ?? 'offline';
   const availabilityLabel = availabilityLabels[availability] ?? availabilityLabels.offline;
 
   return (
-    <article className="care-helper-card" aria-labelledby={`helper-${helper.id}-name`}>
-      <div className="care-helper-card__header">
-        <span
-          className="care-helper-card__avatar"
-          aria-hidden="true"
-          style={{ '--helper-color': color }}
-        >
-          {helper.initials ?? getInitials(helper.name)}
-        </span>
-        <div>
-          <h3 id={`helper-${helper.id}-name`} className="care-helper-card__name">
-            {helper.name}
-          </h3>
-          <p className="care-helper-card__role">{helper.role ?? 'Helper'}</p>
+    <dialog
+      className="dialog"
+      ref={dialogRef}
+      aria-labelledby="helper-detail-title"
+      onClose={onClose}
+    >
+      <form method="dialog" className="dialog__inner">
+        <header className="dialog__header">
+          <h2 id="helper-detail-title">{helper.name}</h2>
+          <button type="button" className="dialog__close" aria-label="Close" onClick={onClose}>
+            <span aria-hidden="true">X</span>
+          </button>
+        </header>
+
+        <div className="dialog__body">
+          <dl className="detail-list">
+            <div className="detail-row">
+              <dt className="detail-row__label">Availability</dt>
+              <dd className="detail-row__value">
+                <span className={`availability-badge availability-badge--${availability}`}>
+                  {availabilityLabel}
+                </span>
+              </dd>
+            </div>
+            <div className="detail-row">
+              <dt className="detail-row__label">Role</dt>
+              <dd className="detail-row__value">{helper.role ?? 'Helper'}</dd>
+            </div>
+            <div className="detail-row">
+              <dt className="detail-row__label">Phone</dt>
+              <dd className="detail-row__value"><a href={`tel:${helper.phone}`}>{helper.phone}</a></dd>
+            </div>
+            {helper.notes && (
+              <div className="detail-row">
+                <dt className="detail-row__label">Notes</dt>
+                <dd className="detail-row__value">{helper.notes}</dd>
+              </div>
+            )}
+          </dl>
         </div>
-      </div>
 
-      <span className={`availability-badge availability-badge--${availability}`}>
-        {availabilityLabel}
-      </span>
-
-      <div className="care-helper-card__details">
-        <p className="care-helper-card__phone">
-          <span className="care-helper-card__meta-label">Phone: </span>
-          <a href={`tel:${helper.phone}`}>{helper.phone}</a>
-        </p>
-        {helper.notes && (
-          <p className="care-helper-card__notes">
-            <span className="care-helper-card__meta-label">Notes: </span>
-            {helper.notes}
-          </p>
-        )}
-      </div>
-
-      <div className="care-helper-card__actions">
-        <button
-          type="button"
-          className="care-helper-card__action care-helper-card__action--edit"
-          aria-label={`Edit ${helper.name}`}
-          onClick={onEdit}
-        >
-          Edit
-        </button>
-        <button
-          type="button"
-          className="care-helper-card__action care-helper-card__action--remove"
-          aria-label={`Remove ${helper.name}`}
-          onClick={onRemove}
-        >
-          Remove
-        </button>
-      </div>
-    </article>
+        <footer className="dialog__footer dialog__footer--item-actions">
+          <ItemActions itemLabel={helper.name} onEdit={onEdit} onRemove={onRemove} />
+        </footer>
+      </form>
+    </dialog>
   );
 }
 
@@ -268,7 +353,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) showModalWithInitialFocus(dialog);
     if (!open && dialog.open) {
       setDiscardOpen(false);
       dialog.close();
@@ -278,7 +363,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
   useEffect(() => {
     const dialog = discardDialogRef.current;
     if (!dialog) return;
-    if (discardOpen && !dialog.open) dialog.showModal();
+    if (discardOpen && !dialog.open) showModalWithInitialFocus(dialog);
     if (!discardOpen && dialog.open) dialog.close();
   }, [discardOpen]);
 
@@ -384,7 +469,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
 
       {discardOpen && (
         <dialog
-          className="dialog dialog--discard-helper"
+          className="dialog dialog--discard-item"
           ref={discardDialogRef}
           aria-labelledby="discard-helper-title"
           aria-describedby="discard-helper-message"
@@ -396,7 +481,7 @@ function HelperFormDialog({ open, mode, helper, onClose, onSave }) {
             </header>
 
             <div className="dialog__body">
-              <p id="discard-helper-message" className="discard-helper-message">
+              <p id="discard-helper-message" className="discard-item-message">
                 This helper has unsaved information. Close without saving?
               </p>
             </div>
@@ -447,100 +532,5 @@ function HelperField({
       <label htmlFor={id}>{label}</label>
       {multiline ? <textarea {...inputProps} /> : <input type="text" {...inputProps} />}
     </div>
-  );
-}
-
-function RemoveHelperDialog({ helper, onClose, onConfirm }) {
-  const dialogRef = useRef(null);
-  const open = Boolean(helper);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-  }, [open]);
-
-  if (!helper) return null;
-
-  return (
-    <dialog
-      className="dialog dialog--remove-helper"
-      ref={dialogRef}
-      aria-labelledby="remove-helper-title"
-      aria-describedby="remove-helper-message"
-      onClose={onClose}
-    >
-      <form method="dialog" className="dialog__inner">
-        <header className="dialog__header">
-          <h2 id="remove-helper-title">Are you sure?</h2>
-        </header>
-
-        <div className="dialog__body">
-          <p id="remove-helper-message" className="remove-helper-message">
-            Remove {helper.name} from your care team?
-          </p>
-        </div>
-
-        <footer className="dialog__footer">
-          <button
-            type="button"
-            className="danger-btn"
-            onClick={onConfirm}
-          >
-            Remove helper
-          </button>
-          <button
-            type="button"
-            className="secondary-btn"
-            onClick={onClose}
-          >
-            Keep helper
-          </button>
-        </footer>
-      </form>
-    </dialog>
-  );
-}
-
-function HelperConfirmationDialog({ confirmation, onClose }) {
-  const dialogRef = useRef(null);
-  const open = Boolean(confirmation);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-  }, [open]);
-
-  if (!confirmation) return null;
-
-  return (
-    <dialog
-      className="dialog dialog--confirmation"
-      ref={dialogRef}
-      aria-labelledby="helper-confirmation-title"
-      onClose={onClose}
-    >
-      <form method="dialog" className="dialog__inner">
-        <header className="dialog__header">
-          <h2 id="helper-confirmation-title">{confirmation.title}</h2>
-          <button
-            type="button"
-            className="dialog__close"
-            aria-label="Close"
-            onClick={onClose}
-          >
-            <span aria-hidden="true">X</span>
-          </button>
-        </header>
-
-        <div className="confirmation-panel">
-          <div className="confirmation-panel__icon" aria-hidden="true">OK</div>
-          <p className="confirmation-panel__title">{confirmation.message}</p>
-        </div>
-      </form>
-    </dialog>
   );
 }

@@ -1,13 +1,22 @@
 import { useRef, useEffect } from 'react';
 import { statusLabels, typeLabels } from '../data';
+import ItemActions from './ItemActions';
+import { showModalWithInitialFocus } from '../dialogFocus';
 
-export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
+export default function TaskDetailDialog({
+  task,
+  open,
+  onClose,
+  onComplete,
+  onEdit,
+  onRemove,
+}) {
   const dialogRef = useRef(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) showModalWithInitialFocus(dialog);
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
@@ -69,8 +78,13 @@ export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
           </dl>
         </div>
 
-        {task.status !== 'done' && (
-          <footer className="dialog__footer">
+        <footer className="dialog__footer dialog__footer--item-actions">
+          <ItemActions
+            itemLabel={task.title}
+            onEdit={() => onEdit(task.id)}
+            onRemove={() => onRemove(task.id)}
+          />
+          {task.status !== 'done' && (
             <button
               type="button"
               className="primary-btn"
@@ -78,8 +92,8 @@ export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
             >
               Mark complete
             </button>
-          </footer>
-        )}
+          )}
+        </footer>
       </form>
     </dialog>
   );

@@ -1,5 +1,6 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import { typeOptions } from '../data';
+import { showModalWithInitialFocus } from '../dialogFocus';
 
 const emptyForm = {
   title: '',
@@ -9,39 +10,55 @@ const emptyForm = {
   type: 'appointment',
 };
 
-export default function NewAppointmentDialog({ open, onClose, onAdd }) {
+function taskToForm(task) {
+  if (!task) return { ...emptyForm };
+
+  return {
+    title: task.title ?? '',
+    time: task.time ?? '',
+    location: task.location ?? '',
+    notes: task.notes ?? '',
+    type: task.type ?? 'appointment',
+  };
+}
+
+export default function NewAppointmentDialog({ open, task = null, onClose, onAdd, onSave }) {
   const dialogRef = useRef(null);
   const discardDialogRef = useRef(null);
   const [form, setForm] = useState({ ...emptyForm });
   const [errors, setErrors] = useState({});
   const [discardOpen, setDiscardOpen] = useState(false);
+  const initialForm = useMemo(() => taskToForm(task), [task]);
+  const isEditMode = Boolean(task);
 
   const hasRequiredFields = Boolean(
     form.title.trim() && form.time.trim() && form.location.trim(),
   );
-  const hasUnsavedData = ['title', 'time', 'location', 'notes'].some(
-    (field) => form[field].trim(),
-  );
+  const hasUnsavedData = isEditMode
+    ? ['title', 'time', 'location', 'notes', 'type'].some(
+        (field) => form[field] !== initialForm[field],
+      )
+    : ['title', 'time', 'location', 'notes'].some((field) => form[field].trim());
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (open && !dialog.open) {
-      setForm({ ...emptyForm });
+      setForm(initialForm);
       setErrors({});
       setDiscardOpen(false);
-      dialog.showModal();
+      showModalWithInitialFocus(dialog);
     }
     if (!open && dialog.open) {
       setDiscardOpen(false);
       dialog.close();
     }
-  }, [open]);
+  }, [initialForm, open]);
 
   useEffect(() => {
     const dialog = discardDialogRef.current;
     if (!dialog) return;
-    if (discardOpen && !dialog.open) dialog.showModal();
+    if (discardOpen && !dialog.open) showModalWithInitialFocus(dialog);
     if (!discardOpen && dialog.open) dialog.close();
   }, [discardOpen]);
 
@@ -60,14 +77,23 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
       setErrors(errs);
       return;
     }
-    onAdd({
-      id: String(Date.now()),
+    const normalized = {
       title: form.title.trim(),
-      date: 'Today',
       time: form.time.trim(),
       location: form.location.trim(),
       notes: form.notes.trim(),
       type: form.type,
+    };
+
+    if (isEditMode) {
+      onSave({ ...task, ...normalized });
+      return;
+    }
+
+    onAdd({
+      id: String(Date.now()),
+      ...normalized,
+      date: 'Today',
       status: 'todo',
       actionLabel: 'View',
     });
@@ -115,7 +141,9 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
       >
         <form className="dialog__inner" onSubmit={handleSubmit}>
           <header className="dialog__header">
-            <h2 id="new-reminder-title">New Reminder</h2>
+            <h2 id="new-reminder-title">
+              {isEditMode ? 'Edit Reminder' : 'New Reminder'}
+            </h2>
             <button
               type="button"
               className="dialog__close"
@@ -213,7 +241,7 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
 
       {discardOpen && (
         <dialog
-          className="dialog dialog--discard-helper"
+          className="dialog dialog--discard-item"
           ref={discardDialogRef}
           aria-labelledby="discard-reminder-title"
           aria-describedby="discard-reminder-message"
@@ -225,7 +253,7 @@ export default function NewAppointmentDialog({ open, onClose, onAdd }) {
             </header>
 
             <div className="dialog__body">
-              <p id="discard-reminder-message" className="discard-helper-message">
+              <p id="discard-reminder-message" className="discard-item-message">
                 This reminder has unsaved information. Close without saving?
               </p>
             </div>

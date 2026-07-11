@@ -26,6 +26,20 @@ describe('SettingsDialog', () => {
     expect(screen.getByText('Accessibility settings')).toBeInTheDocument();
   });
 
+  it('provides mouse and keyboard instructions for changing and saving settings', () => {
+    render(
+      <SettingsDialog open={true} settings={defaultSettings} onSave={onSave} onClose={onClose} />,
+    );
+
+    const dialog = screen.getByRole('dialog', { name: 'Accessibility settings' });
+    const instructions = screen.getByText(/Click an option, or focus it and press Space or Enter/i);
+
+    expect(instructions).toHaveTextContent(
+      'Click an option, or focus it and press Space or Enter, to toggle the setting. Click Save settings to apply and retain your changes.',
+    );
+    expect(dialog).toHaveAttribute('aria-describedby', instructions.id);
+  });
+
   it('renders display settings checkboxes', () => {
     render(
       <SettingsDialog open={true} settings={defaultSettings} onSave={onSave} onClose={onClose} />,
@@ -92,6 +106,63 @@ describe('SettingsDialog', () => {
       expect.objectContaining({ darkTheme: true }),
     );
     expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it('allows keyboard-only navigation and toggling for every display setting', async () => {
+    const user = userEvent.setup();
+    render(
+      <SettingsDialog
+        open={true}
+        settings={defaultSettings}
+        onChange={onChange}
+        onSave={onSave}
+        onClose={onClose}
+      />,
+    );
+
+    await user.tab();
+    expect(screen.getByRole('button', { name: /^Close$/ })).toHaveFocus();
+
+    const options = [
+      screen.getByLabelText('Larger text (125%)'),
+      screen.getByLabelText('High contrast mode'),
+      screen.getByLabelText('Dark Theme'),
+      screen.getByLabelText('Reduce motion'),
+    ];
+
+    for (const option of options) {
+      await user.tab();
+      expect(option).toHaveFocus();
+      await user.keyboard(' ');
+    }
+
+    expect(options[0]).toBeChecked();
+    expect(options[1]).toBeChecked();
+    expect(options[2]).toBeChecked();
+    expect(options[3]).not.toBeChecked();
+    expect(onChange).toHaveBeenCalledTimes(4);
+  });
+
+  it('also toggles a focused display setting with Enter', async () => {
+    const user = userEvent.setup();
+    render(
+      <SettingsDialog
+        open={true}
+        settings={defaultSettings}
+        onChange={onChange}
+        onSave={onSave}
+        onClose={onClose}
+      />,
+    );
+
+    const darkTheme = screen.getByLabelText('Dark Theme');
+    darkTheme.focus();
+    await user.keyboard('{Enter}');
+
+    expect(darkTheme).toBeChecked();
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ darkTheme: true }),
+    );
   });
 
   it('calls onClose when close button is clicked', async () => {
