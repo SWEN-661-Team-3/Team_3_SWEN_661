@@ -15,15 +15,15 @@ describe('HelpDialog', () => {
 
   it('lists keyboard shortcuts', () => {
     render(<HelpDialog open={true} onClose={onClose} />);
-    expect(screen.getByText(/creates a new reminder/)).toBeInTheDocument();
-    expect(screen.getByText(/saves the plan/)).toBeInTheDocument();
-    expect(screen.getByText(/searches tasks/)).toBeInTheDocument();
-    expect(screen.getByText(/opens today's plan/)).toBeInTheDocument();
-    expect(screen.getByText(/opens the Care Team page/)).toBeInTheDocument();
-    expect(screen.getByText(/opens settings/)).toBeInTheDocument();
-    expect(screen.getByText(/closes the dialog/)).toBeInTheDocument();
-    expect(screen.getByText(/opens the help dialog/)).toBeInTheDocument();
-    expect(screen.getByText(/opens emergency help/)).toBeInTheDocument();
+    expect(screen.getAllByText(/creates a new reminder/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/saves the plan/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/searches tasks/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/opens today's plan/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/opens the Care Team page/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/opens settings/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/closes the dialog/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/opens the help dialog/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/opens emergency help/).length).toBeGreaterThan(0);
   });
 
   it('renders shortcut descriptions without list semantics', () => {
@@ -32,8 +32,10 @@ describe('HelpDialog', () => {
     expect(container.querySelector('ul')).not.toBeInTheDocument();
     expect(container.querySelector('ol')).not.toBeInTheDocument();
     expect(container.querySelector('li')).not.toBeInTheDocument();
-    expect(container.querySelector('[aria-label="F1, opens help dialog"]')).toBeInTheDocument();
-    expect(container.querySelector('[aria-label="F2, opens emergency help"]')).toBeInTheDocument();
+    expect(screen.queryByRole('group')).not.toBeInTheDocument();
+    expect(screen.getByText('Control plus comma, opens settings.')).toHaveClass('visually-hidden');
+    expect(screen.getByText('F1, opens help dialog.')).toHaveClass('visually-hidden');
+    expect(screen.getByText('F2, opens emergency help.')).toHaveClass('visually-hidden');
   });
 
   it('shows usage instructions', () => {

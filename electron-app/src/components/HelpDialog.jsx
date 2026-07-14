@@ -37,16 +37,46 @@ export default function HelpDialog({ open, onClose }) {
             actions work with the keyboard.
           </p>
           <div className="help-list">
-            <p className="help-list__row" aria-label="Ctrl+N, creates a new reminder"><kbd>Ctrl</kbd>+<kbd>N</kbd> creates a new reminder.</p>
-            <p className="help-list__row" aria-label="Ctrl+S, saves the plan"><kbd>Ctrl</kbd>+<kbd>S</kbd> saves the plan.</p>
-            <p className="help-list__row" aria-label="Ctrl+F, searches tasks"><kbd>Ctrl</kbd>+<kbd>F</kbd> searches tasks.</p>
-            <p className="help-list__row" aria-label="Ctrl+1, opens today's plan"><kbd>Ctrl</kbd>+<kbd>1</kbd> opens today&apos;s plan.</p>
-            <p className="help-list__row" aria-label="Ctrl+2, opens the Care Team page"><kbd>Ctrl</kbd>+<kbd>2</kbd> opens the Care Team page.</p>
-            <p className="help-list__row" aria-label="Control plus comma, opens settings"><kbd>Ctrl</kbd>+<kbd>,</kbd> opens settings.</p>
-            <p className="help-list__row" aria-label="Tab or Shift+Tab, moves between panels"><kbd>Tab</kbd> or <kbd>Shift</kbd>+<kbd>Tab</kbd> moves between panels.</p>
-            <p className="help-list__row" aria-label="Escape, closes the dialog"><kbd>Esc</kbd> closes the dialog.</p>
-            <p className="help-list__row" aria-label="F1, opens help dialog"><kbd>F1</kbd> opens the help dialog.</p>
-            <p className="help-list__row" aria-label="F2, opens emergency help"><kbd>F2</kbd> opens emergency help.</p>
+            <p className="help-list__row">
+              <span className="visually-hidden">Control plus N, creates a new reminder.</span>
+              <span aria-hidden="true"><kbd>Ctrl</kbd>+<kbd>N</kbd> creates a new reminder.</span>
+            </p>
+            <p className="help-list__row">
+              <span className="visually-hidden">Control plus S, saves the plan.</span>
+              <span aria-hidden="true"><kbd>Ctrl</kbd>+<kbd>S</kbd> saves the plan.</span>
+            </p>
+            <p className="help-list__row">
+              <span className="visually-hidden">Control plus F, searches tasks.</span>
+              <span aria-hidden="true"><kbd>Ctrl</kbd>+<kbd>F</kbd> searches tasks.</span>
+            </p>
+            <p className="help-list__row">
+              <span className="visually-hidden">Control plus 1, opens today&apos;s plan.</span>
+              <span aria-hidden="true"><kbd>Ctrl</kbd>+<kbd>1</kbd> opens today&apos;s plan.</span>
+            </p>
+            <p className="help-list__row">
+              <span className="visually-hidden">Control plus 2, opens the Care Team page.</span>
+              <span aria-hidden="true"><kbd>Ctrl</kbd>+<kbd>2</kbd> opens the Care Team page.</span>
+            </p>
+            <p className="help-list__row">
+              <span className="visually-hidden">Control plus comma, opens settings.</span>
+              <span aria-hidden="true"><kbd>Ctrl</kbd>+<kbd>,</kbd> opens settings.</span>
+            </p>
+            <p className="help-list__row">
+              <span className="visually-hidden">Tab or Shift plus Tab, moves between panels.</span>
+              <span aria-hidden="true"><kbd>Tab</kbd> or <kbd>Shift</kbd>+<kbd>Tab</kbd> moves between panels.</span>
+            </p>
+            <p className="help-list__row">
+              <span className="visually-hidden">Escape, closes the dialog.</span>
+              <span aria-hidden="true"><kbd>Esc</kbd> closes the dialog.</span>
+            </p>
+            <p className="help-list__row">
+              <span className="visually-hidden">F1, opens help dialog.</span>
+              <span aria-hidden="true"><kbd>F1</kbd> opens the help dialog.</span>
+            </p>
+            <p className="help-list__row">
+              <span className="visually-hidden">F2, opens emergency help.</span>
+              <span aria-hidden="true"><kbd>F2</kbd> opens emergency help.</span>
+            </p>
           </div>
         </div>
       </div>
