@@ -28,7 +28,7 @@ export default function TaskList({ tasks, filter, onSelectTask }) {
             <button
               type="button"
               className={classes}
-              aria-label={`${item.title}, ${item.time}, ${status.label}, ${type.label}`}
+              aria-label={`${item.title}, ${item.time}`}
               onClick={() => onSelectTask(item.id)}
             >
               <span className="task-list__status" aria-hidden="true">{status.icon}</span>

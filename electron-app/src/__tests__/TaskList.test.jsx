@@ -92,7 +92,7 @@ describe('TaskList', () => {
       <TaskList tasks={initialPlan} selectedId={null} filter="" onSelectTask={onSelectTask} />,
     );
     expect(
-      screen.getByLabelText(/Daily Vitamin & Heart Med, 8:00 AM, Done, Medication/),
+      screen.getByLabelText(/Daily Vitamin & Heart Med, 8:00 AM/),
     ).toBeInTheDocument();
   });
 

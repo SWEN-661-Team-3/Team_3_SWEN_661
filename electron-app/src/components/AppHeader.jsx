@@ -1,24 +1,22 @@
 export default function AppHeader({ activeView = 'today', onAction }) {
   const buttons = [
-    { action: 'new-record', label: 'New', title: 'New reminder (Ctrl+N)' },
-    { action: 'save', label: 'Save Plan', title: 'Save plan (Ctrl+S)' },
+    { action: 'new-record', label: 'New' },
+    { action: 'save', label: 'Save Plan' },
     'divider',
-    { action: 'search', label: 'Search', title: 'Search (Ctrl+F)' },
+    { action: 'search', label: 'Search' },
     {
       action: 'view-todays-plan',
       label: "Today's Plan",
-      title: "Today's Plan (Ctrl+1)",
       active: activeView === 'today',
     },
     {
       action: 'view-care-team',
       label: 'Care Team',
-      title: 'Care Team (Ctrl+2)',
       active: activeView === 'care-team',
     },
-    { action: 'open-settings', label: 'Settings', title: 'Settings (Ctrl+,)' },
+    { action: 'open-settings', label: 'Settings' },
     'divider',
-    { action: 'emergency', label: 'Emergency', title: 'Emergency help (F2)', danger: true },
+    { action: 'emergency', label: 'Emergency', danger: true },
   ];
 
   return (
@@ -28,7 +26,7 @@ export default function AppHeader({ activeView = 'today', onAction }) {
         <h1 className="app-header__title">CareConnect</h1>
       </div>
 
-      <nav className="toolbar" aria-label="CareConnect toolbar">
+      <nav className="toolbar" aria-label="Toolbar">
         {buttons.map((btn, i) => {
           if (btn === 'divider') {
             return <span key={`div-${i}`} className="toolbar-divider" aria-hidden="true" />;
@@ -45,7 +43,6 @@ export default function AppHeader({ activeView = 'today', onAction }) {
               key={btn.action}
               type="button"
               className={classes}
-              title={btn.title}
               aria-current={btn.active ? 'true' : undefined}
               onClick={() => onAction(btn.action)}
             >

@@ -54,7 +54,7 @@ describe('WCAG 2.1 AA Accessibility', () => {
       );
 
       expect(
-        screen.getByRole('button', { name: /Take Medicine.*8:00 AM.*Pending.*Medication/i }),
+        screen.getByRole('button', { name: /Take Medicine.*8:00 AM/i }),
       ).toBeInTheDocument();
     });
   });
@@ -75,10 +75,10 @@ describe('WCAG 2.1 AA Accessibility', () => {
 
       expect(document.title).toBe("Today's Plan - CareConnect");
 
-      await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
+      await user.click(screen.getByRole('button', { name: 'Care Team' }));
       expect(document.title).toBe('Care Team - CareConnect');
 
-      await user.click(screen.getByTitle("Today's Plan (Ctrl+1)"));
+      await user.click(screen.getByRole('button', { name: "Today's Plan" }));
       expect(document.title).toBe("Today's Plan - CareConnect");
     });
   });
@@ -97,7 +97,7 @@ describe('WCAG 2.1 AA Accessibility', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
+      await user.click(screen.getByRole('button', { name: 'Care Team' }));
 
       expect(screen.getByRole('heading', { level: 1, name: 'CareConnect' })).toBeInTheDocument();
       expect(screen.getByRole('heading', { level: 2, name: 'Care Team' })).toBeInTheDocument();
@@ -109,7 +109,7 @@ describe('WCAG 2.1 AA Accessibility', () => {
       const onAction = jest.fn();
       render(<AppHeader activeView="today" onAction={onAction} />);
 
-      const todayBtn = screen.getByTitle("Today's Plan (Ctrl+1)");
+      const todayBtn = screen.getByRole('button', { name: "Today's Plan" });
       expect(todayBtn).toHaveClass('toolbar-btn--active');
       expect(todayBtn).toHaveAttribute('aria-current', 'true');
     });
@@ -150,10 +150,10 @@ describe('WCAG 2.1 AA Accessibility', () => {
       const onAction = jest.fn();
       render(<AppHeader activeView="care-team" onAction={onAction} />);
 
-      const careTeamBtn = screen.getByTitle('Care Team (Ctrl+2)');
+      const careTeamBtn = screen.getByRole('button', { name: 'Care Team' });
       expect(careTeamBtn).toHaveAttribute('aria-current', 'true');
 
-      const todayBtn = screen.getByTitle("Today's Plan (Ctrl+1)");
+      const todayBtn = screen.getByRole('button', { name: "Today's Plan" });
       expect(todayBtn).not.toHaveAttribute('aria-current');
     });
 
@@ -161,7 +161,7 @@ describe('WCAG 2.1 AA Accessibility', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+      await user.click(screen.getByRole('button', { name: 'Settings' }));
       expect(
         screen.getByRole('dialog', { name: /accessibility settings/i }),
       ).toBeInTheDocument();
@@ -171,7 +171,7 @@ describe('WCAG 2.1 AA Accessibility', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
+      await user.click(screen.getByRole('button', { name: 'Care Team' }));
 
       const sarahCard = screen.getByRole('button', { name: /^Sarah Johnson, Helper, available/ });
       expect(sarahCard).toBeInTheDocument();

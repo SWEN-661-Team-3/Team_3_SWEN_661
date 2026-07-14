@@ -375,7 +375,7 @@ export default function App() {
           ref={mainRef}
         >
           {activeView === 'today' && (
-            <div className="page-header">
+            <div className="page-header" aria-hidden="true">
               <p className="page-subtitle">Here is today&apos;s plan.</p>
             </div>
           )}

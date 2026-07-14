@@ -15,7 +15,7 @@ export default function HeroCard({ task, onClick }) {
       className="hero-card"
       tabIndex={0}
       role="button"
-      aria-label={`Up Next: ${task.title}, ${task.time}, ${location}. Press Enter to view details.`}
+      aria-label={`${task.title}, ${task.time}, ${location}`}
       onClick={() => onClick(task.id)}
       onKeyDown={handleKeyDown}
     >
