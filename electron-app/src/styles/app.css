@@ -1457,10 +1457,9 @@ body.dark-mode.high-contrast {
 
 .help-list {
   margin: 0;
-  padding-left: var(--space-6);
 }
 
-.help-list li {
+.help-list__row {
   margin-bottom: var(--space-2);
 }
 

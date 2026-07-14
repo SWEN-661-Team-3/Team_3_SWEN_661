@@ -10,20 +10,30 @@ describe('HelpDialog', () => {
 
   it('renders the help dialog title', () => {
     render(<HelpDialog open={true} onClose={onClose} />);
-    expect(screen.getByText('CareConnect Help')).toBeInTheDocument();
+    expect(screen.getByText('Keyboard shortcuts')).toBeInTheDocument();
   });
 
   it('lists keyboard shortcuts', () => {
     render(<HelpDialog open={true} onClose={onClose} />);
-    expect(screen.getByText(/New reminder/)).toBeInTheDocument();
-    expect(screen.getByText(/Save plan/)).toBeInTheDocument();
-    expect(screen.getByText(/Search tasks/)).toBeInTheDocument();
-    expect(screen.getByText(/Today's plan/)).toBeInTheDocument();
-    expect(screen.getByText(/Care Team/)).toBeInTheDocument();
-    expect(screen.getByText(/Open settings/)).toBeInTheDocument();
-    expect(screen.getByText(/Close dialog/)).toBeInTheDocument();
-    expect(screen.getByText(/This help panel/)).toBeInTheDocument();
-    expect(screen.getByText(/Emergency help/)).toBeInTheDocument();
+    expect(screen.getByText(/creates a new reminder/)).toBeInTheDocument();
+    expect(screen.getByText(/saves the plan/)).toBeInTheDocument();
+    expect(screen.getByText(/searches tasks/)).toBeInTheDocument();
+    expect(screen.getByText(/opens today's plan/)).toBeInTheDocument();
+    expect(screen.getByText(/opens the Care Team page/)).toBeInTheDocument();
+    expect(screen.getByText(/opens settings/)).toBeInTheDocument();
+    expect(screen.getByText(/closes the dialog/)).toBeInTheDocument();
+    expect(screen.getByText(/opens the help dialog/)).toBeInTheDocument();
+    expect(screen.getByText(/opens emergency help/)).toBeInTheDocument();
+  });
+
+  it('renders shortcut descriptions without list semantics', () => {
+    const { container } = render(<HelpDialog open={true} onClose={onClose} />);
+
+    expect(container.querySelector('ul')).not.toBeInTheDocument();
+    expect(container.querySelector('ol')).not.toBeInTheDocument();
+    expect(container.querySelector('li')).not.toBeInTheDocument();
+    expect(container.querySelector('[aria-label="F1, opens help dialog"]')).toBeInTheDocument();
+    expect(container.querySelector('[aria-label="F2, opens emergency help"]')).toBeInTheDocument();
   });
 
   it('shows usage instructions', () => {

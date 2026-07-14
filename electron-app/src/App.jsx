@@ -286,6 +286,7 @@ export default function App() {
 
   function openShortcutsDialog() {
     setHelpOpen(true);
+    announce('Keyboard shortcuts dialog opened. Press F1 for help. Press F2 for emergency help. Press Ctrl+S to save the plan.');
   }
 
   function openEmergencyDialog() {

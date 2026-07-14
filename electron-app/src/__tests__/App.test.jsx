@@ -140,16 +140,19 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: 'Keyboard Shortcuts' }));
-    expect(screen.getByText('CareConnect Help')).toBeInTheDocument();
+    expect(screen.getByText('Keyboard shortcuts')).toBeInTheDocument();
   });
 
-  it('opens shortcuts dialog with the F1 shortcut', async () => {
+  it('opens shortcuts dialog with the F1 shortcut and announces a concise summary', async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await user.keyboard('{F1}');
 
-    expect(screen.getByText('CareConnect Help')).toBeInTheDocument();
+    expect(screen.getByText('Keyboard shortcuts')).toBeInTheDocument();
+    expect(
+      screen.getByText('Keyboard shortcuts dialog opened. Press F1 for help. Press F2 for emergency help. Press Ctrl+S to save the plan.'),
+    ).toBeInTheDocument();
   });
 
   it('opens emergency help from the toolbar', async () => {

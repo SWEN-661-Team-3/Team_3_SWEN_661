@@ -58,7 +58,7 @@ describe('Keyboard Navigation', () => {
 
     await user.keyboard('{F1}');
 
-    const dialog = screen.getByRole('dialog', { name: 'CareConnect Help' });
+    const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' });
     expect(dialog).toHaveFocus();
     expect(screen.getByRole('button', { name: 'Close' })).not.toHaveFocus();
   });
@@ -68,7 +68,7 @@ describe('Keyboard Navigation', () => {
     render(<App />);
 
     await user.keyboard('{F1}');
-    const dialog = screen.getByRole('dialog', { name: 'CareConnect Help' });
+    const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' });
     expect(dialog).toHaveAttribute('tabindex', '-1');
 
     await user.tab();
