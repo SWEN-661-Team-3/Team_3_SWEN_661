@@ -20,7 +20,7 @@ export default function CompletionDialog({ open, message, onClose }) {
       aria-labelledby="completion-dialog-title"
       onClose={onClose}
     >
-      <form method="dialog" className="dialog__inner">
+      <div className="dialog__inner">
         <header className="dialog__header">
           <h2 id="completion-dialog-title">Task complete</h2>
           <button
@@ -39,7 +39,7 @@ export default function CompletionDialog({ open, message, onClose }) {
             {message}
           </p>
         </div>
-      </form>
+      </div>
     </dialog>
   );
 }

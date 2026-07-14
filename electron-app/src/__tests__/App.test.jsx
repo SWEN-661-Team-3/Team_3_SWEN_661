@@ -113,7 +113,7 @@ describe('App', () => {
 
     expect(screen.getByRole('heading', { name: 'Care Team' })).toBeInTheDocument();
     expect(screen.getByText('3 helpers on your care team')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: "View Sarah Johnson's details" })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Sarah Johnson, Helper, available/ })).toBeInTheDocument();
   });
 
   it('opens the Care Team page with Ctrl+2', async () => {

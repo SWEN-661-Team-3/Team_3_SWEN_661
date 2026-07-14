@@ -20,7 +20,7 @@ describe('WCAG 2.1 AA Accessibility', () => {
       expect(screen.getByRole('complementary', { name: /plan summary/i })).toBeInTheDocument();
     });
 
-    it('provides accessible group labels on stats row', () => {
+    it('provides accessible status label on stats row', () => {
       const tasks = [
         { id: '1', status: 'done' },
         { id: '2', status: 'todo' },
@@ -28,9 +28,9 @@ describe('WCAG 2.1 AA Accessibility', () => {
       ];
       render(<StatsRow tasks={tasks} />);
 
-      expect(screen.getByRole('group', { name: 'Task statistics' })).toBeInTheDocument();
-      expect(screen.getByRole('group', { name: 'Tasks done: 1 of 3' })).toBeInTheDocument();
-      expect(screen.getByRole('group', { name: 'Pending: 2' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('status', { name: /Tasks done: 1 of 3.*Pending: 2/ }),
+      ).toBeInTheDocument();
     });
 
     it('uses definition list for task detail dialog', async () => {
@@ -89,8 +89,8 @@ describe('WCAG 2.1 AA Accessibility', () => {
       const h1 = screen.getByRole('heading', { level: 1 });
       expect(h1).toHaveTextContent('CareConnect');
 
-      const h3 = screen.getAllByRole('heading', { level: 3 });
-      expect(h3.length).toBeGreaterThan(0);
+      const h2 = screen.getAllByRole('heading', { level: 2 });
+      expect(h2.length).toBeGreaterThan(0);
     });
 
     it('headings follow a logical hierarchy on care team view', async () => {
@@ -173,7 +173,7 @@ describe('WCAG 2.1 AA Accessibility', () => {
 
       await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
 
-      const sarahCard = screen.getByRole('button', { name: "View Sarah Johnson's details" });
+      const sarahCard = screen.getByRole('button', { name: /^Sarah Johnson, Helper, available/ });
       expect(sarahCard).toBeInTheDocument();
 
       await user.click(sarahCard);

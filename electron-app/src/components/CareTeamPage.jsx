@@ -222,20 +222,20 @@ function HelperCard({ helper, color, onOpen }) {
       className="care-helper-card"
       role="button"
       tabIndex={0}
-      aria-label={`View ${helper.name}'s details`}
+      aria-label={`${helper.name}, ${helper.role ?? 'Helper'}, ${availabilityLabel}. Phone: ${helper.phone}. Press Enter to view details.`}
       onClick={onOpen}
       onKeyDown={handleKeyDown}
     >
+      <div aria-hidden="true">
         <div className="care-helper-card__header">
           <span
             className="care-helper-card__avatar"
-            aria-hidden="true"
             style={{ '--helper-color': color }}
           >
             {helper.initials ?? getInitials(helper.name)}
           </span>
           <div>
-            <h3 id={`helper-${helper.id}-name`} className="care-helper-card__name">
+            <h3 className="care-helper-card__name">
               {helper.name}
             </h3>
             <p className="care-helper-card__role">{helper.role ?? 'Helper'}</p>
@@ -259,6 +259,7 @@ function HelperCard({ helper, color, onOpen }) {
           )}
         </div>
         <span className="care-helper-card__hint">Open details</span>
+      </div>
     </article>
   );
 }
@@ -284,7 +285,7 @@ function HelperDetailDialog({ helper, open, onClose, onEdit, onRemove }) {
       aria-labelledby="helper-detail-title"
       onClose={onClose}
     >
-      <form method="dialog" className="dialog__inner">
+      <div className="dialog__inner">
         <header className="dialog__header">
           <h2 id="helper-detail-title">{helper.name}</h2>
           <button type="button" className="dialog__close" aria-label="Close" onClick={onClose}>
@@ -322,7 +323,7 @@ function HelperDetailDialog({ helper, open, onClose, onEdit, onRemove }) {
         <footer className="dialog__footer dialog__footer--item-actions">
           <ItemActions itemLabel={helper.name} onEdit={onEdit} onRemove={onRemove} />
         </footer>
-      </form>
+      </div>
     </dialog>
   );
 }

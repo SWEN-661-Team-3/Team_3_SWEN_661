@@ -20,7 +20,7 @@ export default function SavePlanConfirmationDialog({ open, onClose }) {
       aria-labelledby="save-plan-confirmation-title"
       onClose={onClose}
     >
-      <form method="dialog" className="dialog__inner">
+      <div className="dialog__inner">
         <header className="dialog__header">
           <h2 id="save-plan-confirmation-title">Plan saved</h2>
           <button
@@ -39,7 +39,7 @@ export default function SavePlanConfirmationDialog({ open, onClose }) {
             Today&apos;s plan was saved as a text file.
           </p>
         </div>
-      </form>
+      </div>
     </dialog>
   );
 }

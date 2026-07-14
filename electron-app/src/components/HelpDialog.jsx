@@ -18,7 +18,7 @@ export default function HelpDialog({ open, onClose }) {
       aria-labelledby="help-dialog-title"
       onClose={onClose}
     >
-      <form method="dialog" className="dialog__inner">
+      <div className="dialog__inner">
         <header className="dialog__header">
           <h2 id="help-dialog-title">CareConnect Help</h2>
           <button
@@ -49,7 +49,7 @@ export default function HelpDialog({ open, onClose }) {
             <li><kbd>F2</kbd> &mdash; Emergency help</li>
           </ul>
         </div>
-      </form>
+      </div>
     </dialog>
   );
 }

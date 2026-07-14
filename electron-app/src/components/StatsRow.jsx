@@ -4,22 +4,22 @@ export default function StatsRow({ tasks }) {
   const total = tasks.length;
 
   return (
-    <div className="stats-row" role="group" aria-label="Task statistics">
-      <div className="stat-card" role="group" aria-label={`Tasks done: ${done} of ${total}`}>
-        <span className="stat-card__icon stat-card__icon--success" aria-hidden="true">
+    <div className="stats-row" role="status" aria-label={`Tasks done: ${done} of ${total}. Pending: ${pending}.`}>
+      <div className="stat-card" aria-hidden="true">
+        <span className="stat-card__icon stat-card__icon--success">
           {'\u2713'}
         </span>
         <div>
-          <p className="stat-card__value" aria-hidden="true">{done}/{total}</p>
+          <p className="stat-card__value">{done}/{total}</p>
           <p className="stat-card__label">Tasks done</p>
         </div>
       </div>
-      <div className="stat-card" role="group" aria-label={`Pending: ${pending}`}>
-        <span className="stat-card__icon stat-card__icon--warning" aria-hidden="true">
+      <div className="stat-card" aria-hidden="true">
+        <span className="stat-card__icon stat-card__icon--warning">
           {'\u25F7'}
         </span>
         <div>
-          <p className="stat-card__value" aria-hidden="true">{pending}</p>
+          <p className="stat-card__value">{pending}</p>
           <p className="stat-card__label">Pending</p>
         </div>
       </div>

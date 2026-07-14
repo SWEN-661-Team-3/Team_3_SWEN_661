@@ -10,7 +10,7 @@
 
 ## 1. Executive Summary
 
-Comprehensive accessibility testing was conducted on the CareConnect desktop application using three methods: automated scanning with axe DevTools, manual screen reader testing with NVDA (Windows), and keyboard-only navigation testing. Nine accessibility issues were identified across WCAG 2.1 Level AA criteria. All identified issues have been resolved. Test coverage remains at 91.35% line coverage (188 tests across 19 suites), exceeding the 60% minimum requirement.
+Comprehensive accessibility testing was conducted on the CareConnect desktop application using three methods: automated scanning with axe DevTools, manual screen reader testing with NVDA (Windows), and keyboard-only navigation testing. Twelve accessibility issues were identified across WCAG 2.1 Level AA criteria. All identified issues have been resolved. Test coverage remains above 60% (202 tests across 19 suites), exceeding the minimum requirement.
 
 ---
 
@@ -137,6 +137,36 @@ All application functionality was tested using keyboard-only input:
 | Description | When the emergency countdown completes and help is confirmed, the confirmation message was not announced to assistive technology as a status update. |
 | Resolution | Added `role="status"` to the confirmed-phase container, ensuring the "Help Is On The Way" message is announced by screen readers without requiring focus. |
 
+### Issue 10: HeroCard and HelperCard Cause NVDA Double-Reading
+
+| Field | Value |
+|-------|-------|
+| WCAG Criterion | 4.1.2 Name, Role, Value |
+| Severity | Serious |
+| Component | `HeroCard.jsx`, `CareTeamPage.jsx` (HelperCard) |
+| Description | Cards used `role="button"` with `aria-labelledby` pointing to child elements. NVDA would announce both the accessible name and all visible child text, resulting in confusing double-read output that sounded like "code structure." The hero card's location was also not conveyed in a single focusable announcement. |
+| Resolution | Replaced `aria-labelledby` with a single `aria-label` that includes all relevant info (name, time, location for hero card; name, role, availability, phone for helper cards). Marked all visual child content as `aria-hidden="true"` to eliminate double-reading. |
+
+### Issue 11: Informational Dialogs Announced as Forms by NVDA
+
+| Field | Value |
+|-------|-------|
+| WCAG Criterion | 1.3.1 Info and Relationships |
+| Severity | Minor |
+| Component | `TaskDetailDialog.jsx`, `CompletionDialog.jsx`, `HelpDialog.jsx`, `SavePlanConfirmationDialog.jsx`, `CareTeamPage.jsx` (HelperDetailDialog) |
+| Description | Read-only dialogs (task detail, completion, help, etc.) used `<form method="dialog">` as a wrapper, causing NVDA to announce "form" when entering the dialog even though no form inputs were present. |
+| Resolution | Replaced `<form method="dialog">` with `<div>` in all informational dialogs. Dialogs with actual inputs (settings, new reminder, helper forms) retain their `<form>` elements. |
+
+### Issue 12: StatsRow Verbose Screen Reader Output
+
+| Field | Value |
+|-------|-------|
+| WCAG Criterion | 4.1.2 Name, Role, Value |
+| Severity | Minor |
+| Component | `StatsRow.jsx` |
+| Description | Each stat card used `role="group"` with `aria-label`, but the child text labels repeated the same information, causing redundant NVDA output. |
+| Resolution | Changed the container to `role="status"` with a single `aria-label` summarizing all stats. Marked all child content `aria-hidden="true"` so NVDA reads one clean announcement. |
+
 ---
 
 ## 4. Keyboard Navigation Verification
@@ -181,10 +211,12 @@ All application functionality was tested using keyboard-only input:
 - Emergency countdown provides `aria-label` updates each second
 
 ### Content Structure
-- Heading navigation (H key) follows logical hierarchy: h1 > h2 > h3
+- Heading navigation (H key) follows logical hierarchy: h1 > h2
 - Task list announced as "Task list, list" with item count
 - Definition list in task detail read as term-definition pairs
-- Stats row groups announced with full context
+- Stats announced as a single status: "Tasks done: X of Y. Pending: Z."
+- Hero card reads one clean announcement including title, time, and location
+- Helper cards read one clean announcement including name, role, availability, and phone
 
 ---
 
@@ -219,7 +251,7 @@ All files                        |   89.87 |    81.62 |   87.75 |   91.35
 ```
 
 **Test Suites:** 19 passed, 19 total
-**Tests:** 188 passed, 188 total (20 new WCAG accessibility tests)
+**Tests:** 202 passed, 202 total (20 WCAG accessibility tests)
 
 ---
 

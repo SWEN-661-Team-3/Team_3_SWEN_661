@@ -33,7 +33,7 @@ export default function TaskDetailDialog({
       aria-labelledby="detail-dialog-title"
       onClose={onClose}
     >
-      <form method="dialog" className="dialog__inner">
+      <div className="dialog__inner">
         <header className="dialog__header">
           <h2 id="detail-dialog-title">{task.title}</h2>
           <button
@@ -94,7 +94,7 @@ export default function TaskDetailDialog({
             </button>
           )}
         </footer>
-      </form>
+      </div>
     </dialog>
   );
 }
