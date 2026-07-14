@@ -56,11 +56,23 @@ describe('EmergencyDialog', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'I Need Help' }));
 
-    expect(screen.getByLabelText('Sending alert in 10 seconds')).toBeInTheDocument();
+    expect(screen.getByText('10')).toBeInTheDocument();
+    const announcement = screen.getByText(
+      'Care Connect will notifiy your care team in 10 seconds unless the cancel button is clicked.',
+    );
+    expect(announcement).toHaveAttribute('aria-live', 'polite');
+    expect(announcement).toHaveFocus();
     expect(screen.getByText('Notifying:')).toBeInTheDocument();
     expect(screen.getByText('Sarah Johnson')).toBeInTheDocument();
     expect(screen.getByText('Dr. Emily Smith')).toBeInTheDocument();
     expect(onAlertSent).not.toHaveBeenCalled();
+
+    const countdownCancelButton = screen.getByRole('button', { name: 'Cancel' });
+    act(() => {
+      countdownCancelButton.focus();
+    });
+    expect(countdownCancelButton).toHaveFocus();
+    expect(announcement).toBeEmptyDOMElement();
 
     for (let i = 0; i < 10; i += 1) {
       act(() => {
@@ -68,8 +80,11 @@ describe('EmergencyDialog', () => {
       });
     }
 
-    expect(screen.getByRole('dialog', { name: 'Help Is On The Way' })).toBeInTheDocument();
-    expect(screen.getByText(/Your emergency contacts have been notified/)).toBeInTheDocument();
+    const confirmedDialog = screen.getByRole('dialog', { name: 'Help Is On The Way' });
+    expect(confirmedDialog).toBeInTheDocument();
+    expect(confirmedDialog).toHaveFocus();
+    expect(screen.getByText(/Your emergency contacts have been notified\. Stay calm and stay where you are\. Notified: Sarah Johnson, Helper\. Dr\. Emily Smith, Doctor/)).toBeInTheDocument();
+    expect(screen.getByText(/Your emergency contacts have been notified/, { selector: '.emergency-panel__copy' })).toBeInTheDocument();
     expect(screen.getAllByText('Notified')).toHaveLength(2);
     expect(onAlertSent).toHaveBeenCalledTimes(1);
   });
