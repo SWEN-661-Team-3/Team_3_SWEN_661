@@ -5,10 +5,12 @@ import NewAppointmentDialog from '../components/NewAppointmentDialog';
 describe('NewAppointmentDialog', () => {
   const onClose = jest.fn();
   const onAdd = jest.fn();
+  const onSave = jest.fn();
 
   beforeEach(() => {
     onClose.mockClear();
     onAdd.mockClear();
+    onSave.mockClear();
   });
 
   it('renders the dialog title', () => {
@@ -125,5 +127,48 @@ describe('NewAppointmentDialog', () => {
     expect(screen.getByLabelText(/title/i)).toHaveAttribute('aria-required', 'true');
     expect(screen.getByLabelText(/^time$/i)).toHaveAttribute('aria-required', 'true');
     expect(screen.getByLabelText(/location/i)).toHaveAttribute('aria-required', 'true');
+  });
+
+  it('prefills and saves an existing reminder without replacing system fields', async () => {
+    const user = userEvent.setup();
+    const task = {
+      id: '2',
+      title: 'Eye Doctor Checkup',
+      date: 'Today',
+      time: '10:30 AM',
+      location: 'City Eye Clinic',
+      notes: 'Bring glasses',
+      type: 'appointment',
+      status: 'done',
+      actionLabel: 'View',
+    };
+
+    render(
+      <NewAppointmentDialog
+        open={true}
+        task={task}
+        onClose={onClose}
+        onAdd={onAdd}
+        onSave={onSave}
+      />,
+    );
+
+    expect(screen.getByRole('dialog', { name: 'Edit Reminder' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/title/i)).toHaveValue('Eye Doctor Checkup');
+    expect(screen.getByLabelText(/^time$/i)).toHaveValue('10:30 AM');
+    expect(screen.getByLabelText(/location/i)).toHaveValue('City Eye Clinic');
+
+    await user.clear(screen.getByLabelText(/title/i));
+    await user.type(screen.getByLabelText(/title/i), 'Updated Eye Checkup');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
+      id: '2',
+      title: 'Updated Eye Checkup',
+      status: 'done',
+      date: 'Today',
+      actionLabel: 'View',
+    }));
+    expect(onAdd).not.toHaveBeenCalled();
   });
 });

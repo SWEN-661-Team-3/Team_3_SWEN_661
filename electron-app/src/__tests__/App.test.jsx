@@ -45,7 +45,7 @@ describe('App', () => {
   it('opens search bar when Search toolbar button is clicked', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByTitle('Search (Ctrl+F)'));
+    await user.click(screen.getByRole('button', { name: 'Search' }));
     expect(screen.getByPlaceholderText(/search tasks/i)).toBeInTheDocument();
   });
 
@@ -55,7 +55,7 @@ describe('App', () => {
     const main = document.getElementById('main-content');
     const focusSpy = jest.spyOn(main, 'focus');
 
-    await user.click(screen.getByTitle("Today's Plan (Ctrl+1)"));
+    await user.click(screen.getByRole('button', { name: "Today's Plan" }));
 
     expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
   });
@@ -63,7 +63,7 @@ describe('App', () => {
   it('closes search bar when Escape is pressed', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByTitle('Search (Ctrl+F)'));
+    await user.click(screen.getByRole('button', { name: 'Search' }));
     expect(screen.getByPlaceholderText(/search tasks/i)).toBeInTheDocument();
     await user.keyboard('{Escape}');
     expect(screen.queryByPlaceholderText(/search tasks/i)).not.toBeInTheDocument();
@@ -77,17 +77,31 @@ describe('App', () => {
     expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled();
   });
 
+  it('does not visually mark a task as previously opened', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const taskButton = screen.getAllByRole('button', { name: /Eye Doctor Checkup/i })[0];
+
+    await user.click(taskButton);
+    expect(taskButton).not.toHaveClass('task-list__btn--selected');
+
+    const detailDialog = screen.getByRole('dialog', { name: 'Eye Doctor Checkup' });
+    await user.click(within(detailDialog).getByRole('button', { name: 'Mark complete' }));
+
+    expect(taskButton).not.toHaveClass('task-list__btn--selected');
+  });
+
   it('opens new reminder dialog from toolbar', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByTitle('New reminder (Ctrl+N)'));
+    await user.click(screen.getByRole('button', { name: 'New' }));
     expect(screen.getByText('New Reminder')).toBeInTheDocument();
   });
 
   it('opens settings dialog from toolbar', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
     expect(screen.getByText('Accessibility settings')).toBeInTheDocument();
   });
 
@@ -95,11 +109,11 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
+    await user.click(screen.getByRole('button', { name: 'Care Team' }));
 
     expect(screen.getByRole('heading', { name: 'Care Team' })).toBeInTheDocument();
     expect(screen.getByText('3 helpers on your care team')).toBeInTheDocument();
-    expect(screen.getByRole('article', { name: 'Sarah Johnson' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Sarah Johnson, Helper, available/ })).toBeInTheDocument();
   });
 
   it('opens the Care Team page with Ctrl+2', async () => {
@@ -115,7 +129,7 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('Care Team (Ctrl+2)'));
+    await user.click(screen.getByRole('button', { name: 'Care Team' }));
     fireEvent.keyDown(document, { key: 'f', ctrlKey: true });
 
     expect(screen.getByPlaceholderText(/search tasks/i)).toBeInTheDocument();
@@ -126,22 +140,25 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: 'Keyboard Shortcuts' }));
-    expect(screen.getByText('CareConnect Help')).toBeInTheDocument();
+    expect(screen.getByText('Keyboard shortcuts')).toBeInTheDocument();
   });
 
-  it('opens shortcuts dialog with the F1 shortcut', async () => {
+  it('opens shortcuts dialog with the F1 shortcut and announces a concise summary', async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await user.keyboard('{F1}');
 
-    expect(screen.getByText('CareConnect Help')).toBeInTheDocument();
+    expect(screen.getByText('Keyboard shortcuts')).toBeInTheDocument();
+    expect(
+      screen.getByText('Keyboard shortcuts dialog opened. Press F1 for help. Press F2 for emergency help. Press Ctrl+S to save the plan.'),
+    ).toBeInTheDocument();
   });
 
   it('opens emergency help from the toolbar', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByTitle('Emergency help (F2)'));
+    await user.click(screen.getByRole('button', { name: 'Emergency' }));
 
     const emergencyDialog = screen.getByRole('dialog', { name: 'Emergency Help' });
     expect(within(emergencyDialog).getByRole('button', { name: 'I Need Help' })).toBeInTheDocument();
@@ -163,7 +180,7 @@ describe('App', () => {
 
     expect(document.body).not.toHaveClass('large-text');
     expect(document.body).not.toHaveClass('dark-mode');
-    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
     await user.click(screen.getByLabelText('Larger text (125%)'));
     await user.click(screen.getByLabelText('Dark Theme'));
 
@@ -176,7 +193,7 @@ describe('App', () => {
     expect(document.body).not.toHaveClass('large-text');
     expect(document.body).not.toHaveClass('dark-mode');
 
-    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
     expect(screen.getByLabelText('Larger text (125%)')).not.toBeChecked();
     expect(screen.getByLabelText('Dark Theme')).not.toBeChecked();
   });
@@ -185,14 +202,14 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
     await user.click(screen.getByLabelText('Dark Theme'));
     expect(document.body).toHaveClass('dark-mode');
 
     await user.click(screen.getByText('Save settings'));
     expect(document.body).toHaveClass('dark-mode');
 
-    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
     expect(screen.getByLabelText('Dark Theme')).toBeChecked();
   });
 
@@ -200,7 +217,7 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('Settings (Ctrl+,)'));
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
     expect(screen.queryByLabelText(/dark high contrast/i)).not.toBeInTheDocument();
 
     await user.click(screen.getByLabelText('High contrast mode'));
@@ -213,7 +230,7 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('New reminder (Ctrl+N)'));
+    await user.click(screen.getByRole('button', { name: 'New' }));
     await user.type(screen.getByLabelText(/title/i), 'Physical Therapy');
     await user.type(screen.getByLabelText(/^time$/i), '4:00 PM');
     await user.type(screen.getByLabelText(/location/i), 'PT Center');
@@ -234,7 +251,7 @@ describe('App', () => {
     window.careConnect = { savePlanText };
     render(<App />);
 
-    await user.click(screen.getByTitle('New reminder (Ctrl+N)'));
+    await user.click(screen.getByRole('button', { name: 'New' }));
     await user.type(screen.getByLabelText(/title/i), 'Physical Therapy');
     await user.type(screen.getByLabelText(/^time$/i), '4:00 PM');
     await user.type(screen.getByLabelText(/location/i), 'PT Center');
@@ -246,7 +263,7 @@ describe('App', () => {
         .getByRole('button', { name: /^Close$/ }),
     );
 
-    await user.click(screen.getByTitle('Save plan (Ctrl+S)'));
+    await user.click(screen.getByRole('button', { name: 'Save Plan' }));
 
     expect(savePlanText).toHaveBeenCalledWith(expect.stringContaining("Today's Plan"));
     expect(savePlanText).toHaveBeenCalledWith(expect.stringContaining(
@@ -266,7 +283,7 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('Save plan (Ctrl+S)'));
+    await user.click(screen.getByRole('button', { name: 'Save Plan' }));
 
     expect(await screen.findByText('Unable to save plan')).toBeInTheDocument();
   });
@@ -290,7 +307,7 @@ describe('App', () => {
     window.careConnect = { savePlanText };
     render(<App />);
 
-    await user.click(screen.getByTitle('Save plan (Ctrl+S)'));
+    await user.click(screen.getByRole('button', { name: 'Save Plan' }));
 
     await waitFor(() => expect(savePlanText).toHaveBeenCalled());
     expect(await screen.findByText('Unable to save plan')).toBeInTheDocument();
@@ -309,5 +326,70 @@ describe('App', () => {
     expect(screen.getByText('2/6')).toBeInTheDocument();
     await user.click(within(completionDialog).getByRole('button', { name: /^Close$/ }));
     expect(screen.queryByRole('dialog', { name: 'Task complete' })).not.toBeInTheDocument();
+  });
+
+  it('edits a task from its detail dialog and updates Today\'s Plan', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: /Eye Doctor Checkup/i })[0]);
+    await user.click(screen.getByRole('button', { name: 'Edit Eye Doctor Checkup' }));
+
+    const editDialog = screen.getByRole('dialog', { name: 'Edit Reminder' });
+    const titleInput = within(editDialog).getByLabelText('Title');
+    expect(titleInput).toHaveValue('Eye Doctor Checkup');
+    expect(within(editDialog).getByLabelText('Time')).toHaveValue('10:30 AM');
+    expect(within(editDialog).getByLabelText('Location')).toHaveValue(
+      'City Eye Clinic, 123 Vision Way',
+    );
+
+    await user.clear(titleInput);
+    await user.type(titleInput, 'Annual Eye Checkup');
+    await user.click(within(editDialog).getByRole('button', { name: 'Save' }));
+
+    expect(screen.getAllByText('Annual Eye Checkup').length).toBeGreaterThanOrEqual(2);
+    expect(screen.queryByText('Eye Doctor Checkup')).not.toBeInTheDocument();
+    const confirmation = screen.getByRole('dialog', { name: 'Reminder updated' });
+    expect(within(confirmation).getByText('Annual Eye Checkup was updated.')).toBeInTheDocument();
+  });
+
+  it('protects unsaved task edits', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: /Eye Doctor Checkup/i })[0]);
+    await user.click(screen.getByRole('button', { name: 'Edit Eye Doctor Checkup' }));
+    const editDialog = screen.getByRole('dialog', { name: 'Edit Reminder' });
+    await user.type(within(editDialog).getByLabelText('Notes'), ' Updated');
+    await user.click(within(editDialog).getByRole('button', { name: /^Close$/ }));
+
+    expect(screen.getByRole('dialog', { name: 'Are you sure?' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Continue editing' }));
+    expect(screen.getByRole('dialog', { name: 'Edit Reminder' })).toBeInTheDocument();
+  });
+
+  it('requires confirmation before removing a task and updates the next task', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: /Eye Doctor Checkup/i })[0]);
+    await user.click(screen.getByRole('button', { name: 'Remove Eye Doctor Checkup' }));
+
+    let removeDialog = screen.getByRole('dialog', { name: 'Remove reminder?' });
+    expect(within(removeDialog).getByText(
+      "Remove Eye Doctor Checkup from today's plan?",
+    )).toBeInTheDocument();
+
+    await user.click(within(removeDialog).getByRole('button', { name: 'Keep reminder' }));
+    expect(screen.getAllByText('Eye Doctor Checkup').length).toBeGreaterThanOrEqual(1);
+
+    await user.click(screen.getByRole('button', { name: 'Remove Eye Doctor Checkup' }));
+    removeDialog = screen.getByRole('dialog', { name: 'Remove reminder?' });
+    await user.click(within(removeDialog).getByRole('button', { name: 'Remove reminder' }));
+
+    expect(screen.queryByText('Eye Doctor Checkup')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Lunch and Afternoon Meds').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Eye Doctor Checkup was removed.')).toBeInTheDocument();
+    expect(screen.getByText('1/5')).toBeInTheDocument();
   });
 });

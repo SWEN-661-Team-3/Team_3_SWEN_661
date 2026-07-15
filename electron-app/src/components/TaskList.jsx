@@ -1,6 +1,6 @@
 import { statusLabels, typeLabels } from '../data';
 
-export default function TaskList({ tasks, selectedId, filter, onSelectTask }) {
+export default function TaskList({ tasks, filter, onSelectTask }) {
   const query = (filter || '').trim().toLowerCase();
 
   const filtered = tasks.filter((item) => {
@@ -21,7 +21,6 @@ export default function TaskList({ tasks, selectedId, filter, onSelectTask }) {
         const classes = [
           'task-list__btn',
           item.status === 'done' && 'task-list__btn--done',
-          selectedId === item.id && 'task-list__btn--selected',
         ].filter(Boolean).join(' ');
 
         return (
@@ -29,13 +28,13 @@ export default function TaskList({ tasks, selectedId, filter, onSelectTask }) {
             <button
               type="button"
               className={classes}
-              aria-label={`${item.title}, ${item.time}, ${status.label}, ${type.label}`}
+              aria-label={`${item.title}, ${item.time}`}
               onClick={() => onSelectTask(item.id)}
             >
               <span className="task-list__status" aria-hidden="true">{status.icon}</span>
               <span>
-                <p className="task-list__title">{item.title}</p>
-                <p className="task-list__time">{item.time} &middot; {type.label}</p>
+                <span className="task-list__title">{item.title}</span>
+                <span className="task-list__time">{item.time} &middot; {type.label}</span>
               </span>
             </button>
           </li>

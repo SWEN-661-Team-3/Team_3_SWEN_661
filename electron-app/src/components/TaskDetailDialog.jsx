@@ -1,13 +1,22 @@
 import { useRef, useEffect } from 'react';
 import { statusLabels, typeLabels } from '../data';
+import ItemActions from './ItemActions';
+import { showModalWithInitialFocus } from '../dialogFocus';
 
-export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
+export default function TaskDetailDialog({
+  task,
+  open,
+  onClose,
+  onComplete,
+  onEdit,
+  onRemove,
+}) {
   const dialogRef = useRef(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) showModalWithInitialFocus(dialog);
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
@@ -24,7 +33,7 @@ export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
       aria-labelledby="detail-dialog-title"
       onClose={onClose}
     >
-      <form method="dialog" className="dialog__inner">
+      <div className="dialog__inner">
         <header className="dialog__header">
           <h2 id="detail-dialog-title">{task.title}</h2>
           <button
@@ -38,37 +47,44 @@ export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
         </header>
 
         <div className="dialog__body">
-          <div className="detail-row">
-            <p className="detail-row__label">Status</p>
-            <p className="detail-row__value">
-              <span className={`status-badge status-badge--${task.status}`}>
-                <span aria-hidden="true">{status.icon}</span>
-                {' '}{status.label}
-              </span>
-            </p>
-          </div>
-          <div className="detail-row">
-            <p className="detail-row__label">Type</p>
-            <p className="detail-row__value">{type.label}</p>
-          </div>
-          <div className="detail-row">
-            <p className="detail-row__label">Time</p>
-            <p className="detail-row__value">{task.time}</p>
-          </div>
-          <div className="detail-row">
-            <p className="detail-row__label">Location</p>
-            <p className="detail-row__value">{location}</p>
-          </div>
-          {task.notes && (
+          <dl className="detail-list">
             <div className="detail-row">
-              <p className="detail-row__label">Notes</p>
-              <p className="detail-row__value">{task.notes}</p>
+              <dt className="detail-row__label">Status</dt>
+              <dd className="detail-row__value">
+                <span className={`status-badge status-badge--${task.status}`}>
+                  <span aria-hidden="true">{status.icon}</span>
+                  {' '}{status.label}
+                </span>
+              </dd>
             </div>
-          )}
+            <div className="detail-row">
+              <dt className="detail-row__label">Type</dt>
+              <dd className="detail-row__value">{type.label}</dd>
+            </div>
+            <div className="detail-row">
+              <dt className="detail-row__label">Time</dt>
+              <dd className="detail-row__value">{task.time}</dd>
+            </div>
+            <div className="detail-row">
+              <dt className="detail-row__label">Location</dt>
+              <dd className="detail-row__value">{location}</dd>
+            </div>
+            {task.notes && (
+              <div className="detail-row">
+                <dt className="detail-row__label">Notes</dt>
+                <dd className="detail-row__value">{task.notes}</dd>
+              </div>
+            )}
+          </dl>
         </div>
 
-        {task.status !== 'done' && (
-          <footer className="dialog__footer">
+        <footer className="dialog__footer dialog__footer--item-actions">
+          <ItemActions
+            itemLabel={task.title}
+            onEdit={() => onEdit(task.id)}
+            onRemove={() => onRemove(task.id)}
+          />
+          {task.status !== 'done' && (
             <button
               type="button"
               className="primary-btn"
@@ -76,9 +92,9 @@ export default function TaskDetailDialog({ task, open, onClose, onComplete }) {
             >
               Mark complete
             </button>
-          </footer>
-        )}
-      </form>
+          )}
+        </footer>
+      </div>
     </dialog>
   );
 }

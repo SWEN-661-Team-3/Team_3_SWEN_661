@@ -79,12 +79,12 @@ describe('TaskList', () => {
     expect(buttons[0].className).toContain('task-list__btn--done');
   });
 
-  it('applies selected styling for selected task', () => {
+  it('does not reveal which task was previously selected', () => {
     render(
       <TaskList tasks={initialPlan} selectedId="2" filter="" onSelectTask={onSelectTask} />,
     );
     const buttons = screen.getAllByRole('button');
-    expect(buttons[1].className).toContain('task-list__btn--selected');
+    expect(buttons[1].className).not.toContain('task-list__btn--selected');
   });
 
   it('has accessible labels on task buttons', () => {
@@ -92,7 +92,7 @@ describe('TaskList', () => {
       <TaskList tasks={initialPlan} selectedId={null} filter="" onSelectTask={onSelectTask} />,
     );
     expect(
-      screen.getByLabelText(/Daily Vitamin & Heart Med, 8:00 AM, Done, Medication/),
+      screen.getByLabelText(/Daily Vitamin & Heart Med, 8:00 AM/),
     ).toBeInTheDocument();
   });
 

@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import { showModalWithInitialFocus } from '../dialogFocus';
 
 const INITIAL_COUNTDOWN = 10;
+const COUNTDOWN_ANNOUNCEMENT =
+  'Care Connect will notifiy your care team in 10 seconds unless the cancel button is clicked.';
 
 export default function EmergencyDialog({
   open,
@@ -9,20 +12,25 @@ export default function EmergencyDialog({
   onAlertSent,
 }) {
   const dialogRef = useRef(null);
+  const countdownAnnouncementRef = useRef(null);
   const [phase, setPhase] = useState('idle');
   const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN);
+  const [countdownAnnouncement, setCountdownAnnouncement] = useState('');
+  const [confirmedAnnouncement, setConfirmedAnnouncement] = useState('');
 
   useEffect(() => {
     if (!open) {
       setPhase('idle');
       setCountdown(INITIAL_COUNTDOWN);
+      setCountdownAnnouncement('');
+      setConfirmedAnnouncement('');
     }
   }, [open]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) showModalWithInitialFocus(dialog);
   }, [open]);
 
   useEffect(() => {
@@ -41,16 +49,41 @@ export default function EmergencyDialog({
     return () => window.clearTimeout(timerId);
   }, [countdown, onAlertSent, open, phase]);
 
+  useEffect(() => {
+    if (open && phase === 'countdown') {
+      countdownAnnouncementRef.current?.focus({ preventScroll: true });
+    }
+  }, [open, phase]);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!open || phase !== 'confirmed' || !dialog) return;
+
+    dialog.tabIndex = -1;
+    dialog.focus({ preventScroll: true });
+    setConfirmedAnnouncement(
+      `Your emergency contacts have been notified. Stay calm and stay where you are. Notified: ${contacts
+        .map((contact) => `${contact.name}${contact.relationship ? `, ${contact.relationship}` : ''}`)
+        .join('. ')}`,
+    );
+    dialog.addEventListener('blur', () => {
+      dialog.removeAttribute('tabindex');
+    }, { once: true });
+  }, [open, phase]);
+
   if (!open) return null;
 
   function startCountdown() {
     setPhase('countdown');
     setCountdown(INITIAL_COUNTDOWN);
+    setCountdownAnnouncement(COUNTDOWN_ANNOUNCEMENT);
   }
 
   function closeDialog() {
     setPhase('idle');
     setCountdown(INITIAL_COUNTDOWN);
+    setCountdownAnnouncement('');
+    setConfirmedAnnouncement('');
     onClose?.();
   }
 
@@ -94,7 +127,6 @@ export default function EmergencyDialog({
             <button
               type="button"
               className="emergency-help-button"
-              aria-describedby="emergency-start-description"
               onClick={startCountdown}
             >
               I Need Help
@@ -113,14 +145,20 @@ export default function EmergencyDialog({
         {phase === 'countdown' && (
           <div className="emergency-panel emergency-panel--countdown">
             <p className="emergency-panel__label">Sending alert in</p>
-            <p
-              className="emergency-panel__countdown"
-              aria-live="polite"
-              aria-label={`Sending alert in ${countdown} seconds`}
-            >
+            <p className="emergency-panel__countdown" aria-hidden="true">
               {countdown}
             </p>
             <p className="emergency-panel__label">seconds</p>
+            <p
+              className="visually-hidden"
+              ref={countdownAnnouncementRef}
+              tabIndex="-1"
+              aria-live="polite"
+              aria-atomic="true"
+              onBlur={() => setCountdownAnnouncement('')}
+            >
+              {countdownAnnouncement}
+            </p>
 
             <ContactList
               title="Notifying:"
@@ -139,11 +177,19 @@ export default function EmergencyDialog({
         )}
 
         {phase === 'confirmed' && (
-          <div className="emergency-panel emergency-panel--confirmed">
+          <div className="emergency-panel emergency-panel--confirmed" role="status">
             <div className="emergency-panel__icon emergency-panel__icon--success" aria-hidden="true">
               OK
             </div>
             <p className="emergency-panel__heading">Help Is On The Way</p>
+            <p
+              id="emergency-confirmed-announcement"
+              className="visually-hidden"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {confirmedAnnouncement}
+            </p>
             <p className="emergency-panel__copy">
               Your emergency contacts have been notified. Stay calm and stay
               where you are.

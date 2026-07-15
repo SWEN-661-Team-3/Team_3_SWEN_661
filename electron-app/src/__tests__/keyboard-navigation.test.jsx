@@ -16,7 +16,7 @@ describe('Keyboard Navigation', () => {
 
     await user.tab(); // skip link
     await user.tab(); // first toolbar button (New)
-    expect(screen.getByTitle('New reminder (Ctrl+N)')).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'New' })).toHaveFocus();
   });
 
   it('can tab through all toolbar buttons', async () => {
@@ -26,17 +26,17 @@ describe('Keyboard Navigation', () => {
     await user.tab(); // skip link
     await user.tab(); // New
     await user.tab(); // Save
-    expect(screen.getByTitle('Save plan (Ctrl+S)')).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Save Plan' })).toHaveFocus();
     await user.tab(); // Search
-    expect(screen.getByTitle('Search (Ctrl+F)')).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Search' })).toHaveFocus();
     await user.tab(); // Today's Plan
-    expect(screen.getByTitle("Today's Plan (Ctrl+1)")).toHaveFocus();
+    expect(screen.getByRole('button', { name: "Today's Plan" })).toHaveFocus();
     await user.tab(); // Care Team
-    expect(screen.getByTitle('Care Team (Ctrl+2)')).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Care Team' })).toHaveFocus();
     await user.tab(); // Settings
-    expect(screen.getByTitle('Settings (Ctrl+,)')).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Settings' })).toHaveFocus();
     await user.tab(); // Emergency
-    expect(screen.getByTitle('Emergency help (F2)')).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Emergency' })).toHaveFocus();
   });
 
   it('hero card is focusable and activatable via keyboard', async () => {
@@ -49,6 +49,33 @@ describe('Keyboard Navigation', () => {
 
     await user.keyboard('{Enter}');
     expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled();
+    expect(screen.getByRole('dialog', { name: 'Eye Doctor Checkup' })).toHaveFocus();
+  });
+
+  it('focuses a shortcut-opened dialog card instead of its close button', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.keyboard('{F1}');
+
+    const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' });
+    expect(dialog).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Close' })).not.toHaveFocus();
+  });
+
+  it('removes the dialog card focus state after focus moves inside it', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.keyboard('{F1}');
+    const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' });
+    expect(dialog).toHaveAttribute('tabindex', '-1');
+
+    await user.tab();
+
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus();
+    expect(dialog).not.toHaveAttribute('tabindex');
+    expect(dialog).not.toHaveFocus();
   });
 
   it('task list buttons are focusable', async () => {
@@ -58,11 +85,23 @@ describe('Keyboard Navigation', () => {
     expect(taskBtns[0]).toHaveFocus();
   });
 
+  it('does not retain focus on a task after its dialog receives keyboard focus', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const taskButton = screen.getAllByRole('button', { name: /Daily Vitamin/i })[0];
+
+    taskButton.focus();
+    await user.keyboard('{Enter}');
+
+    expect(screen.getByRole('dialog', { name: 'Daily Vitamin & Heart Med' })).toHaveFocus();
+    expect(taskButton).not.toHaveFocus();
+  });
+
   it('Escape closes the search bar', async () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('Search (Ctrl+F)'));
+    await user.click(screen.getByRole('button', { name: 'Search' }));
     expect(screen.getByPlaceholderText(/search tasks/i)).toBeInTheDocument();
 
     await user.keyboard('{Escape}');
@@ -73,7 +112,7 @@ describe('Keyboard Navigation', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('Search (Ctrl+F)'));
+    await user.click(screen.getByRole('button', { name: 'Search' }));
     expect(screen.getByPlaceholderText(/search tasks/i)).toHaveFocus();
   });
 
@@ -94,7 +133,7 @@ describe('Keyboard Navigation', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTitle('New reminder (Ctrl+N)'));
+    await user.click(screen.getByRole('button', { name: 'New' }));
 
     const titleInput = screen.getByLabelText(/title/i);
     titleInput.focus();

@@ -10,20 +10,32 @@ describe('HelpDialog', () => {
 
   it('renders the help dialog title', () => {
     render(<HelpDialog open={true} onClose={onClose} />);
-    expect(screen.getByText('CareConnect Help')).toBeInTheDocument();
+    expect(screen.getByText('Keyboard shortcuts')).toBeInTheDocument();
   });
 
   it('lists keyboard shortcuts', () => {
     render(<HelpDialog open={true} onClose={onClose} />);
-    expect(screen.getByText(/New reminder/)).toBeInTheDocument();
-    expect(screen.getByText(/Save plan/)).toBeInTheDocument();
-    expect(screen.getByText(/Search tasks/)).toBeInTheDocument();
-    expect(screen.getByText(/Today's plan/)).toBeInTheDocument();
-    expect(screen.getByText(/Care Team/)).toBeInTheDocument();
-    expect(screen.getByText(/Open settings/)).toBeInTheDocument();
-    expect(screen.getByText(/Close dialog/)).toBeInTheDocument();
-    expect(screen.getByText(/This help panel/)).toBeInTheDocument();
-    expect(screen.getByText(/Emergency help/)).toBeInTheDocument();
+    expect(screen.getAllByText(/creates a new reminder/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/saves the plan/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/searches tasks/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/opens today's plan/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/opens the Care Team page/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/opens settings/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/closes the dialog/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/opens the help dialog/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/opens emergency help/).length).toBeGreaterThan(0);
+  });
+
+  it('renders shortcut descriptions without list semantics', () => {
+    const { container } = render(<HelpDialog open={true} onClose={onClose} />);
+
+    expect(container.querySelector('ul')).not.toBeInTheDocument();
+    expect(container.querySelector('ol')).not.toBeInTheDocument();
+    expect(container.querySelector('li')).not.toBeInTheDocument();
+    expect(screen.queryByRole('group')).not.toBeInTheDocument();
+    expect(screen.getByText('Control plus comma, opens settings.')).toHaveClass('visually-hidden');
+    expect(screen.getByText('F1, opens help dialog.')).toHaveClass('visually-hidden');
+    expect(screen.getByText('F2, opens emergency help.')).toHaveClass('visually-hidden');
   });
 
   it('shows usage instructions', () => {

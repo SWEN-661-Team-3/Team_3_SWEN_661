@@ -23,15 +23,15 @@ describe('CareTeamPage', () => {
     expect(screen.getByRole('heading', { name: 'Care Team' })).toBeInTheDocument();
     expect(screen.getByText('3 helpers on your care team')).toBeInTheDocument();
 
-    const sarahCard = screen.getByRole('article', { name: 'Sarah Johnson' });
+    const sarahCard = screen.getByRole('button', { name: /^Sarah Johnson, Helper, available/ });
     expect(within(sarahCard).getByText('Helper')).toBeInTheDocument();
     expect(within(sarahCard).getByText('available')).toBeInTheDocument();
     expect(within(sarahCard).getByText('(555) 234-5678')).toBeInTheDocument();
     expect(within(sarahCard).getByText(/Available weekdays/)).toBeInTheDocument();
-    expect(within(sarahCard).getByRole('button', { name: 'Edit' })).toBeInTheDocument();
-    expect(within(sarahCard).getByRole('button', { name: 'Remove' })).toBeInTheDocument();
+    expect(within(sarahCard).queryByRole('button', { name: 'Edit Sarah Johnson' })).not.toBeInTheDocument();
+    expect(within(sarahCard).queryByRole('button', { name: 'Remove Sarah Johnson' })).not.toBeInTheDocument();
 
-    const doctorCard = screen.getByRole('article', { name: 'Dr. Emily Smith' });
+    const doctorCard = screen.getByRole('button', { name: /^Dr\. Emily Smith, Eye Doctor, away/ });
     expect(within(doctorCard).getByText('away')).toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe('CareTeamPage', () => {
 
     const confirmation = screen.getByRole('dialog', { name: 'Helper saved' });
     expect(within(confirmation).getByText('Pat Lee was added to your care team.')).toBeInTheDocument();
-    expect(screen.getByRole('article', { name: 'Pat Lee' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Pat Lee, Nurse, available/ })).toBeInTheDocument();
   });
 
   it('closes a blank Add Helper dialog without confirmation', async () => {
@@ -98,12 +98,30 @@ describe('CareTeamPage', () => {
     expect(screen.getByRole('dialog', { name: 'Add Helper' })).toBeInTheDocument();
   });
 
+  it('shows helper actions only after opening the card', async () => {
+    const user = userEvent.setup();
+    render(<CareTeamHarness />);
+
+    const sarahCard = screen.getByRole('button', { name: /^Sarah Johnson, Helper, available/ });
+    await user.click(sarahCard);
+
+    const detailDialog = screen.getByRole('dialog', { name: 'Sarah Johnson' });
+    expect(within(detailDialog).getByRole('button', { name: 'Edit Sarah Johnson' })).toBeInTheDocument();
+    expect(within(detailDialog).getByRole('button', { name: 'Remove Sarah Johnson' })).toBeInTheDocument();
+    expect(within(detailDialog).getByRole('link', { name: '(555) 234-5678' })).toHaveAttribute(
+      'href',
+      'tel:(555) 234-5678',
+    );
+  });
+
   it('edits helper details and shows a confirmation dialog', async () => {
     const user = userEvent.setup();
     render(<CareTeamHarness />);
 
-    const sarahCard = screen.getByRole('article', { name: 'Sarah Johnson' });
-    await user.click(within(sarahCard).getByRole('button', { name: 'Edit' }));
+    const sarahCard = screen.getByRole('button', { name: /^Sarah Johnson, Helper, available/ });
+    await user.click(sarahCard);
+    const detailDialog = screen.getByRole('dialog', { name: 'Sarah Johnson' });
+    await user.click(within(detailDialog).getByRole('button', { name: 'Edit Sarah Johnson' }));
 
     expect(screen.getByRole('dialog', { name: 'Edit Helper' })).toBeInTheDocument();
     await user.clear(screen.getByLabelText('Phone'));
@@ -111,18 +129,21 @@ describe('CareTeamPage', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     const confirmation = screen.getByRole('dialog', { name: 'Helper updated' });
-    expect(within(confirmation).getByText("Sarah Johnson's details were updated.")).toBeInTheDocument();
-    expect(screen.getByText('(555) 999-0000')).toBeInTheDocument();
+    expect(within(confirmation).getByText('Sarah Johnson was updated.')).toBeInTheDocument();
+    expect(screen.getAllByText('(555) 999-0000').length).toBeGreaterThanOrEqual(1);
   });
 
   it('asks before closing Edit Helper after field changes', async () => {
     const user = userEvent.setup();
     render(<CareTeamHarness />);
 
-    const sarahCard = screen.getByRole('article', { name: 'Sarah Johnson' });
-    await user.click(within(sarahCard).getByRole('button', { name: 'Edit' }));
-    await user.type(screen.getByLabelText('Notes'), ' Call before arriving');
-    await user.click(screen.getByRole('button', { name: /^Close$/ }));
+    const sarahCard = screen.getByRole('button', { name: /^Sarah Johnson, Helper, available/ });
+    await user.click(sarahCard);
+    const detailDialog = screen.getByRole('dialog', { name: 'Sarah Johnson' });
+    await user.click(within(detailDialog).getByRole('button', { name: 'Edit Sarah Johnson' }));
+    const editDialog = screen.getByRole('dialog', { name: 'Edit Helper' });
+    await user.type(within(editDialog).getByLabelText('Notes'), ' Call before arriving');
+    await user.click(within(editDialog).getByRole('button', { name: /^Close$/ }));
 
     expect(screen.getByRole('dialog', { name: 'Are you sure?' })).toBeInTheDocument();
   });
@@ -131,14 +152,47 @@ describe('CareTeamPage', () => {
     const user = userEvent.setup();
     render(<CareTeamHarness />);
 
-    const robertCard = screen.getByRole('article', { name: 'Robert Chen' });
-    await user.click(within(robertCard).getByRole('button', { name: 'Remove' }));
+    const robertCard = screen.getByRole('button', { name: /^Robert Chen, Family, offline/ });
+    await user.click(robertCard);
+    const detailDialog = screen.getByRole('dialog', { name: 'Robert Chen' });
+    await user.click(within(detailDialog).getByRole('button', { name: 'Remove Robert Chen' }));
 
-    const removeDialog = screen.getByRole('dialog', { name: 'Are you sure?' });
+    const removeDialog = screen.getByRole('dialog', { name: 'Remove helper?' });
     expect(within(removeDialog).getByText('Remove Robert Chen from your care team?')).toBeInTheDocument();
 
     await user.click(within(removeDialog).getByRole('button', { name: 'Remove helper' }));
-    expect(screen.queryByRole('article', { name: 'Robert Chen' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Robert Chen, Family/ })).not.toBeInTheDocument();
     expect(screen.getByText('2 helpers on your care team')).toBeInTheDocument();
+  });
+
+  it('opens helper detail via keyboard Enter and Space', async () => {
+    const user = userEvent.setup();
+    render(<CareTeamHarness />);
+
+    const sarahCard = screen.getByRole('button', { name: /^Sarah Johnson, Helper, available/ });
+    sarahCard.focus();
+    await user.keyboard('{Enter}');
+
+    expect(screen.getByRole('dialog', { name: 'Sarah Johnson' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /^Close$/ }));
+
+    const doctorCard = screen.getByRole('button', { name: /^Dr\. Emily Smith, Eye Doctor, away/ });
+    doctorCard.focus();
+    await user.keyboard(' ');
+
+    expect(screen.getByRole('dialog', { name: 'Dr. Emily Smith' })).toBeInTheDocument();
+  });
+
+  it('discards unsaved helper form after confirmation', async () => {
+    const user = userEvent.setup();
+    render(<CareTeamHarness />);
+
+    await user.click(screen.getByRole('button', { name: 'Add Helper' }));
+    await user.type(screen.getByLabelText('Name'), 'Test');
+    await user.click(screen.getByRole('button', { name: /^Close$/ }));
+
+    const discard = screen.getByRole('dialog', { name: 'Are you sure?' });
+    await user.click(within(discard).getByRole('button', { name: 'Close without saving' }));
+    expect(screen.queryByRole('dialog', { name: 'Add Helper' })).not.toBeInTheDocument();
   });
 });

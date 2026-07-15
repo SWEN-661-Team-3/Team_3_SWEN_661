@@ -4,9 +4,9 @@ export default function StatsRow({ tasks }) {
   const total = tasks.length;
 
   return (
-    <div className="stats-row">
-      <div className="stat-card">
-        <span className="stat-card__icon stat-card__icon--success" aria-hidden="true">
+    <div className="stats-row" role="status" aria-label={`Tasks done: ${done} of ${total}. Pending: ${pending}.`}>
+      <div className="stat-card" aria-hidden="true">
+        <span className="stat-card__icon stat-card__icon--success">
           {'\u2713'}
         </span>
         <div>
@@ -14,8 +14,8 @@ export default function StatsRow({ tasks }) {
           <p className="stat-card__label">Tasks done</p>
         </div>
       </div>
-      <div className="stat-card">
-        <span className="stat-card__icon stat-card__icon--warning" aria-hidden="true">
+      <div className="stat-card" aria-hidden="true">
+        <span className="stat-card__icon stat-card__icon--warning">
           {'\u25F7'}
         </span>
         <div>
