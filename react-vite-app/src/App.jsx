@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import AppHeader from './components/AppHeader';
 import AppFooter from './components/AppFooter';
 import TodayPage from './pages/TodayPage';
@@ -35,6 +36,12 @@ export default function App() {
 
   return (
     <>
+      <Helmet defaultTitle="CareConnect - Daily Care Management" titleTemplate="%s">
+        <meta property="og:url" content="https://careconnect.app" />
+        <meta property="og:site_name" content="CareConnect" />
+        <meta name="twitter:card" content="summary" />
+      </Helmet>
+
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
