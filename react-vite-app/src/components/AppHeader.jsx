@@ -4,46 +4,48 @@ export default function AppHeader() {
   return (
     <header className="app-header" role="banner">
       <NavLink to="/" className="app-header__brand" aria-label="CareConnect home">
-        <span className="app-header__logo" aria-hidden="true">CC</span>
+        <img
+          src="/icons/icon-192x192.svg"
+          alt="CareConnect logo"
+          className="app-header__logo-img"
+          width="44"
+          height="44"
+        />
         <h1 className="app-header__title">CareConnect</h1>
       </NavLink>
 
       <nav aria-label="Main navigation">
-        <ul className="nav-links" role="menubar">
-          <li role="none">
+        <ul className="nav-links">
+          <li>
             <NavLink
               to="/"
               end
               className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
-              role="menuitem"
             >
               Today&apos;s Plan
             </NavLink>
           </li>
-          <li role="none">
+          <li>
             <NavLink
               to="/care-team"
               className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
-              role="menuitem"
             >
               Care Team
             </NavLink>
           </li>
-          <li role="none" aria-hidden="true"><span className="nav-divider" /></li>
-          <li role="none">
+          <li aria-hidden="true"><span className="nav-divider" /></li>
+          <li>
             <NavLink
               to="/settings"
               className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
-              role="menuitem"
             >
               Settings
             </NavLink>
           </li>
-          <li role="none">
+          <li>
             <NavLink
               to="/emergency"
               className="nav-link nav-link--danger"
-              role="menuitem"
             >
               Emergency
             </NavLink>
