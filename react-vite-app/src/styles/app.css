@@ -322,6 +322,12 @@ body.large-text {
   line-height: var(--line-height-heading);
 }
 
+.page-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-5);
+}
+
 /* Hero card */
 .hero-card {
   display: block;

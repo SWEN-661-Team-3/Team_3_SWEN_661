@@ -1,16 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import CareConnectDialog from './CareConnectDialog';
 
 const availabilityLabels = {
   available: 'Available',
   away: 'Away',
   offline: 'Offline',
 };
-
-const availabilityOptions = [
-  { value: 'available', label: 'Available' },
-  { value: 'away', label: 'Away' },
-  { value: 'offline', label: 'Offline' },
-];
 
 function getInitials(name) {
   return name
@@ -21,10 +16,12 @@ function getInitials(name) {
     .join('');
 }
 
-export default function CareMemberDetailDialog({ member, open, onClose, onSave }) {
+export default function CareMemberDetailDialog({ member, open, mode = 'view', onClose, onSave, onRemove }) {
   const dialogRef = useRef(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(mode === 'add');
   const [form, setForm] = useState(() => (member ? { ...member } : null));
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
+  const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
 
   useEffect(() => {
     const el = dialogRef.current;
@@ -39,41 +36,66 @@ export default function CareMemberDetailDialog({ member, open, onClose, onSave }
   if (!member || !form) return null;
 
   const titleId = `care-member-detail-title-${member.id}`;
+  const isAdding = mode === 'add';
+  const title = isAdding ? 'Add Care Team Member' : member.name;
+  const savedForm = {
+    ...member,
+    name: member.name.trim(),
+    role: member.role.trim(),
+    relationship: member.relationship.trim(),
+    phone: member.phone.trim(),
+    notes: member.notes.trim(),
+  };
+  const currentForm = {
+    ...form,
+    name: form.name.trim(),
+    role: form.role.trim(),
+    relationship: form.relationship.trim(),
+    phone: form.phone.trim(),
+    notes: form.notes.trim(),
+  };
+  const hasUnsavedChanges = isEditing && JSON.stringify(currentForm) !== JSON.stringify(savedForm);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
-  function handleSave(event) {
-    event.preventDefault();
-    const trimmedName = form.name.trim();
+  function requestClose() {
+    if (hasUnsavedChanges) {
+      setConfirmCloseOpen(true);
+      return;
+    }
+    onClose();
+  }
+
+  function handleSave() {
     const nextMember = {
-      ...form,
-      name: trimmedName,
-      role: form.role.trim(),
-      relationship: form.relationship.trim(),
-      phone: form.phone.trim(),
-      notes: form.notes.trim(),
-      initials: getInitials(trimmedName) || member.initials,
+      ...currentForm,
+      initials: getInitials(currentForm.name) || member.initials,
     };
-    onSave(nextMember);
-    setIsEditing(false);
+    const didSave = onSave(nextMember);
+    if (didSave) setIsEditing(false);
   }
 
   return (
+    <>
     <dialog
       ref={dialogRef}
       className="dialog"
       aria-labelledby={titleId}
       onClose={onClose}
+      onCancel={(event) => {
+        event.preventDefault();
+        requestClose();
+      }}
     >
-      <form className="dialog__inner" onSubmit={handleSave}>
+      <div className="dialog__inner">
         <div className="dialog__header">
-          <h2 id={titleId}>{member.name}</h2>
+          <h2 id={titleId}>{title}</h2>
           <button
             type="button"
             className="dialog__close"
-            onClick={onClose}
+            onClick={requestClose}
             aria-label="Close dialog"
           >
             &times;
@@ -140,20 +162,6 @@ export default function CareMemberDetailDialog({ member, open, onClose, onSave }
                 />
               </label>
               <label className="edit-field">
-                <span className="edit-field__label">Availability</span>
-                <select
-                  className="edit-field__control"
-                  value={form.availability}
-                  onChange={(event) => updateField('availability', event.target.value)}
-                >
-                  {availabilityOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="edit-field">
                 <span className="edit-field__label">Phone</span>
                 <input
                   className="edit-field__control"
@@ -182,29 +190,67 @@ export default function CareMemberDetailDialog({ member, open, onClose, onSave }
               <button type="button" className="secondary-btn" onClick={onClose}>
                 Close
               </button>
-              <button type="button" className="primary-btn" onClick={() => setIsEditing(true)}>
+              <button
+                type="button"
+                className="primary-btn"
+                onClick={() => {
+                  setForm({ ...member });
+                  setIsEditing(true);
+                }}
+              >
                 Edit Details
               </button>
+              {!isAdding && (
+                <button
+                  type="button"
+                  className="danger-btn"
+                  onClick={() => setConfirmRemoveOpen(true)}
+                >
+                  Remove Helper
+                </button>
+              )}
             </>
           ) : (
             <>
               <button
                 type="button"
                 className="secondary-btn"
-                onClick={() => {
-                  setForm({ ...member });
-                  setIsEditing(false);
-                }}
+                onClick={requestClose}
               >
-                Cancel
+                Close
               </button>
-              <button type="submit" className="primary-btn">
-                Save Changes
+              <button type="button" className="primary-btn" onClick={handleSave}>
+                {isAdding ? 'Add Member' : 'Save Changes'}
               </button>
             </>
           )}
         </div>
-      </form>
+      </div>
     </dialog>
+      <CareConnectDialog
+        open={confirmCloseOpen}
+        title="Close Without Saving?"
+        message="You have unsaved changes. Close without saving?"
+        cancelLabel="Keep Editing"
+        confirmLabel="Close Without Saving"
+        onCancel={() => setConfirmCloseOpen(false)}
+        onConfirm={() => {
+          setConfirmCloseOpen(false);
+          onClose();
+        }}
+      />
+      <CareConnectDialog
+        open={confirmRemoveOpen}
+        title="Remove Helper?"
+        message={`Remove ${member.name} from the care team?`}
+        cancelLabel="Keep Helper"
+        confirmLabel="Remove Helper"
+        onCancel={() => setConfirmRemoveOpen(false)}
+        onConfirm={() => {
+          setConfirmRemoveOpen(false);
+          onRemove(member.id);
+        }}
+      />
+    </>
   );
 }

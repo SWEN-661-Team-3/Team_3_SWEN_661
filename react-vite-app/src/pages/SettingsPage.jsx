@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import SettingsPanel from '../components/SettingsPanel';
+import CareConnectDialog from '../components/CareConnectDialog';
 
 const defaultSettings = {
   largeText: false,
@@ -9,11 +11,20 @@ const defaultSettings = {
 };
 
 export default function SettingsPage({ settings, onSettingsChange }) {
+  const [draftSettings, setDraftSettings] = useState(() => ({ ...settings }));
+  const [pendingSettings, setPendingSettings] = useState(null);
+
   function handleSave(newSettings) {
-    onSettingsChange(newSettings);
+    setPendingSettings(newSettings);
+  }
+
+  function confirmSaveSettings() {
+    onSettingsChange(pendingSettings);
+    setPendingSettings(null);
   }
 
   function handleReset() {
+    setDraftSettings({ ...defaultSettings });
     onSettingsChange({ ...defaultSettings });
   }
 
@@ -31,14 +42,24 @@ export default function SettingsPage({ settings, onSettingsChange }) {
         <main id="main-content" role="main" aria-label="Application settings">
           <div className="main-content">
             <SettingsPanel
-              settings={settings}
-              onChange={onSettingsChange}
+              settings={draftSettings}
+              onChange={setDraftSettings}
               onSave={handleSave}
               onReset={handleReset}
             />
           </div>
         </main>
       </div>
+
+      <CareConnectDialog
+        open={Boolean(pendingSettings)}
+        title="Save Settings?"
+        message="Save these settings?"
+        cancelLabel="Keep Editing"
+        confirmLabel="Save Settings"
+        onCancel={() => setPendingSettings(null)}
+        onConfirm={confirmSaveSettings}
+      />
     </>
   );
 }
