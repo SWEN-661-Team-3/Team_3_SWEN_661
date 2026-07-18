@@ -115,7 +115,8 @@ export default function TodayPage({ plan, setPlan, helpers }) {
 
         <main id="main-content" role="main" aria-label="Today's care plan">
           <div className="main-content">
-            <div className="page-header" aria-hidden="true">
+            <div className="page-header">
+              <h1 className="page-title">Today&apos;s Plan</h1>
               <p className="page-subtitle">Here is today&apos;s plan.</p>
             </div>
 

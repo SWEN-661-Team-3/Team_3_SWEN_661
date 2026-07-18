@@ -11,7 +11,7 @@ export default function AppHeader() {
           width="44"
           height="44"
         />
-        <h1 className="app-header__title">CareConnect</h1>
+        <span className="app-header__title">CareConnect</span>
       </NavLink>
 
       <nav aria-label="Main navigation">

@@ -106,7 +106,7 @@ export default function CareTeamPage({ helpers, setHelpers }) {
           <div className="main-content main-content--wide">
             <div className="care-team-header">
               <div>
-                <h2>Care Team</h2>
+                <h1 className="page-title">Care Team</h1>
                 <p className="care-team-subtitle">
                   Your helpers, doctors, and family contacts.
                 </p>

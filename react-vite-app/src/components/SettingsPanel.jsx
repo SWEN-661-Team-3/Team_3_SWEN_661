@@ -5,7 +5,7 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset }) {
 
   return (
     <section aria-labelledby="settings-heading">
-      <h2 id="settings-heading">Accessibility Settings</h2>
+      <h1 id="settings-heading" className="page-title">Accessibility Settings</h1>
       <p>Adjust display preferences to improve readability and comfort.</p>
 
       <fieldset className="settings-fieldset">

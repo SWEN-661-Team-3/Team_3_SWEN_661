@@ -15,6 +15,9 @@ export default function EmergencyPage({ contacts }) {
       <div className="app-layout app-layout--wide">
         <main id="main-content" role="main" aria-label="Emergency help">
           <div className="main-content">
+            <div className="page-header">
+              <h1 className="page-title">Emergency</h1>
+            </div>
             <EmergencyPanel contacts={contacts} />
           </div>
         </main>

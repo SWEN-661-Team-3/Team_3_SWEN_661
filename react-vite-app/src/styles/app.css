@@ -314,6 +314,18 @@ body.large-text {
   margin-bottom: var(--space-8);
 }
 
+.page-title {
+  margin-block: 0.83em;
+  color: var(--color-text);
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: var(--line-height-heading);
+}
+
+.page-header .page-title {
+  margin: 0;
+}
+
 .page-subtitle {
   margin: var(--space-2) 0 0;
   font-size: var(--font-size-lg);
