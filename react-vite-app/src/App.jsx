@@ -18,7 +18,7 @@ const initialAccessibilitySettings = {
 
 export default function App() {
   const [plan, setPlan] = useState(() => structuredClone(initialPlan));
-  const [helpers] = useState(() => structuredClone(caregivers));
+  const [helpers, setHelpers] = useState(() => structuredClone(caregivers));
   const [settings, setSettings] = useState(() => ({ ...initialAccessibilitySettings }));
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function App() {
         />
         <Route
           path="/care-team"
-          element={<CareTeamPage helpers={helpers} />}
+          element={<CareTeamPage helpers={helpers} setHelpers={setHelpers} />}
         />
         <Route
           path="/settings"

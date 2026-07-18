@@ -1,8 +1,46 @@
+import { useCallback, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import CareMemberDetailDialog from '../components/CareMemberDetailDialog';
 
 const HELPER_COLORS = ['#1d4ed8', '#046c50', '#9333ea', '#c2410c', '#0e7490'];
+const availabilityLabels = {
+  available: 'Available',
+  away: 'Away',
+  offline: 'Offline',
+};
 
-export default function CareTeamPage({ helpers }) {
+export default function CareTeamPage({ helpers, setHelpers }) {
+  const [selectedId, setSelectedId] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const statusRef = useRef(null);
+
+  const announce = useCallback((message) => {
+    if (statusRef.current) {
+      statusRef.current.textContent = message;
+    }
+  }, []);
+
+  const selectedMember = helpers.find((helper) => helper.id === selectedId) ?? null;
+
+  function openMemberDetail(id) {
+    setSelectedId(id);
+    setDetailOpen(true);
+    const member = helpers.find((helper) => helper.id === id);
+    if (member) announce(`Opened details for ${member.name}`);
+  }
+
+  function closeMemberDetail() {
+    setDetailOpen(false);
+    setSelectedId(null);
+  }
+
+  function saveMember(updatedMember) {
+    setHelpers((prev) =>
+      prev.map((helper) => (helper.id === updatedMember.id ? updatedMember : helper)),
+    );
+    announce(`Saved details for ${updatedMember.name}`);
+  }
+
   return (
     <>
       <Helmet>
@@ -30,9 +68,11 @@ export default function CareTeamPage({ helpers }) {
               aria-label="Team members"
             >
               {helpers.map((helper) => (
-                <article
+                <button
+                  type="button"
                   key={helper.id}
                   className="care-helper-card"
+                  onClick={() => openMemberDetail(helper.id)}
                   aria-label={`${helper.name}, ${helper.role}`}
                 >
                   <div className="care-helper-card__header">
@@ -50,8 +90,7 @@ export default function CareTeamPage({ helpers }) {
                   </div>
 
                   <span className={`availability-badge availability-badge--${helper.availability}`}>
-                    {helper.availability === 'available' ? 'Available' :
-                     helper.availability === 'away' ? 'Away' : 'Offline'}
+                    {availabilityLabels[helper.availability]}
                   </span>
 
                   <div className="care-helper-card__details">
@@ -62,13 +101,29 @@ export default function CareTeamPage({ helpers }) {
                     {helper.notes && (
                       <p className="care-helper-card__notes">{helper.notes}</p>
                     )}
+                    <p className="care-helper-card__hint">Click to view and edit details</p>
                   </div>
-                </article>
+                </button>
               ))}
             </section>
+
+            <div
+              ref={statusRef}
+              className="visually-hidden"
+              aria-live="polite"
+              aria-atomic="true"
+            />
           </div>
         </main>
       </div>
+
+      <CareMemberDetailDialog
+        key={selectedMember?.id ?? 'closed'}
+        member={selectedMember}
+        open={detailOpen}
+        onClose={closeMemberDetail}
+        onSave={saveMember}
+      />
     </>
   );
 }

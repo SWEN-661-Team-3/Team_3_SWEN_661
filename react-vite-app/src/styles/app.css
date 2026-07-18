@@ -532,12 +532,23 @@ body.large-text {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  width: 100%;
   min-width: 0;
   min-height: 17rem;
   padding: var(--space-6);
   border: var(--stroke-width) solid var(--color-border);
   border-radius: 1rem;
   background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.care-helper-card:hover {
+  background: var(--color-blue-bg);
+  border-color: var(--color-primary);
 }
 
 .care-helper-card__header {
@@ -597,6 +608,12 @@ body.large-text {
 
 .care-helper-card__notes {
   color: var(--color-text-muted);
+}
+
+.care-helper-card__hint {
+  margin: auto 0 0;
+  color: var(--color-primary);
+  font-weight: 700;
 }
 
 .availability-badge {
@@ -754,6 +771,42 @@ body.large-text {
   min-width: 0;
   font-size: var(--font-size-md);
   font-weight: 400;
+}
+
+/* Edit form */
+.edit-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.edit-field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.edit-field--full {
+  grid-column: 1 / -1;
+}
+
+.edit-field__label {
+  color: var(--color-text-muted);
+  font-weight: 700;
+}
+
+.edit-field__control {
+  width: 100%;
+  min-height: 3rem;
+  padding: var(--space-2) var(--space-3);
+  border: var(--stroke-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+textarea.edit-field__control {
+  resize: vertical;
 }
 
 /* Status badge */
@@ -1043,6 +1096,10 @@ body.large-text {
   .care-team-header {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .edit-form {
+    grid-template-columns: 1fr;
   }
 }
 
