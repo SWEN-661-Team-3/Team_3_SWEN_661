@@ -1,6 +1,5 @@
-# React + Vite Hello World
-
-SWEN 661 - Team 3 development environment setup.
+# React + Vite 
+SWEN 661 - Team 3 environment setup for web-browsers.
 
 ## Run
 
