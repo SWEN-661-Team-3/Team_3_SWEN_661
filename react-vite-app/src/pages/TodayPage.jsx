@@ -113,7 +113,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
           onSelectTask={openTaskDetail}
         />
 
-        <main id="main-content" role="main" aria-label="Today's care plan">
+        <main id="main-content" aria-label="Today's care plan">
           <div className="main-content">
             <div className="page-header">
               <h1 className="page-title">Today&apos;s Plan</h1>

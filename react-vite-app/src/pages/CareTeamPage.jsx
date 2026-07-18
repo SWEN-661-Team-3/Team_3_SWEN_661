@@ -102,7 +102,7 @@ export default function CareTeamPage({ helpers, setHelpers }) {
       </Helmet>
 
       <div className="app-layout app-layout--wide">
-        <main id="main-content" role="main" aria-label="Care team members">
+        <main id="main-content" aria-label="Care team members">
           <div className="main-content main-content--wide">
             <div className="care-team-header">
               <div>

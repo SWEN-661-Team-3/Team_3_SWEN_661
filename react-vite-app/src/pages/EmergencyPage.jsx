@@ -13,7 +13,7 @@ export default function EmergencyPage({ contacts }) {
       </Helmet>
 
       <div className="app-layout app-layout--wide">
-        <main id="main-content" role="main" aria-label="Emergency help">
+        <main id="main-content" aria-label="Emergency help">
           <div className="main-content">
             <div className="page-header">
               <h1 className="page-title">Emergency</h1>

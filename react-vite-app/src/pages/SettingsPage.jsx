@@ -39,7 +39,7 @@ export default function SettingsPage({ settings, onSettingsChange }) {
       </Helmet>
 
       <div className="app-layout app-layout--wide">
-        <main id="main-content" role="main" aria-label="Application settings">
+        <main id="main-content" aria-label="Application settings">
           <div className="main-content">
             <SettingsPanel
               settings={draftSettings}

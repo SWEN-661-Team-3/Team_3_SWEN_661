@@ -1,6 +1,6 @@
 export default function AppFooter() {
   return (
-    <footer className="app-footer" role="contentinfo">
+    <footer className="app-footer">
       <p>CareConnect &mdash; Helping you manage daily care with confidence.</p>
       <ul className="app-footer__links">
         <li><a href="#accessibility-statement">Accessibility</a></li>

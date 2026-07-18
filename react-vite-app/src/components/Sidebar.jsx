@@ -2,7 +2,7 @@ import { statusLabels } from '../data/careData';
 
 export default function Sidebar({ helperName, tasks, onSelectTask }) {
   return (
-    <aside className="sidebar" role="complementary" aria-label="Daily plan sidebar">
+    <aside className="sidebar" aria-label="Daily plan sidebar">
       <div className="sidebar-section">
         <h2 className="sidebar-heading">Your Helper</h2>
         <div className="helper-card">

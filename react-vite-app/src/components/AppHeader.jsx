@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 
 export default function AppHeader() {
   return (
-    <header className="app-header" role="banner">
+    <header className="app-header">
       <NavLink to="/" className="app-header__brand" aria-label="CareConnect home">
         <img
           src="/icons/icon-192x192.svg"
