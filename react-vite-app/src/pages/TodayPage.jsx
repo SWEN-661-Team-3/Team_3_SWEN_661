@@ -14,6 +14,8 @@ export default function TodayPage({ plan, setPlan, helpers }) {
   const [completeNotice, setCompleteNotice] = useState(null);
   const statusRef = useRef(null);
   const taskButtonRefs = useRef({});
+  const triggerRef = useRef(null);
+  const mainContentRef = useRef(null);
 
   const announce = useCallback((message) => {
     if (statusRef.current) {
@@ -28,7 +30,8 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     : plan.find((t) => t.id === selectedId) ?? null;
   const helperName = helpers[0]?.name ?? 'Helper';
 
-  function openTaskDetail(id) {
+  function openTaskDetail(id, event) {
+    triggerRef.current = event?.currentTarget ?? taskButtonRefs.current[id] ?? null;
     setSelectedId(id);
     setDetailOpen(true);
     const task = plan.find((t) => t.id === id);
@@ -41,8 +44,6 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     setPlan((prev) =>
       prev.map((t) => (t.id === id ? { ...t, status: 'done' } : t)),
     );
-    setSelectedId(null);
-    setDetailOpen(false);
     setCompleteNotice({
       id,
       title: task.title,
@@ -61,6 +62,14 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     setDetailOpen(false);
     setSelectedId(null);
     setDraftTask(null);
+    requestAnimationFrame(() => {
+      const trigger = triggerRef.current;
+      if (trigger?.isConnected && !trigger.disabled) {
+        trigger.focus();
+      } else {
+        mainContentRef.current?.focus();
+      }
+    });
   }
 
   function openAddReminder() {
@@ -122,7 +131,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
           }}
         />
 
-        <main id="main-content" aria-labelledby="today-plan-heading">
+        <main ref={mainContentRef} id="main-content" aria-labelledby="today-plan-heading" tabIndex="-1">
           <div className="main-content">
             <div className="page-header">
               <h1 id="today-plan-heading" className="page-title">Today&apos;s Plan</h1>

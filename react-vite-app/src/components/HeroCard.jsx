@@ -9,7 +9,7 @@ export default function HeroCard({ task, onClick }) {
     <button
       type="button"
       className="hero-card"
-      onClick={() => onClick(task.id)}
+      onClick={(event) => onClick(task.id, event)}
       aria-label={`Next up: ${task.title} at ${task.time}. Click for details.`}
     >
       <span className="hero-card__badge">

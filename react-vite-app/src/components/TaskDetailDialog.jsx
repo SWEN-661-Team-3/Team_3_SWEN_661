@@ -4,6 +4,8 @@ import CareConnectDialog from './CareConnectDialog';
 
 export default function TaskDetailDialog({ task, open, mode = 'view', onClose, onComplete, onSave }) {
   const dialogRef = useRef(null);
+  const titleRef = useRef(null);
+  const closeButtonRef = useRef(null);
   const [isEditing, setIsEditing] = useState(mode === 'add');
   const [form, setForm] = useState(() => (task ? { ...task } : null));
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
@@ -11,12 +13,18 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
   useEffect(() => {
     const el = dialogRef.current;
     if (!el) return;
-    if (open) {
+    if (open && !el.open) {
       el.classList.remove('dialog--enter');
       el.showModal();
+      requestAnimationFrame(() => {
+        const initialFocus = titleRef.current ?? closeButtonRef.current;
+        if (el.open && initialFocus && el.contains(initialFocus)) {
+          initialFocus.focus({ preventScroll: true });
+        }
+      });
       void el.offsetWidth;
       el.classList.add('dialog--enter');
-    } else {
+    } else if (!open && el.open) {
       el.close();
     }
   }, [open]);
@@ -56,7 +64,7 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
       setConfirmCloseOpen(true);
       return;
     }
-    onClose();
+    dialogRef.current?.close();
   }
 
   function handleSave() {
@@ -78,8 +86,9 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
     >
       <div className="dialog__inner">
         <div className="dialog__header">
-          <h2 id="task-detail-title">{title}</h2>
+          <h2 ref={titleRef} id="task-detail-title" tabIndex="-1">{title}</h2>
           <button
+            ref={closeButtonRef}
             type="button"
             className="dialog__close"
             onClick={requestClose}
@@ -199,7 +208,7 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
         <div className="dialog__footer">
           {!isEditing ? (
             <>
-              <button type="button" className="secondary-btn" onClick={onClose}>
+              <button type="button" className="secondary-btn" onClick={requestClose}>
                 Close
               </button>
               <button
@@ -216,7 +225,10 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                 <button
                   type="button"
                   className="primary-btn"
-                  onClick={() => onComplete(task.id)}
+                  onClick={() => {
+                    onComplete(task.id);
+                    dialogRef.current?.close();
+                  }}
                 >
                   Mark Complete
                 </button>
@@ -248,7 +260,7 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
         onCancel={() => setConfirmCloseOpen(false)}
         onConfirm={() => {
           setConfirmCloseOpen(false);
-          onClose();
+          dialogRef.current?.close();
         }}
       />
     </>

@@ -25,7 +25,7 @@ export default function Sidebar({ helperName, tasks, onSelectTask, getTaskButton
                   ref={getTaskButtonRef?.(task.id)}
                   type="button"
                   className={`task-list__btn${task.status === 'done' ? ' task-list__btn--done' : ''}`}
-                  onClick={() => onSelectTask(task.id)}
+                  onClick={(event) => onSelectTask(task.id, event)}
                   aria-label={`${task.title}, ${task.time}, ${status.label}`}
                 >
                   <span className="task-list__status" aria-hidden="true">
