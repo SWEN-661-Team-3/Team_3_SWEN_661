@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import AppHeader from './components/AppHeader';
 import AppFooter from './components/AppFooter';
+import OfflineStatusBanner from './components/OfflineStatusBanner';
 import TodayPage from './pages/TodayPage';
 import CareTeamPage from './pages/CareTeamPage';
 import SettingsPage from './pages/SettingsPage';
@@ -45,6 +46,8 @@ export default function App() {
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
+
+      <OfflineStatusBanner />
 
       <AppHeader />
 

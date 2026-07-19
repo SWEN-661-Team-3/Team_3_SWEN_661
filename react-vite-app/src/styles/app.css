@@ -265,6 +265,32 @@ body.large-text {
   animation: reminder-complete 180ms ease-out;
 }
 
+.offline-status-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  border-bottom: 3px solid var(--color-warning);
+  background: var(--color-warning-bg);
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.offline-status-banner__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  font-size: var(--font-size-md);
+  line-height: 1;
+}
+
+.offline-status-banner p { margin: 0; }
+
 .task-list__status {
   flex-shrink: 0;
   width: 1.75rem;
