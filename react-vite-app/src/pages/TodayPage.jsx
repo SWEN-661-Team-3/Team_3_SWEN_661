@@ -34,8 +34,6 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     triggerRef.current = event?.currentTarget ?? taskButtonRefs.current[id] ?? null;
     setSelectedId(id);
     setDetailOpen(true);
-    const task = plan.find((t) => t.id === id);
-    if (task) announce(`Opened details for ${task.title}`);
   }
 
   function completeTask(id) {
@@ -86,7 +84,6 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     });
     setSelectedId('new');
     setDetailOpen(true);
-    announce('Opened add reminder form');
   }
 
   function saveTask(task) {
