@@ -40,7 +40,7 @@ test('each routed page has one explicit page-level h1', () => {
 test("Today's Plan heading and introduction are visible to assistive technology", () => {
   const today = source('src/pages/TodayPage.jsx');
 
-  assert.match(today, /<h1 className="page-title">Today&apos;s Plan<\/h1>/);
+  assert.match(today, /<h1 id="today-plan-heading" className="page-title">Today&apos;s Plan<\/h1>/);
   assert.match(today, /<p className="page-subtitle">Here is today&apos;s plan\.<\/p>/);
   assert.doesNotMatch(today, /<div className="page-header" aria-hidden="true">/);
 });
