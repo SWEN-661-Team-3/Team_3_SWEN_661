@@ -16,7 +16,7 @@ function h1Count(markup) {
 const routeHeadings = [
   ['src/pages/TodayPage.jsx', "Today&apos;s Plan"],
   ['src/pages/CareTeamPage.jsx', 'Care Team'],
-  ['src/components/SettingsPanel.jsx', 'Accessibility Settings'],
+  ['src/components/SettingsPanel.jsx', 'Settings'],
   ['src/pages/EmergencyPage.jsx', 'Emergency'],
 ];
 

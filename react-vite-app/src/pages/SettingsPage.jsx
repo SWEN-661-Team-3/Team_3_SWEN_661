@@ -10,7 +10,7 @@ const defaultSettings = {
   reduceMotion: true,
 };
 
-export default function SettingsPage({ settings, onSettingsChange }) {
+export default function SettingsPage({ settings, onSettingsChange, notifications }) {
   const [draftSettings, setDraftSettings] = useState(() => ({ ...settings }));
   const [pendingSettings, setPendingSettings] = useState(null);
 
@@ -46,6 +46,7 @@ export default function SettingsPage({ settings, onSettingsChange }) {
               onChange={setDraftSettings}
               onSave={handleSave}
               onReset={handleReset}
+              notifications={notifications}
             />
           </div>
         </main>

@@ -1,12 +1,12 @@
-export default function SettingsPanel({ settings, onChange, onSave, onReset }) {
+export default function SettingsPanel({ settings, onChange, onSave, onReset, notifications }) {
   function handleToggle(key) {
     onChange({ ...settings, [key]: !settings[key] });
   }
 
   return (
     <section aria-labelledby="settings-heading">
-      <h1 id="settings-heading" className="page-title">Accessibility Settings</h1>
-      <p>Adjust display preferences to improve readability and comfort.</p>
+      <h1 id="settings-heading" className="page-title">Settings</h1>
+      <p>Adjust display and notification preferences.</p>
 
       <fieldset className="settings-fieldset">
         <legend>Display Preferences</legend>
@@ -67,6 +67,33 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset }) {
           </span>
         </label>
       </fieldset>
+
+      {notifications && (
+        <fieldset className="settings-fieldset">
+          <legend>Notifications</legend>
+
+          <label className="settings-row">
+            <input
+              type="checkbox"
+              checked={notifications.enabled}
+              disabled={!notifications.supported || notifications.permission === 'denied'}
+              onChange={notifications.toggle}
+              aria-describedby="notif-desc"
+            />
+            <span>
+              Task Reminders
+              <br />
+              <small id="notif-desc">
+                {!notifications.supported
+                  ? 'Notifications are not supported in this browser'
+                  : notifications.permission === 'denied'
+                    ? 'Notifications were blocked. Enable them in your browser settings.'
+                    : 'Get notified 15 minutes before upcoming tasks'}
+              </small>
+            </span>
+          </label>
+        </fieldset>
+      )}
 
       <div className="dialog__footer" style={{ padding: 0, borderTop: 'none' }}>
         <button type="button" className="secondary-btn" onClick={onReset}>

@@ -9,6 +9,7 @@ import CareTeamPage from './pages/CareTeamPage';
 import SettingsPage from './pages/SettingsPage';
 import EmergencyPage from './pages/EmergencyPage';
 import { caregivers, initialPlan } from './data/careData';
+import useNotifications from './hooks/useNotifications';
 
 const initialAccessibilitySettings = {
   largeText: false,
@@ -21,6 +22,7 @@ export default function App() {
   const [plan, setPlan] = useState(() => structuredClone(initialPlan));
   const [helpers, setHelpers] = useState(() => structuredClone(caregivers));
   const [settings, setSettings] = useState(() => ({ ...initialAccessibilitySettings }));
+  const notifications = useNotifications(plan);
 
   useEffect(() => {
     document.body.classList.toggle('large-text', settings.largeText);
@@ -68,6 +70,7 @@ export default function App() {
             <SettingsPage
               settings={settings}
               onSettingsChange={setSettings}
+              notifications={notifications}
             />
           }
         />
