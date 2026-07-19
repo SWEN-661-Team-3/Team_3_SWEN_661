@@ -6,10 +6,12 @@ export default function CareConnectDialog({
   message,
   confirmLabel = 'OK',
   cancelLabel,
+  variant,
   onConfirm,
   onCancel,
 }) {
   const dialogRef = useRef(null);
+  const confirmButtonClass = variant === 'destructive' ? 'danger-btn' : 'primary-btn';
 
   useEffect(() => {
     const el = dialogRef.current;
@@ -24,7 +26,7 @@ export default function CareConnectDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="dialog dialog--confirm"
+      className={`dialog dialog--confirm${variant ? ` dialog--${variant}` : ''}`}
       aria-labelledby="careconnect-dialog-title"
       onCancel={(event) => {
         event.preventDefault();
@@ -51,7 +53,7 @@ export default function CareConnectDialog({
               {cancelLabel}
             </button>
           )}
-          <button type="button" className="primary-btn" onClick={onConfirm}>
+          <button type="button" className={confirmButtonClass} onClick={onConfirm}>
             {confirmLabel}
           </button>
         </div>

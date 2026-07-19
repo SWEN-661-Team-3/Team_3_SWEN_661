@@ -11,8 +11,9 @@ export default function TodayPage({ plan, setPlan, helpers }) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [draftTask, setDraftTask] = useState(null);
   const [saveNotice, setSaveNotice] = useState(null);
-  const [pendingCompleteId, setPendingCompleteId] = useState(null);
+  const [completeNotice, setCompleteNotice] = useState(null);
   const statusRef = useRef(null);
+  const taskButtonRefs = useRef({});
 
   const announce = useCallback((message) => {
     if (statusRef.current) {
@@ -35,20 +36,25 @@ export default function TodayPage({ plan, setPlan, helpers }) {
   }
 
   function completeTask(id) {
-    setPendingCompleteId(id);
-  }
-
-  function confirmCompleteTask() {
-    const id = pendingCompleteId;
     const task = plan.find((t) => t.id === id);
     if (!task) return;
     setPlan((prev) =>
       prev.map((t) => (t.id === id ? { ...t, status: 'done' } : t)),
     );
     setSelectedId(null);
-    setPendingCompleteId(null);
     setDetailOpen(false);
-    if (task) announce(`${task.title} marked complete!`);
+    setCompleteNotice({
+      id,
+      title: task.title,
+    });
+  }
+
+  function closeCompleteNotice() {
+    const completedId = completeNotice?.id;
+    setCompleteNotice(null);
+    requestAnimationFrame(() => {
+      taskButtonRefs.current[completedId]?.focus();
+    });
   }
 
   function closeTaskDetail() {
@@ -111,6 +117,9 @@ export default function TodayPage({ plan, setPlan, helpers }) {
           helperName={helperName}
           tasks={plan}
           onSelectTask={openTaskDetail}
+          getTaskButtonRef={(id) => (element) => {
+            taskButtonRefs.current[id] = element;
+          }}
         />
 
         <main id="main-content" aria-label="Today's care plan">
@@ -157,13 +166,11 @@ export default function TodayPage({ plan, setPlan, helpers }) {
       />
 
       <CareConnectDialog
-        open={Boolean(pendingCompleteId)}
-        title="Complete Reminder?"
-        message={`Mark "${plan.find((task) => task.id === pendingCompleteId)?.title ?? 'this reminder'}" complete?`}
-        cancelLabel="Keep Pending"
-        confirmLabel="Mark Complete"
-        onCancel={() => setPendingCompleteId(null)}
-        onConfirm={confirmCompleteTask}
+        open={Boolean(completeNotice)}
+        title="Reminder Complete"
+        message={`"${completeNotice?.title ?? 'Reminder'}" was marked complete.`}
+        variant="success"
+        onConfirm={closeCompleteNotice}
       />
     </>
   );

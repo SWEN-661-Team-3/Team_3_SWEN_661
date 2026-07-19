@@ -245,6 +245,7 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
         message={`Remove ${member.name} from the care team?`}
         cancelLabel="Keep Helper"
         confirmLabel="Remove Helper"
+        variant="destructive"
         onCancel={() => setConfirmRemoveOpen(false)}
         onConfirm={() => {
           setConfirmRemoveOpen(false);

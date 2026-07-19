@@ -46,8 +46,8 @@ export default function CareTeamPage({ helpers, setHelpers }) {
       setHelpers((prev) => [...prev, updatedMember]);
       announce(`${updatedMember.name} added to the care team`);
       setSaveNotice({
-        title: 'Care Team Member Added',
-        message: 'Care team member was added.',
+        title: `${updatedMember.name} Added`,
+        message: `${updatedMember.name} was added.`,
       });
     } else {
       setHelpers((prev) =>
@@ -55,8 +55,8 @@ export default function CareTeamPage({ helpers, setHelpers }) {
       );
       announce(`Saved details for ${updatedMember.name}`);
       setSaveNotice({
-        title: 'Care Team Member Saved',
-        message: 'Care team member was saved.',
+        title: `${updatedMember.name} Saved`,
+        message: `${updatedMember.name} was saved.`,
       });
     }
     setDetailOpen(false);
@@ -184,6 +184,7 @@ export default function CareTeamPage({ helpers, setHelpers }) {
         open={Boolean(saveNotice)}
         title={saveNotice?.title ?? ''}
         message={saveNotice?.message ?? ''}
+        variant="success"
         onConfirm={() => setSaveNotice(null)}
       />
     </>

@@ -693,6 +693,24 @@ body.large-text {
   max-width: 36rem;
 }
 
+.dialog--success {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.dialog--destructive {
+  border-color: var(--color-emergency);
+  background: var(--color-emergency-bg);
+}
+
+.dialog--destructive .dialog__header {
+  border-bottom-color: var(--color-emergency);
+}
+
+.dialog--destructive .dialog__header h2 {
+  color: var(--color-emergency);
+}
+
 .dialog__inner {
   display: flex;
   flex-direction: column;

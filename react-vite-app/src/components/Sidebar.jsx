@@ -1,6 +1,6 @@
 import { statusLabels } from '../data/careData';
 
-export default function Sidebar({ helperName, tasks, onSelectTask }) {
+export default function Sidebar({ helperName, tasks, onSelectTask, getTaskButtonRef }) {
   return (
     <aside className="sidebar" aria-label="Daily plan sidebar">
       <div className="sidebar-section">
@@ -22,6 +22,7 @@ export default function Sidebar({ helperName, tasks, onSelectTask }) {
             return (
               <li key={task.id} className="task-list__item">
                 <button
+                  ref={getTaskButtonRef?.(task.id)}
                   type="button"
                   className={`task-list__btn${task.status === 'done' ? ' task-list__btn--done' : ''}`}
                   onClick={() => onSelectTask(task.id)}
