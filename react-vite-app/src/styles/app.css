@@ -262,6 +262,7 @@ body.large-text {
 .task-list__btn--done {
   background: var(--color-success-bg);
   border-color: var(--color-success);
+  animation: reminder-complete 180ms ease-out;
 }
 
 .task-list__status {
@@ -277,6 +278,30 @@ body.large-text {
 .task-list__btn--done .task-list__status,
 .task-list__btn--done .task-list__title {
   color: var(--color-success);
+}
+
+.task-list__btn--done .task-list__status {
+  animation: reminder-complete-indicator 180ms ease-out;
+}
+
+@keyframes reminder-complete {
+  from {
+    opacity: 0.65;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reminder-complete-indicator {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .task-list__title {
@@ -683,6 +708,22 @@ body.large-text {
   color: var(--color-text);
   box-shadow: var(--shadow-dialog);
   overflow: hidden;
+}
+
+.dialog.dialog--enter {
+  animation: dialog-enter 180ms ease-out;
+}
+
+@keyframes dialog-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .dialog::backdrop {
@@ -1140,6 +1181,10 @@ textarea.edit-field__control {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
@@ -1155,4 +1200,8 @@ body.reduce-motion *::after {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
+}
+
+body.reduce-motion {
+  scroll-behavior: auto;
 }

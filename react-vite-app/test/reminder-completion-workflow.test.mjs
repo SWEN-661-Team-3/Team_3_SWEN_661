@@ -52,6 +52,35 @@ test('completed reminders keep using the existing completed visual classes', () 
   assert.match(styles, /\.dialog--success\s*\{\s*border-color: var\(--color-success\);\s*background: var\(--color-success-bg\);/);
 });
 
+test('motion preference keeps dialogs and completed reminders functional without waits', () => {
+  const app = source('src/App.jsx');
+  const today = source('src/pages/TodayPage.jsx');
+  const taskDialog = source('src/components/TaskDetailDialog.jsx');
+  const memberDialog = source('src/components/CareMemberDetailDialog.jsx');
+  const confirmationDialog = source('src/components/CareConnectDialog.jsx');
+  const styles = source('src/styles/app.css');
+
+  assert.match(app, /document\.body\.classList\.toggle\('reduce-motion', settings\.reduceMotion\)/);
+  assert.match(app, /document\.body\.classList\.remove\([^)]*'reduce-motion'/);
+  assert.match(today, /status: 'done'/);
+  assert.match(today, /setDetailOpen\(false\)/);
+  assert.match(today, /open=\{Boolean\(completeNotice\)\}/);
+  assert.match(taskDialog, /className="dialog"/);
+  assert.match(memberDialog, /className="dialog"/);
+  assert.match(confirmationDialog, /className=\{`dialog dialog--confirm/);
+  assert.match(taskDialog, /showModal\(\)/);
+  assert.match(memberDialog, /showModal\(\)/);
+  assert.match(confirmationDialog, /showModal\(\)/);
+  assert.match(taskDialog, /classList\.add\('dialog--enter'\)/);
+  assert.match(memberDialog, /classList\.add\('dialog--enter'\)/);
+  assert.match(confirmationDialog, /classList\.add\('dialog--enter'\)/);
+  assert.match(styles, /\.dialog\.dialog--enter\s*\{\s*animation: dialog-enter 180ms ease-out;/);
+  assert.match(styles, /\.task-list__btn--done\s*\{[\s\S]*animation: reminder-complete 180ms ease-out;/);
+  assert.match(styles, /body\.reduce-motion \*,[\s\S]*animation-duration: 0\.01ms !important;[\s\S]*transition-duration: 0\.01ms !important;/);
+  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*animation-duration: 0\.01ms !important;[\s\S]*transition-duration: 0\.01ms !important;/);
+  assert.doesNotMatch(today, /setTimeout|animationend/);
+});
+
 test('remove and unsaved-change confirmations remain available', () => {
   const careMemberDialog = source('src/components/CareMemberDetailDialog.jsx');
   const taskDialog = source('src/components/TaskDetailDialog.jsx');

@@ -17,7 +17,10 @@ export default function CareConnectDialog({
     const el = dialogRef.current;
     if (!el) return;
     if (open) {
+      el.classList.remove('dialog--enter');
       el.showModal();
+      void el.offsetWidth;
+      el.classList.add('dialog--enter');
     } else {
       el.close();
     }
