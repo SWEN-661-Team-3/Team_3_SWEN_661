@@ -45,13 +45,19 @@ export default function EmergencyPanel({ contacts }) {
   }, [phase]);
 
   useEffect(() => {
+    if (phase === 'countdown' && countdown === 2) {
+      announce('2 seconds remaining');
+    }
+  }, [phase, countdown, announce]);
+
+  useEffect(() => {
     if (phase === 'confirmed') {
-      announce('Alert sent. Help is on the way. Your emergency contacts have been notified.');
+      announce('Emergency alert sent');
     }
   }, [phase, announce]);
 
   return (
-    <section aria-labelledby="emergency-heading" aria-live="assertive">
+    <section aria-labelledby="emergency-heading">
       <div
         ref={statusRef}
         className="visually-hidden"
@@ -104,7 +110,7 @@ export default function EmergencyPanel({ contacts }) {
       {phase === 'countdown' && (
         <div className="emergency-panel">
           <h2 id="emergency-heading">Sending Alert...</h2>
-          <p className="emergency-panel__copy" aria-live="polite">
+          <p className="emergency-panel__copy">
             Alert will be sent in {countdown} second{countdown !== 1 ? 's' : ''}.
           </p>
           <button
