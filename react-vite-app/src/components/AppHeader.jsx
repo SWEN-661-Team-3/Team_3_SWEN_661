@@ -1,4 +1,6 @@
 import { NavLink } from 'react-router-dom';
+import MobileNavigation from './MobileNavigation';
+import { navigationItems } from './navigationItems';
 
 export default function AppHeader() {
   return (
@@ -14,44 +16,26 @@ export default function AppHeader() {
         <span className="app-header__title">CareConnect</span>
       </NavLink>
 
-      <nav aria-label="Main navigation">
+      <nav className="desktop-navigation" aria-label="Main navigation">
         <ul className="nav-links">
-          <li>
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
-            >
-              Today&apos;s Plan
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/care-team"
-              className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
-            >
-              Care Team
-            </NavLink>
-          </li>
+          {navigationItems.slice(0, 2).map(({ label, to, end }) => (
+            <li key={to}>
+              <NavLink to={to} end={end} className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}>
+                {label}
+              </NavLink>
+            </li>
+          ))}
           <li aria-hidden="true"><span className="nav-divider" /></li>
-          <li>
-            <NavLink
-              to="/settings"
-              className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
-            >
-              Settings
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/emergency"
-              className="nav-link nav-link--danger"
-            >
-              Emergency
-            </NavLink>
-          </li>
+          {navigationItems.slice(2).map(({ label, to, danger }) => (
+            <li key={to}>
+              <NavLink to={to} className={`nav-link${danger ? ' nav-link--danger' : ''}`}>
+                {label}
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </nav>
+      <MobileNavigation items={navigationItems} />
     </header>
   );
 }
