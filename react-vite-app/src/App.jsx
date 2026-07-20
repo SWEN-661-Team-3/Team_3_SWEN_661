@@ -1,28 +1,86 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import AppHeader from './components/AppHeader';
+import AppFooter from './components/AppFooter';
+import OfflineStatusBanner from './components/OfflineStatusBanner';
+import TodayPage from './pages/TodayPage';
+import CareTeamPage from './pages/CareTeamPage';
+import SettingsPage from './pages/SettingsPage';
+import EmergencyPage from './pages/EmergencyPage';
+import { caregivers, initialPlan } from './data/careData';
+import useNotifications from './hooks/useNotifications';
 
-function App() {
-  const [count, setCount] = useState(0)
+const initialAccessibilitySettings = {
+  largeText: false,
+  highContrast: false,
+  darkTheme: false,
+  reduceMotion: true,
+};
+
+export default function App() {
+  const [plan, setPlan] = useState(() => structuredClone(initialPlan));
+  const [helpers, setHelpers] = useState(() => structuredClone(caregivers));
+  const [settings, setSettings] = useState(() => ({ ...initialAccessibilitySettings }));
+  const notifications = useNotifications(plan);
+
+  useEffect(() => {
+    document.body.classList.toggle('large-text', settings.largeText);
+    document.body.classList.toggle('high-contrast', settings.highContrast);
+    document.body.classList.toggle('dark-mode', settings.darkTheme);
+    document.body.classList.toggle('reduce-motion', settings.reduceMotion);
+
+    return () => {
+      document.body.classList.remove('large-text', 'high-contrast', 'dark-mode', 'reduce-motion');
+    };
+  }, [settings]);
+
+  const emergencyContacts = helpers.slice(0, 2);
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', color: 'white', fontFamily: 'system-ui, sans-serif' }}>
-      <div style={{ display: 'flex', gap: '2rem', marginBottom: '2rem' }}>
-        <img src={viteLogo} alt="Vite logo" style={{ height: '80px' }} />
-        <img src={reactLogo} alt="React logo" style={{ height: '80px', animation: 'spin 4s linear infinite' }} />
-      </div>
-      <h1 style={{ fontSize: '3rem', margin: '0.5rem 0' }}>Hello World!</h1>
-      <p style={{ fontSize: '1.4rem', opacity: 0.8, margin: '0.5rem 0' }}>SWEN 661 - React + Vite App</p>
-      <p style={{ fontSize: '1.1rem', opacity: 0.6, margin: '0.5rem 0' }}>Team 3</p>
-      <button
-        type="button"
-        onClick={() => setCount((count) => count + 1)}
-        style={{ marginTop: '2rem', padding: '0.8rem 2rem', fontSize: '1.1rem', borderRadius: '8px', border: 'none', background: '#646cff', color: 'white', cursor: 'pointer' }}
-      >
-        Count is {count}
-      </button>
-    </div>
-  )
-}
+    <>
+      <Helmet defaultTitle="CareConnect - Daily Care Management" titleTemplate="%s">
+        <meta property="og:url" content="https://careconnect.app" />
+        <meta property="og:site_name" content="CareConnect" />
+        <meta name="twitter:card" content="summary" />
+      </Helmet>
 
-export default App
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
+
+      <OfflineStatusBanner />
+
+      <AppHeader />
+
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <TodayPage plan={plan} setPlan={setPlan} helpers={helpers} />
+          }
+        />
+        <Route
+          path="/care-team"
+          element={<CareTeamPage helpers={helpers} setHelpers={setHelpers} />}
+        />
+        <Route
+          path="/settings"
+          element={
+            <SettingsPage
+              settings={settings}
+              onSettingsChange={setSettings}
+              notifications={notifications}
+            />
+          }
+        />
+        <Route
+          path="/emergency"
+          element={<EmergencyPage contacts={emergencyContacts} />}
+        />
+      </Routes>
+
+      <AppFooter />
+    </>
+  );
+}

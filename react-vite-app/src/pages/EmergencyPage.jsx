@@ -1,0 +1,27 @@
+import { Helmet } from 'react-helmet-async';
+import EmergencyPanel from '../components/EmergencyPanel';
+
+export default function EmergencyPage({ contacts }) {
+  return (
+    <>
+      <Helmet>
+        <title>Emergency - CareConnect</title>
+        <meta name="description" content="Send an emergency alert to your care team contacts." />
+        <meta property="og:title" content="Emergency Help - CareConnect" />
+        <meta property="og:description" content="Get help quickly by alerting your emergency contacts." />
+        <meta property="og:type" content="website" />
+      </Helmet>
+
+      <div className="app-layout app-layout--wide">
+        <main id="main-content" aria-labelledby="emergency-heading">
+          <div className="main-content">
+            <div className="page-header">
+              <h1 id="emergency-heading" className="page-title">Emergency</h1>
+            </div>
+            <EmergencyPanel contacts={contacts} />
+          </div>
+        </main>
+      </div>
+    </>
+  );
+}
