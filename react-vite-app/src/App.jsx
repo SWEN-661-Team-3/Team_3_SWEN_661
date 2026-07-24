@@ -9,6 +9,7 @@ import { ROUTES, ROUTE_SEGMENTS } from './routes';
 
 const TodayPage = lazy(() => import('./pages/TodayPage'));
 const CareTeamPage = lazy(() => import('./pages/CareTeamPage'));
+const CaregiverDetailPage = lazy(() => import('./pages/CaregiverDetailPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const EmergencyPage = lazy(() => import('./pages/EmergencyPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
@@ -65,7 +66,7 @@ export default function App() {
               <Route index element={<CareTeamPage helpers={helpers} setHelpers={setHelpers} />} />
               <Route
                 path={ROUTE_SEGMENTS.caregiverId}
-                element={<CareTeamPage helpers={helpers} setHelpers={setHelpers} />}
+                element={<CaregiverDetailPage helpers={helpers} setHelpers={setHelpers} />}
               />
             </Route>
             <Route path={ROUTES.settings}>

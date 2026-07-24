@@ -28,9 +28,12 @@ test.describe('Navigation', () => {
     await expect(page).toHaveURL('/emergency');
   });
 
-  test('supports direct navigation to nested routes', async ({ page }) => {
+  test('supports deep linking to a caregiver detail route', async ({ page }) => {
     await page.goto('/care-team/sarah');
-    await expect(page.getByRole('heading', { name: 'Care Team', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sarah Johnson', level: 1 })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Back to Care Team' })).toHaveAttribute('href', '/care-team');
+    await page.getByRole('link', { name: 'Back to Care Team' }).click();
+    await expect(page).toHaveURL('/care-team');
 
     await page.goto('/settings/notifications');
     await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();

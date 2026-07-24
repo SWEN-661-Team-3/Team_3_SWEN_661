@@ -56,20 +56,20 @@ describe('CareTeamPage', () => {
     expect(document.getElementById('main-content')).not.toBeInTheDocument();
   });
 
-  it('opens member detail when card is clicked', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<CareTeamPage helpers={getHelpers()} setHelpers={jest.fn()} />);
-    await user.click(screen.getByLabelText('Sarah Johnson, Helper'));
-    expect(screen.getByText('Close')).toBeInTheDocument();
-    expect(screen.getByText('Edit Details')).toBeInTheDocument();
-  });
-
   it('has a live region for announcements', () => {
     const { container } = renderWithProviders(
       <CareTeamPage helpers={getHelpers()} setHelpers={jest.fn()} />,
     );
     const liveRegion = container.querySelector('[aria-live="polite"]');
     expect(liveRegion).toBeInTheDocument();
+  });
+
+  it('opens member detail when a card is clicked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CareTeamPage helpers={getHelpers()} setHelpers={jest.fn()} />);
+    await user.click(screen.getByLabelText('Sarah Johnson, Helper'));
+    expect(screen.getByText('Close')).toBeInTheDocument();
+    expect(screen.getByText('Edit Details')).toBeInTheDocument();
   });
 
   it('closes member detail dialog', async () => {
@@ -89,7 +89,7 @@ describe('CareTeamPage', () => {
     expect(setHelpers).toHaveBeenCalled();
   });
 
-  it('shows save success notice after saving', async () => {
+  it('shows save success notice after editing a member', async () => {
     const user = userEvent.setup();
     renderWithProviders(<CareTeamPage helpers={getHelpers()} setHelpers={jest.fn()} />);
     await user.click(screen.getByLabelText('Sarah Johnson, Helper'));
@@ -129,11 +129,11 @@ describe('CareTeamPage', () => {
     renderWithProviders(<CareTeamPage helpers={getHelpers()} setHelpers={setHelpers} />);
     await user.click(screen.getByLabelText('Sarah Johnson, Helper'));
     const removeButtons = screen.getAllByText('Remove Helper');
-    const mainRemoveBtn = removeButtons.find((el) => el.closest('.dialog:not(.dialog--confirm)'));
-    if (mainRemoveBtn) {
-      await user.click(mainRemoveBtn);
+    const mainRemoveButton = removeButtons.find((element) => element.closest('.dialog:not(.dialog--confirm)'));
+    if (mainRemoveButton) {
+      await user.click(mainRemoveButton);
       const confirmRemove = screen.getAllByText('Remove Helper').find(
-        (el) => el.closest('.dialog--destructive'),
+        (element) => element.closest('.dialog--destructive'),
       );
       if (confirmRemove) {
         await user.click(confirmRemove);
@@ -141,4 +141,5 @@ describe('CareTeamPage', () => {
       }
     }
   });
+
 });

@@ -46,9 +46,10 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: 'Care Team', level: 1 })).toBeInTheDocument();
   });
 
-  it('renders CareTeamPage on a caregiver detail route', async () => {
+  it('renders the caregiver detail page on a caregiver detail route', async () => {
     renderApp('/care-team/sarah');
-    expect(await screen.findByRole('heading', { name: 'Care Team', level: 1 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Sarah Johnson', level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to Care Team' })).toHaveAttribute('href', '/care-team');
   });
 
   it('renders SettingsPage on /settings', async () => {
