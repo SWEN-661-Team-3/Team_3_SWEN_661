@@ -14,7 +14,7 @@ function PageLoader() {
   );
 }
 
-export default function AppLayout() {
+export default function AppLayout({ children }) {
   const { pathname } = useLocation();
   const isTodayRoute = pathname === ROUTES.today;
 
@@ -32,7 +32,7 @@ export default function AppLayout() {
       >
         <ErrorBoundary withinLayout>
           <Suspense fallback={<PageLoader />}>
-            <Outlet />
+            {children ?? <Outlet />}
           </Suspense>
         </ErrorBoundary>
       </main>

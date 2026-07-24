@@ -3,10 +3,14 @@ import { Navigate, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import AppLayout from './components/AppLayout';
 import ErrorBoundary from './components/ErrorBoundary';
+import GlobalErrorBanner from './components/GlobalErrorBanner';
+import LoadingStatus from './components/LoadingStatus';
 import NotificationRouteGuard from './components/NotificationRouteGuard';
-import { caregivers, initialPlan } from './data/careData';
 import useNotifications from './hooks/useNotifications';
 import { ROUTES, ROUTE_SEGMENTS } from './routes';
+import { getCarePlan } from './services/carePlanService';
+import { getCareTeam } from './services/careTeamService';
+import { defaultSettings, getSettings } from './services/settingsService';
 
 const TodayPage = lazy(() => import('./pages/TodayPage'));
 const CareTeamPage = lazy(() => import('./pages/CareTeamPage'));
@@ -15,18 +19,33 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const EmergencyPage = lazy(() => import('./pages/EmergencyPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
-const initialAccessibilitySettings = {
-  largeText: false,
-  highContrast: false,
-  darkTheme: false,
-  reduceMotion: true,
-};
-
 export default function App() {
-  const [plan, setPlan] = useState(() => structuredClone(initialPlan));
-  const [helpers, setHelpers] = useState(() => structuredClone(caregivers));
-  const [settings, setSettings] = useState(() => ({ ...initialAccessibilitySettings }));
-  const notifications = useNotifications(plan);
+  const [plan, setPlan] = useState(null);
+  const [helpers, setHelpers] = useState(null);
+  const [settings, setSettings] = useState(() => structuredClone(defaultSettings));
+  const [loadError, setLoadError] = useState(null);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const notifications = useNotifications(plan ?? []);
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    Promise.all([getCarePlan(), getCareTeam(), getSettings()])
+      .then(([loadedPlan, loadedTeam, loadedSettings]) => {
+        if (!isCurrent) return;
+        setPlan(loadedPlan);
+        setHelpers(loadedTeam);
+        setSettings(loadedSettings);
+        setLoadError(null);
+      })
+      .catch((error) => {
+        if (isCurrent) setLoadError(error);
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [loadAttempt]);
 
   // Accessibility classes are applied to the document body so CSS can target
   // the entire page. Reduced motion must not remove functionality -- it only
@@ -41,6 +60,30 @@ export default function App() {
       document.body.classList.remove('large-text', 'high-contrast', 'dark-mode', 'reduce-motion');
     };
   }, [settings]);
+
+  if (loadError) {
+    return (
+      <AppLayout>
+        <div className="main-content">
+          <GlobalErrorBanner
+            title="Unable to Load Care Data"
+            message="CareConnect could not load your session data. Please try again."
+            onRetry={() => setLoadAttempt((attempt) => attempt + 1)}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (!plan || !helpers) {
+    return (
+      <AppLayout>
+        <div className="main-content">
+          <LoadingStatus message="Loading care data..." />
+        </div>
+      </AppLayout>
+    );
+  }
 
   const emergencyContacts = helpers.slice(0, 2);
 

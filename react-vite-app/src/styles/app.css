@@ -291,6 +291,52 @@ body.large-text {
 
 .offline-status-banner p { margin: 0; }
 
+/* Shared operation feedback. These use visible text instead of animated-only
+   indicators, so they remain understandable when reduced motion is enabled. */
+.operation-status,
+.global-error-banner,
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4);
+  border: var(--stroke-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.operation-status p,
+.global-error-banner p,
+.empty-state p,
+.global-error-banner h2,
+.empty-state h2 {
+  margin: 0;
+}
+
+.operation-status--loading,
+.operation-status--saving {
+  border-color: var(--color-primary);
+  background: var(--color-blue-bg);
+}
+
+.operation-status--error,
+.global-error-banner {
+  border-color: var(--color-emergency);
+  background: var(--color-emergency-bg);
+}
+
+.global-error-banner h2,
+.empty-state h2 {
+  font-size: var(--font-size-md);
+}
+
+.empty-state {
+  display: block;
+  text-align: center;
+}
+
 .task-list__status {
   flex-shrink: 0;
   width: 1.75rem;

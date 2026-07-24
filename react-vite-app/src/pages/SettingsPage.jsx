@@ -2,13 +2,7 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import SettingsPanel from '../components/SettingsPanel';
 import CareConnectDialog from '../components/CareConnectDialog';
-
-const defaultSettings = {
-  largeText: false,
-  highContrast: false,
-  darkTheme: false,
-  reduceMotion: true,
-};
+import { defaultSettings } from '../services/settingsService';
 
 export default function SettingsPage({ settings, onSettingsChange, notifications }) {
   const [draftSettings, setDraftSettings] = useState(() => ({ ...settings }));

@@ -72,8 +72,9 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: 'Page Not Found', level: 1 })).toBeInTheDocument();
   });
 
-  it('applies accessibility classes to document.body', () => {
+  it('applies accessibility classes to document.body after initial data loads', async () => {
     renderApp();
+    await screen.findByRole('heading', { name: "Today's Plan", level: 1 });
     expect(document.body.classList.contains('reduce-motion')).toBe(true);
   });
 
