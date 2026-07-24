@@ -83,11 +83,10 @@ describe('SettingsPage', () => {
     expect(onSettingsChange).toHaveBeenCalled();
   });
 
-  it('has proper main landmark', () => {
+  it('leaves the main landmark to the shared layout', () => {
     renderWithProviders(
       <SettingsPage settings={defaultSettings} onSettingsChange={jest.fn()} notifications={notifications} />,
     );
-    const main = document.getElementById('main-content');
-    expect(main).toBeInTheDocument();
+    expect(document.getElementById('main-content')).not.toBeInTheDocument();
   });
 });

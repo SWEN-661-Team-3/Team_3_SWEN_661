@@ -1,7 +1,9 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import CareMemberDetailDialog from '../components/CareMemberDetailDialog';
 import CareConnectDialog from '../components/CareConnectDialog';
+import { ROUTES } from '../routes';
 
 const HELPER_COLORS = ['#1d4ed8', '#046c50', '#9333ea', '#c2410c', '#0e7490'];
 const availabilityLabels = {
@@ -11,8 +13,10 @@ const availabilityLabels = {
 };
 
 export default function CareTeamPage({ helpers, setHelpers }) {
-  const [selectedId, setSelectedId] = useState(null);
-  const [detailOpen, setDetailOpen] = useState(false);
+  const { caregiverId } = useParams();
+  const navigate = useNavigate();
+  const [selectedId, setSelectedId] = useState(() => caregiverId ?? null);
+  const [detailOpen, setDetailOpen] = useState(() => Boolean(caregiverId));
   const [draftMember, setDraftMember] = useState(null);
   const [saveNotice, setSaveNotice] = useState(null);
   const statusRef = useRef(null);
@@ -28,9 +32,17 @@ export default function CareTeamPage({ helpers, setHelpers }) {
     ? draftMember
     : helpers.find((helper) => helper.id === selectedId) ?? null;
 
+  useEffect(() => {
+    if (caregiverId) {
+      setSelectedId(caregiverId);
+      setDetailOpen(true);
+    }
+  }, [caregiverId]);
+
   function openMemberDetail(id) {
     setSelectedId(id);
     setDetailOpen(true);
+    navigate(ROUTES.caregiverDetail(id));
     const member = helpers.find((helper) => helper.id === id);
     if (member) announce(`Opened details for ${member.name}`);
   }
@@ -39,6 +51,7 @@ export default function CareTeamPage({ helpers, setHelpers }) {
     setDetailOpen(false);
     setSelectedId(null);
     setDraftMember(null);
+    if (caregiverId) navigate(ROUTES.careTeam);
   }
 
   function saveMember(updatedMember) {
@@ -62,6 +75,7 @@ export default function CareTeamPage({ helpers, setHelpers }) {
     setDetailOpen(false);
     setSelectedId(null);
     setDraftMember(null);
+    if (caregiverId) navigate(ROUTES.careTeam);
     return true;
   }
 
@@ -71,6 +85,7 @@ export default function CareTeamPage({ helpers, setHelpers }) {
     setDetailOpen(false);
     setSelectedId(null);
     setDraftMember(null);
+    if (caregiverId) navigate(ROUTES.careTeam);
     if (member) announce(`${member.name} removed from the care team`);
   }
 
@@ -101,9 +116,7 @@ export default function CareTeamPage({ helpers, setHelpers }) {
         <meta property="og:type" content="website" />
       </Helmet>
 
-      <div className="app-layout app-layout--wide">
-        <main id="main-content" aria-labelledby="care-team-heading">
-          <div className="main-content main-content--wide">
+      <div className="main-content main-content--wide">
             <div className="care-team-header">
               <div>
                 <h1 id="care-team-heading" className="page-title">Care Team</h1>
@@ -166,8 +179,6 @@ export default function CareTeamPage({ helpers, setHelpers }) {
               aria-live="polite"
               aria-atomic="true"
             />
-          </div>
-        </main>
       </div>
 
       <CareMemberDetailDialog

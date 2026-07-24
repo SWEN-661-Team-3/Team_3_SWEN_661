@@ -29,7 +29,7 @@ describe('App', () => {
     expect(screen.getByText(/Helping you manage daily care/)).toBeInTheDocument();
   });
 
-  it('renders TodayPage on the root route', () => {
+  it('redirects the root route to TodayPage', () => {
     renderApp('/');
     expect(screen.getByRole('heading', { name: "Today's Plan", level: 1 })).toBeInTheDocument();
   });
@@ -39,8 +39,18 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'Care Team', level: 1 })).toBeInTheDocument();
   });
 
+  it('renders CareTeamPage on a caregiver detail route', () => {
+    renderApp('/care-team/sarah');
+    expect(screen.getByRole('heading', { name: 'Care Team', level: 1 })).toBeInTheDocument();
+  });
+
   it('renders SettingsPage on /settings', () => {
     renderApp('/settings');
+    expect(screen.getByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument();
+  });
+
+  it('renders SettingsPage on /settings/notifications', () => {
+    renderApp('/settings/notifications');
     expect(screen.getByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument();
   });
 

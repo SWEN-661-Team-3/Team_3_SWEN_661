@@ -8,9 +8,9 @@ An application providing mobile, desktop, and web customization for care recipie
 
 | Name | GitHub | Role (Weeks 1-2) |
 |------|--------|-------------------|
-| Alyssa Smith | [@asmit1325-ai](https://github.com/asmit1325-ai) | Tech Lead |
+| Gideon Sarpong | [@gsarpong1](https://github.com/gsarpong1) | QA Lead |
 | Crystal Schelmety | [@cschel](https://github.com/cschel) | Doc Lead |
-| Ryan Morris | [@ryanramorris16](https://github.com/ryanramorris16) | QA Lead |
+| Ryan Morris | [@ryanramorris16](https://github.com/ryanramorris16) | Tech Lead |
 
 ## Project Documents
 

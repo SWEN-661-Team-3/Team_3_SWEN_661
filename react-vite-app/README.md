@@ -4,8 +4,10 @@ SWEN 661 - Team 3 environment setup for web-browsers.
 ## Run
 
 ```bash
+cd react-vite-app
 npm install
 npm run dev
+npm run test:unit
 ```
 
 Opens at http://localhost:5173

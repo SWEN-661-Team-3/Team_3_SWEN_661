@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import AppHeader from './components/AppHeader';
-import AppFooter from './components/AppFooter';
-import OfflineStatusBanner from './components/OfflineStatusBanner';
+import AppLayout from './components/AppLayout';
 import TodayPage from './pages/TodayPage';
 import CareTeamPage from './pages/CareTeamPage';
 import SettingsPage from './pages/SettingsPage';
 import EmergencyPage from './pages/EmergencyPage';
 import { caregivers, initialPlan } from './data/careData';
 import useNotifications from './hooks/useNotifications';
+import { ROUTES, ROUTE_SEGMENTS } from './routes';
 
 const initialAccessibilitySettings = {
   largeText: false,
@@ -45,42 +44,33 @@ export default function App() {
         <meta name="twitter:card" content="summary" />
       </Helmet>
 
-      <a className="skip-link" href="#main-content">
-        Skip to main content
-      </a>
-
-      <OfflineStatusBanner />
-
-      <AppHeader />
-
       <Routes>
-        <Route
-          path="/"
-          element={
-            <TodayPage plan={plan} setPlan={setPlan} helpers={helpers} />
-          }
-        />
-        <Route
-          path="/care-team"
-          element={<CareTeamPage helpers={helpers} setHelpers={setHelpers} />}
-        />
-        <Route
-          path="/settings"
-          element={
-            <SettingsPage
-              settings={settings}
-              onSettingsChange={setSettings}
-              notifications={notifications}
+        <Route element={<AppLayout />}>
+          <Route path={ROUTES.home} element={<Navigate to={ROUTES.today} replace />} />
+          <Route
+            path={ROUTES.today}
+            element={<TodayPage plan={plan} setPlan={setPlan} helpers={helpers} />}
+          />
+          <Route path={ROUTES.careTeam}>
+            <Route index element={<CareTeamPage helpers={helpers} setHelpers={setHelpers} />} />
+            <Route
+              path={ROUTE_SEGMENTS.caregiverId}
+              element={<CareTeamPage helpers={helpers} setHelpers={setHelpers} />}
             />
-          }
-        />
-        <Route
-          path="/emergency"
-          element={<EmergencyPage contacts={emergencyContacts} />}
-        />
+          </Route>
+          <Route path={ROUTES.settings}>
+            <Route
+              index
+              element={<SettingsPage settings={settings} onSettingsChange={setSettings} notifications={notifications} />}
+            />
+            <Route
+              path={ROUTE_SEGMENTS.notifications}
+              element={<SettingsPage settings={settings} onSettingsChange={setSettings} notifications={notifications} />}
+            />
+          </Route>
+          <Route path={ROUTES.emergency} element={<EmergencyPage contacts={emergencyContacts} />} />
+        </Route>
       </Routes>
-
-      <AppFooter />
     </>
   );
 }
