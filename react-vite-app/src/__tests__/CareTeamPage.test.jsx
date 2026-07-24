@@ -51,10 +51,9 @@ describe('CareTeamPage', () => {
     expect(screen.getByLabelText('Dr. Emily Smith, Eye Doctor')).toBeInTheDocument();
   });
 
-  it('has proper main landmark', () => {
+  it('leaves the main landmark to the shared layout', () => {
     renderWithProviders(<CareTeamPage helpers={getHelpers()} setHelpers={jest.fn()} />);
-    const main = document.getElementById('main-content');
-    expect(main).toBeInTheDocument();
+    expect(document.getElementById('main-content')).not.toBeInTheDocument();
   });
 
   it('opens member detail when card is clicked', async () => {

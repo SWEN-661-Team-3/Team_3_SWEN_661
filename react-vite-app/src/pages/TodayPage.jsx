@@ -15,7 +15,6 @@ export default function TodayPage({ plan, setPlan, helpers }) {
   const statusRef = useRef(null);
   const taskButtonRefs = useRef({});
   const triggerRef = useRef(null);
-  const mainContentRef = useRef(null);
 
   const announce = useCallback((message) => {
     if (statusRef.current) {
@@ -71,7 +70,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
       if (trigger?.isConnected && !trigger.disabled) {
         trigger.focus();
       } else {
-        mainContentRef.current?.focus();
+        document.getElementById('main-content')?.focus();
       }
     });
   }
@@ -124,7 +123,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
         <meta property="og:type" content="website" />
       </Helmet>
 
-      <div className="app-layout">
+      <>
         <Sidebar
           helperName={helperName}
           tasks={plan}
@@ -134,8 +133,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
           }}
         />
 
-        <main ref={mainContentRef} id="main-content" aria-labelledby="today-plan-heading" tabIndex="-1">
-          <div className="main-content">
+        <div className="main-content">
             <div className="page-header">
               <h1 id="today-plan-heading" className="page-title">Today&apos;s Plan</h1>
               <p className="page-subtitle">Here is today&apos;s plan.</p>
@@ -156,9 +154,8 @@ export default function TodayPage({ plan, setPlan, helpers }) {
 
             <HeroCard task={nextTask} onClick={openTaskDetail} />
             <StatsRow tasks={plan} />
-          </div>
-        </main>
-      </div>
+        </div>
+      </>
 
       <TaskDetailDialog
         key={selectedId ?? 'closed'}

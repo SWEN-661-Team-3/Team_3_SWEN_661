@@ -64,6 +64,7 @@ All routes are client-side. The Vercel SPA rewrite (`vercel.json`) ensures direc
 ## Setup
 
 ```bash
+cd react-vite-app
 npm install
 cp .env.example .env.local
 ```
@@ -80,6 +81,7 @@ Variables prefixed with `VITE_` are exposed to the browser. Do not store secrets
 
 ```bash
 npm run dev
+npm run test:unit
 ```
 
 Opens at http://localhost:5173.

@@ -25,9 +25,8 @@ describe('EmergencyPage', () => {
     expect(screen.getByText('Dr. Emily Smith')).toBeInTheDocument();
   });
 
-  it('has proper main landmark', () => {
+  it('leaves the main landmark to the shared layout', () => {
     renderWithProviders(<EmergencyPage contacts={contacts} />);
-    const main = document.getElementById('main-content');
-    expect(main).toBeInTheDocument();
+    expect(document.getElementById('main-content')).not.toBeInTheDocument();
   });
 });

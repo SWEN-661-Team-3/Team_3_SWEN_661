@@ -43,11 +43,9 @@ describe('TodayPage', () => {
     expect(screen.getByText('Add Reminder')).toBeInTheDocument();
   });
 
-  it('has proper main landmark', () => {
+  it('leaves the main landmark to the shared layout', () => {
     renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
-    const main = document.getElementById('main-content');
-    expect(main).toBeInTheDocument();
-    expect(main.tagName).toBe('MAIN');
+    expect(document.getElementById('main-content')).not.toBeInTheDocument();
   });
 
   it('has a live region for announcements', () => {

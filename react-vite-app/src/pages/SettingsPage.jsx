@@ -38,18 +38,14 @@ export default function SettingsPage({ settings, onSettingsChange, notifications
         <meta property="og:type" content="website" />
       </Helmet>
 
-      <div className="app-layout app-layout--wide">
-        <main id="main-content" aria-labelledby="settings-heading">
-          <div className="main-content">
-            <SettingsPanel
-              settings={draftSettings}
-              onChange={setDraftSettings}
-              onSave={handleSave}
-              onReset={handleReset}
-              notifications={notifications}
-            />
-          </div>
-        </main>
+      <div className="main-content">
+        <SettingsPanel
+          settings={draftSettings}
+          onChange={setDraftSettings}
+          onSave={handleSave}
+          onReset={handleReset}
+          notifications={notifications}
+        />
       </div>
 
       <CareConnectDialog

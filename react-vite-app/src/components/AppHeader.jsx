@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom';
+import { ROUTES } from '../routes';
 
 export default function AppHeader() {
   return (
     <header className="app-header">
-      <NavLink to="/" className="app-header__brand" aria-label="CareConnect home">
+      <NavLink to={ROUTES.today} className="app-header__brand" aria-label="CareConnect home">
         <img
           src="/icons/icon-192x192.svg"
           alt="CareConnect logo"
@@ -18,7 +19,7 @@ export default function AppHeader() {
         <ul className="nav-links">
           <li>
             <NavLink
-              to="/"
+              to={ROUTES.today}
               end
               className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
             >
@@ -27,7 +28,7 @@ export default function AppHeader() {
           </li>
           <li>
             <NavLink
-              to="/care-team"
+              to={ROUTES.careTeam}
               className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
             >
               Care Team
@@ -36,7 +37,7 @@ export default function AppHeader() {
           <li aria-hidden="true"><span className="nav-divider" /></li>
           <li>
             <NavLink
-              to="/settings"
+              to={ROUTES.settings}
               className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
             >
               Settings
@@ -44,7 +45,7 @@ export default function AppHeader() {
           </li>
           <li>
             <NavLink
-              to="/emergency"
+              to={ROUTES.emergency}
               className="nav-link nav-link--danger"
             >
               Emergency
