@@ -59,6 +59,8 @@ react-vite-app/
 
 All routes are client-side. The Vercel SPA rewrite (`vercel.json`) ensures direct URL access works in production. The service worker provides the same fallback when offline.
 
+`/settings/notifications` is protected by a capability-based route guard. It requires both the browser Notification API and service workers; it does not use accounts, authentication, or persistent permissions.
+
 ## Prerequisites
 
 - Node.js 18+

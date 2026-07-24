@@ -92,6 +92,11 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
               </small>
             </span>
           </label>
+          {notifications.supported && notifications.permission === 'default' && (
+            <button type="button" className="secondary-btn" onClick={notifications.toggle}>
+              Enable Task Reminders
+            </button>
+          )}
         </fieldset>
       )}
 

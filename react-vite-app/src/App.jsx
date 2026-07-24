@@ -3,6 +3,7 @@ import { Navigate, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import AppLayout from './components/AppLayout';
 import ErrorBoundary from './components/ErrorBoundary';
+import NotificationRouteGuard from './components/NotificationRouteGuard';
 import { caregivers, initialPlan } from './data/careData';
 import useNotifications from './hooks/useNotifications';
 import { ROUTES, ROUTE_SEGMENTS } from './routes';
@@ -76,7 +77,11 @@ export default function App() {
               />
               <Route
                 path={ROUTE_SEGMENTS.notifications}
-                element={<SettingsPage settings={settings} onSettingsChange={setSettings} notifications={notifications} />}
+                element={
+                  <NotificationRouteGuard>
+                    <SettingsPage settings={settings} onSettingsChange={setSettings} notifications={notifications} />
+                  </NotificationRouteGuard>
+                }
               />
             </Route>
             <Route path={ROUTES.emergency} element={<EmergencyPage contacts={emergencyContacts} />} />

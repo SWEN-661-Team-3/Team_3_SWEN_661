@@ -57,9 +57,9 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument();
   });
 
-  it('renders SettingsPage on /settings/notifications', async () => {
+  it('renders the notification route guard in an unsupported environment', async () => {
     renderApp('/settings/notifications');
-    expect(await screen.findByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Notification Settings Unavailable', level: 1 })).toBeInTheDocument();
   });
 
   it('renders EmergencyPage on /emergency', async () => {
