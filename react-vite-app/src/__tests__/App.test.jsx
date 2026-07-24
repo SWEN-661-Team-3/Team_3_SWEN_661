@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import App from '../App';
 
@@ -8,9 +8,15 @@ function renderApp(route = '/') {
     <HelmetProvider>
       <MemoryRouter initialEntries={[route]}>
         <App />
+        <CurrentPath />
       </MemoryRouter>
     </HelmetProvider>,
   );
+}
+
+function CurrentPath() {
+  const { pathname } = useLocation();
+  return <output data-testid="current-path">{pathname}</output>;
 }
 
 describe('App', () => {
@@ -32,6 +38,7 @@ describe('App', () => {
   it('renders TodayPage on the root route', async () => {
     renderApp('/');
     expect(await screen.findByRole('heading', { name: "Today's Plan", level: 1 })).toBeInTheDocument();
+    expect(screen.getByTestId('current-path')).toHaveTextContent('/today');
   });
 
   it('renders CareTeamPage on /care-team', async () => {
@@ -39,8 +46,18 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: 'Care Team', level: 1 })).toBeInTheDocument();
   });
 
+  it('renders CareTeamPage on a caregiver detail route', async () => {
+    renderApp('/care-team/sarah');
+    expect(await screen.findByRole('heading', { name: 'Care Team', level: 1 })).toBeInTheDocument();
+  });
+
   it('renders SettingsPage on /settings', async () => {
     renderApp('/settings');
+    expect(await screen.findByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument();
+  });
+
+  it('renders SettingsPage on /settings/notifications', async () => {
+    renderApp('/settings/notifications');
     expect(await screen.findByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument();
   });
 

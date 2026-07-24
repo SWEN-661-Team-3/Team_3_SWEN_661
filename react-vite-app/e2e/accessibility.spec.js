@@ -36,7 +36,7 @@ test.describe('Accessibility', () => {
   });
 
   test('main landmark is present on each page', async ({ page }) => {
-    const routes = ['/', '/care-team', '/settings', '/emergency'];
+    const routes = ['/today', '/care-team', '/care-team/sarah', '/settings', '/settings/notifications', '/emergency'];
     for (const route of routes) {
       await page.goto(route);
       await expect(page.locator('main')).toBeAttached();

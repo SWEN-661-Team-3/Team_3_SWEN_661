@@ -48,9 +48,12 @@ react-vite-app/
 
 | Path | Page |
 |------|------|
-| `/` | Today's Plan (dashboard) |
+| `/` | Redirects to `/today` |
+| `/today` | Today's Plan (dashboard) |
 | `/care-team` | Care Team member grid |
+| `/care-team/:caregiverId` | Care Team member details |
 | `/settings` | Accessibility and notification settings |
+| `/settings/notifications` | Notification settings |
 | `/emergency` | Emergency alert panel |
 | `*` | 404 Not Found |
 

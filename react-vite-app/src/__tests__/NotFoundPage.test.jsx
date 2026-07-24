@@ -16,7 +16,7 @@ describe('NotFoundPage', () => {
   it('provides a link to Today\'s Plan', () => {
     renderWithProviders(<NotFoundPage />);
     const link = screen.getByRole('link', { name: /Today's Plan/ });
-    expect(link).toHaveAttribute('href', '/');
+    expect(link).toHaveAttribute('href', '/today');
   });
 
   it('provides a link to Care Team', () => {
@@ -25,8 +25,8 @@ describe('NotFoundPage', () => {
     expect(link).toHaveAttribute('href', '/care-team');
   });
 
-  it('has an accessible main landmark', () => {
+  it('leaves the main landmark to the shared layout', () => {
     renderWithProviders(<NotFoundPage />);
-    expect(screen.getByRole('main')).toBeInTheDocument();
+    expect(screen.queryByRole('main')).not.toBeInTheDocument();
   });
 });

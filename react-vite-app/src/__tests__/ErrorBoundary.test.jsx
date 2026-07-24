@@ -62,7 +62,7 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     );
     const link = screen.getByRole('link', { name: 'Return Home' });
-    expect(link).toHaveAttribute('href', '/');
+    expect(link).toHaveAttribute('href', '/today');
   });
 
   it('uses role="alert" for the fallback', () => {

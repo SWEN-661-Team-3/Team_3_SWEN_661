@@ -1,8 +1,18 @@
+import { Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import AppHeader from './AppHeader';
 import AppFooter from './AppFooter';
 import OfflineStatusBanner from './OfflineStatusBanner';
+import ErrorBoundary from './ErrorBoundary';
 import { ROUTES } from '../routes';
+
+function PageLoader() {
+  return (
+    <div className="main-content" role="status" aria-label="Loading page">
+      <p>Loading...</p>
+    </div>
+  );
+}
 
 export default function AppLayout() {
   const { pathname } = useLocation();
@@ -20,7 +30,11 @@ export default function AppLayout() {
         className={`app-layout${isTodayRoute ? '' : ' app-layout--wide'}`}
         tabIndex="-1"
       >
-        <Outlet />
+        <ErrorBoundary withinLayout>
+          <Suspense fallback={<PageLoader />}>
+            <Outlet />
+          </Suspense>
+        </ErrorBoundary>
       </main>
       <AppFooter />
     </>

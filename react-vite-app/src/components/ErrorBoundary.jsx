@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { ROUTES } from '../routes';
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -23,9 +24,8 @@ export default class ErrorBoundary extends Component {
       ? process.env.NODE_ENV !== 'production'
       : false;
 
-    return (
-      <main id="main-content" role="alert" aria-labelledby="error-heading">
-        <div className="main-content" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+    const fallback = (
+      <div className="main-content" role="alert" aria-labelledby="error-heading" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
           <h1 id="error-heading" className="page-title">Something went wrong</h1>
           <p style={{ margin: '1rem 0' }}>
             An unexpected error occurred. You can try again or return to the home page.
@@ -35,7 +35,7 @@ export default class ErrorBoundary extends Component {
             <button type="button" className="primary-btn" onClick={this.handleReset}>
               Try Again
             </button>
-            <a href="/" className="secondary-btn" style={{ textDecoration: 'none' }}>
+            <a href={ROUTES.today} className="secondary-btn" style={{ textDecoration: 'none' }}>
               Return Home
             </a>
           </div>
@@ -50,8 +50,11 @@ export default class ErrorBoundary extends Component {
               </pre>
             </details>
           )}
-        </div>
-      </main>
+      </div>
     );
+
+    if (this.props.withinLayout) return fallback;
+
+    return <main id="main-content">{fallback}</main>;
   }
 }
