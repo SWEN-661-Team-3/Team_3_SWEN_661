@@ -6,6 +6,7 @@ import StatsRow from '../components/StatsRow';
 import TaskDetailDialog from '../components/TaskDetailDialog';
 import CareConnectDialog from '../components/CareConnectDialog';
 import EmptyState from '../components/EmptyState';
+import { saveReminder } from '../services/carePlanService';
 
 export default function TodayPage({ plan, setPlan, helpers }) {
   const [selectedId, setSelectedId] = useState(null);
@@ -96,17 +97,16 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     setDetailOpen(true);
   }
 
-  function saveTask(task) {
+  async function saveTask(task) {
+    const savedTask = await saveReminder(task);
     if (isAddingTask) {
-      setPlan((prev) => [...prev, task]);
-      announce(`${task.title} added to reminders`);
+      setPlan((prev) => [...prev, savedTask]);
       setSaveNotice({
         title: 'Reminder Added',
         message: 'Reminder was added.',
       });
     } else {
-      setPlan((prev) => prev.map((item) => (item.id === task.id ? task : item)));
-      announce(`${task.title} updated`);
+      setPlan((prev) => prev.map((item) => (item.id === savedTask.id ? savedTask : item)));
       setSaveNotice({
         title: 'Reminder Saved',
         message: 'Reminder was saved.',

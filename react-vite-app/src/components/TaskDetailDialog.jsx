@@ -3,6 +3,8 @@ import { statusLabels, typeLabels, typeOptions } from '../data/careData';
 import CareConnectDialog from './CareConnectDialog';
 import CharacterCount from './CharacterCount';
 import FieldHelpText from './FieldHelpText';
+import InlineError from './InlineError';
+import SavingStatus from './SavingStatus';
 import {
   REMINDER_NOTES_MAX_LENGTH,
   REMINDER_TITLE_MAX_LENGTH,
@@ -22,6 +24,8 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
   const [form, setForm] = useState(() => (task ? { ...task } : null));
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   // Focus management: when the dialog opens, focus moves to the heading
   // (via tabIndex="-1") so screen readers announce the dialog context
@@ -96,7 +100,7 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
     dialogRef.current?.close();
   }
 
-  function handleSave() {
+  async function handleSave() {
     const nextErrors = validateReminder(currentForm);
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
@@ -105,8 +109,16 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
       return;
     }
     setErrors({});
-    const didSave = onSave(currentForm);
-    if (didSave) setIsEditing(false);
+    setSaveError(null);
+    setIsSaving(true);
+    try {
+      const didSave = await onSave(currentForm);
+      if (didSave) setIsEditing(false);
+    } catch {
+      setSaveError('Could not save this reminder. Your changes are still here. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -319,15 +331,18 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
             </>
           ) : (
             <>
+              {isSaving && <SavingStatus message="Saving reminder..." />}
+              {saveError && <InlineError message={saveError} onRetry={handleSave} />}
               <button
                 type="button"
                 className="secondary-btn"
                 onClick={requestClose}
+                disabled={isSaving}
               >
                 Close
               </button>
-              <button type="button" className="primary-btn" onClick={handleSave}>
-                {isAdding ? 'Add Reminder' : 'Save Changes'}
+              <button type="button" className="primary-btn" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? 'Saving...' : isAdding ? 'Add Reminder' : 'Save Changes'}
               </button>
             </>
           )}

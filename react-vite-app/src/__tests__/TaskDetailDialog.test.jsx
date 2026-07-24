@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TaskDetailDialog from '../components/TaskDetailDialog';
 
@@ -197,5 +197,48 @@ describe('TaskDetailDialog', () => {
 
     expect(onSave).toHaveBeenCalled();
     expect(screen.queryByText('Enter a reminder title.')).not.toBeInTheDocument();
+  });
+
+  it('shows a saving state and disables duplicate saves while the save is pending', async () => {
+    const user = userEvent.setup();
+    let resolveSave;
+    const onSave = jest.fn(() => new Promise((resolve) => {
+      resolveSave = resolve;
+    }));
+    render(
+      <TaskDetailDialog task={mockTask} open onClose={jest.fn()} onComplete={jest.fn()} onSave={onSave} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Edit Details' }));
+    await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+
+    expect(screen.getByRole('status')).toHaveTextContent('Saving reminder...');
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeDisabled();
+    expect(onSave).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolveSave(true);
+    });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Edit Details' })).toBeInTheDocument());
+  });
+
+  it('preserves reminder values and offers retry when saving fails', async () => {
+    const user = userEvent.setup();
+    const onSave = jest.fn()
+      .mockRejectedValueOnce(new Error('Save failed'))
+      .mockResolvedValueOnce(true);
+    render(
+      <TaskDetailDialog task={mockTask} open onClose={jest.fn()} onComplete={jest.fn()} onSave={onSave} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Edit Details' }));
+    await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not save this reminder.');
+    expect(screen.getByDisplayValue('Eye Doctor Checkup')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try Again' }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Edit Details' })).toBeInTheDocument());
   });
 });

@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TodayPage from '../pages/TodayPage';
 import { initialPlan, caregivers } from '../data/careData';
@@ -134,7 +134,7 @@ describe('TodayPage', () => {
     const addBtn = addButtons.find((el) => el.tagName === 'BUTTON' && el.closest('dialog'));
     if (addBtn) {
       await user.click(addBtn);
-      expect(setPlan).toHaveBeenCalled();
+      await waitFor(() => expect(setPlan).toHaveBeenCalled());
     }
   });
 
@@ -146,7 +146,7 @@ describe('TodayPage', () => {
     await user.click(taskBtn);
     await user.click(screen.getByText('Edit Details'));
     await user.click(screen.getByText('Save Changes'));
-    expect(setPlan).toHaveBeenCalled();
+    await waitFor(() => expect(setPlan).toHaveBeenCalled());
   });
 
   it('uses "Helper" as fallback name when helpers is empty', () => {
