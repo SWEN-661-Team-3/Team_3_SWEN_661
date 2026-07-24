@@ -15,6 +15,12 @@ export default class ErrorBoundary extends Component {
     this.setState({ hasError: false, error: null });
   };
 
+  componentDidUpdate(previousProps) {
+    if (this.state.hasError && previousProps.resetKey !== this.props.resetKey) {
+      this.handleReset();
+    }
+  }
+
   render() {
     if (!this.state.hasError) {
       return this.props.children;
@@ -28,7 +34,7 @@ export default class ErrorBoundary extends Component {
       <div className="main-content" role="alert" aria-labelledby="error-heading" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
           <h1 id="error-heading" className="page-title">Something went wrong</h1>
           <p style={{ margin: '1rem 0' }}>
-            An unexpected error occurred. You can try again or return to the home page.
+            An unexpected error occurred. You can try again or return to Today.
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
@@ -36,7 +42,7 @@ export default class ErrorBoundary extends Component {
               Try Again
             </button>
             <a href={ROUTES.today} className="secondary-btn" style={{ textDecoration: 'none' }}>
-              Return Home
+              Return to Today
             </a>
           </div>
 

@@ -55,13 +55,13 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('Working child')).toBeInTheDocument();
   });
 
-  it('provides a Return Home link', () => {
+  it('provides a Return to Today link', () => {
     render(
       <ErrorBoundary>
         <ThrowingChild shouldThrow={true} />
       </ErrorBoundary>,
     );
-    const link = screen.getByRole('link', { name: 'Return Home' });
+    const link = screen.getByRole('link', { name: 'Return to Today' });
     expect(link).toHaveAttribute('href', '/today');
   });
 
@@ -72,5 +72,35 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     );
     expect(screen.getByRole('alert')).toBeInTheDocument();
+  });
+
+  it('resets when its route key changes', () => {
+    const { rerender } = render(
+      <ErrorBoundary resetKey="/today">
+        <ThrowingChild shouldThrow />
+      </ErrorBoundary>,
+    );
+
+    rerender(
+      <ErrorBoundary resetKey="/care-team">
+        <ThrowingChild shouldThrow={false} />
+      </ErrorBoundary>,
+    );
+
+    expect(screen.getByText('Working child')).toBeInTheDocument();
+  });
+
+  it('hides technical details in production', () => {
+    const environment = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+
+    render(
+      <ErrorBoundary>
+        <ThrowingChild shouldThrow />
+      </ErrorBoundary>,
+    );
+
+    expect(screen.queryByText('Technical Details (development only)')).not.toBeInTheDocument();
+    process.env.NODE_ENV = environment;
   });
 });

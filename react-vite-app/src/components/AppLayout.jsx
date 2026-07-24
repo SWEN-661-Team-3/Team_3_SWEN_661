@@ -30,7 +30,7 @@ export default function AppLayout({ children }) {
         className={`app-layout${isTodayRoute ? '' : ' app-layout--wide'}`}
         tabIndex="-1"
       >
-        <ErrorBoundary withinLayout>
+        <ErrorBoundary withinLayout resetKey={pathname}>
           <Suspense fallback={<PageLoader />}>
             {children ?? <Outlet />}
           </Suspense>
