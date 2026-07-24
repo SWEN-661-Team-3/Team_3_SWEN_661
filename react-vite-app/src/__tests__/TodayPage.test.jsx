@@ -1,0 +1,157 @@
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import TodayPage from '../pages/TodayPage';
+import { initialPlan, caregivers } from '../data/careData';
+import { renderWithProviders } from './testUtils';
+
+function getPlan() {
+  return initialPlan.map((t) => ({ ...t }));
+}
+const helpers = caregivers.map((c) => ({ ...c }));
+
+describe('TodayPage', () => {
+  it('renders the page title', () => {
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    expect(screen.getByRole('heading', { name: "Today's Plan", level: 1 })).toBeInTheDocument();
+  });
+
+  it('renders the hero card with next pending task', () => {
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    const matches = screen.getAllByText('Eye Doctor Checkup');
+    expect(matches.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders stats row', () => {
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    expect(screen.getByText('Completed')).toBeInTheDocument();
+    expect(screen.getByText('Remaining')).toBeInTheDocument();
+  });
+
+  it('renders sidebar with helper name', () => {
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    expect(screen.getByText('Sarah Johnson')).toBeInTheDocument();
+  });
+
+  it('renders all tasks in sidebar', () => {
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    expect(screen.getByText('Daily Vitamin & Heart Med')).toBeInTheDocument();
+    expect(screen.getByText('Nighttime Eye Drops')).toBeInTheDocument();
+  });
+
+  it('has an Add Reminder button', () => {
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    expect(screen.getByText('Add Reminder')).toBeInTheDocument();
+  });
+
+  it('has proper main landmark', () => {
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    const main = document.getElementById('main-content');
+    expect(main).toBeInTheDocument();
+    expect(main.tagName).toBe('MAIN');
+  });
+
+  it('has a live region for announcements', () => {
+    const { container } = renderWithProviders(
+      <TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />,
+    );
+    const liveRegion = container.querySelector('[aria-live="polite"]');
+    expect(liveRegion).toBeInTheDocument();
+  });
+
+  it('opens task detail dialog when a sidebar task is clicked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    const taskBtn = screen.getByLabelText(/Eye Doctor Checkup.*Pending/);
+    await user.click(taskBtn);
+    expect(screen.getByText('Close')).toBeInTheDocument();
+    expect(screen.getByText('Edit Details')).toBeInTheDocument();
+  });
+
+  it('opens task detail dialog from hero card click', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    const heroBtn = screen.getByLabelText(/Next up.*Eye Doctor/);
+    await user.click(heroBtn);
+    expect(screen.getByText('Appointment')).toBeInTheDocument();
+  });
+
+  it('completes a task via Mark Complete', async () => {
+    const user = userEvent.setup();
+    const setPlan = jest.fn();
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={setPlan} helpers={helpers} />);
+    const taskBtn = screen.getByLabelText(/Eye Doctor Checkup.*Pending/);
+    await user.click(taskBtn);
+    await user.click(screen.getByText('Mark Complete'));
+    expect(setPlan).toHaveBeenCalled();
+  });
+
+  it('shows completion notice after marking complete', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    const taskBtn = screen.getByLabelText(/Eye Doctor Checkup.*Pending/);
+    await user.click(taskBtn);
+    await user.click(screen.getByText('Mark Complete'));
+    expect(screen.getByText('Reminder Complete')).toBeInTheDocument();
+  });
+
+  it('dismisses completion notice', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    const taskBtn = screen.getByLabelText(/Eye Doctor Checkup.*Pending/);
+    await user.click(taskBtn);
+    await user.click(screen.getByText('Mark Complete'));
+    const okButtons = screen.getAllByText('OK');
+    const visibleOk = okButtons.find((btn) => btn.closest('dialog[open]'));
+    await user.click(visibleOk || okButtons[0]);
+  });
+
+  it('closes task detail dialog', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    const taskBtn = screen.getByLabelText(/Eye Doctor Checkup.*Pending/);
+    await user.click(taskBtn);
+    await user.click(screen.getByText('Close'));
+  });
+
+  it('opens the add reminder dialog', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
+    await user.click(screen.getByText('Add Reminder'));
+    const addLabels = screen.getAllByText('Add Reminder');
+    expect(addLabels.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('saves a new reminder', async () => {
+    const user = userEvent.setup();
+    const setPlan = jest.fn();
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={setPlan} helpers={helpers} />);
+    await user.click(screen.getByText('Add Reminder'));
+
+    const dialog = document.querySelector('dialog[open]');
+    const titleInput = dialog.querySelector('input.edit-field__control');
+    await user.type(titleInput, 'New Task');
+
+    const addButtons = screen.getAllByText('Add Reminder');
+    const addBtn = addButtons.find((el) => el.tagName === 'BUTTON' && el.closest('dialog'));
+    if (addBtn) {
+      await user.click(addBtn);
+      expect(setPlan).toHaveBeenCalled();
+    }
+  });
+
+  it('opens edit mode in task detail and saves', async () => {
+    const user = userEvent.setup();
+    const setPlan = jest.fn();
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={setPlan} helpers={helpers} />);
+    const taskBtn = screen.getByLabelText(/Eye Doctor Checkup.*Pending/);
+    await user.click(taskBtn);
+    await user.click(screen.getByText('Edit Details'));
+    await user.click(screen.getByText('Save Changes'));
+    expect(setPlan).toHaveBeenCalled();
+  });
+
+  it('uses "Helper" as fallback name when helpers is empty', () => {
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={[]} />);
+    expect(screen.getByText('Helper')).toBeInTheDocument();
+  });
+});

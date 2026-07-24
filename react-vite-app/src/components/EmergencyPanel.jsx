@@ -57,7 +57,7 @@ export default function EmergencyPanel({ contacts }) {
   }, [phase, announce]);
 
   return (
-    <section aria-labelledby="emergency-heading">
+    <section aria-labelledby="emergency-panel-heading">
       <div
         ref={statusRef}
         className="visually-hidden"
@@ -70,7 +70,7 @@ export default function EmergencyPanel({ contacts }) {
           <div className="emergency-panel__icon emergency-panel__icon--warning" aria-hidden="true">
             !
           </div>
-          <h2 id="emergency-heading">Need Help?</h2>
+          <h2 id="emergency-panel-heading">Need Help?</h2>
           <p className="emergency-panel__copy">
             Press the button below to send an alert to your emergency contacts.
             A {COUNTDOWN_SECONDS}-second countdown will begin before the alert is sent.
@@ -109,7 +109,7 @@ export default function EmergencyPanel({ contacts }) {
 
       {phase === 'countdown' && (
         <div className="emergency-panel">
-          <h2 id="emergency-heading">Sending Alert...</h2>
+          <h2 id="emergency-panel-heading">Sending Alert...</h2>
           <p className="emergency-panel__copy">
             Alert will be sent in {countdown} second{countdown !== 1 ? 's' : ''}.
           </p>
@@ -128,7 +128,7 @@ export default function EmergencyPanel({ contacts }) {
           <div className="emergency-panel__icon emergency-panel__icon--success" aria-hidden="true">
             &#10003;
           </div>
-          <h2 id="emergency-heading">Alert Sent</h2>
+          <h2 id="emergency-panel-heading">Alert Sent</h2>
           <p className="emergency-panel__copy">
             Help is on the way. Your emergency contacts have been notified.
           </p>

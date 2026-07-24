@@ -1,0 +1,137 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import TaskDetailDialog from '../components/TaskDetailDialog';
+
+const mockTask = {
+  id: '2',
+  title: 'Eye Doctor Checkup',
+  date: 'Today',
+  time: '10:30 AM',
+  location: 'City Eye Clinic, 123 Vision Way',
+  notes: 'Bring glasses and eye drop list.',
+  type: 'appointment',
+  status: 'todo',
+  actionLabel: 'Get Directions',
+};
+
+describe('TaskDetailDialog', () => {
+  it('renders nothing when task is null', () => {
+    const { container } = render(
+      <TaskDetailDialog task={null} open={false} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    expect(container.querySelector('dialog')).not.toBeInTheDocument();
+  });
+
+  it('renders task details in view mode', () => {
+    render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    expect(screen.getByText('Eye Doctor Checkup')).toBeInTheDocument();
+    expect(screen.getByText('Appointment')).toBeInTheDocument();
+    expect(screen.getByText('10:30 AM')).toBeInTheDocument();
+    expect(screen.getByText('Pending')).toBeInTheDocument();
+  });
+
+  it('shows location when present', () => {
+    render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    expect(screen.getByText('City Eye Clinic, 123 Vision Way')).toBeInTheDocument();
+  });
+
+  it('shows notes when present', () => {
+    render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    expect(screen.getByText('Bring glasses and eye drop list.')).toBeInTheDocument();
+  });
+
+  it('hides location row when location is empty', () => {
+    const noLoc = { ...mockTask, location: '' };
+    render(
+      <TaskDetailDialog task={noLoc} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    expect(screen.queryByText('Location')).not.toBeInTheDocument();
+  });
+
+  it('hides notes row when notes are empty', () => {
+    const noNotes = { ...mockTask, notes: '' };
+    render(
+      <TaskDetailDialog task={noNotes} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    const noteLabels = screen.queryAllByText('Notes');
+    expect(noteLabels).toHaveLength(0);
+  });
+
+  it('shows Mark Complete button for todo tasks', () => {
+    render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    expect(screen.getByText('Mark Complete')).toBeInTheDocument();
+  });
+
+  it('hides Mark Complete button for done tasks', () => {
+    const doneTask = { ...mockTask, status: 'done' };
+    render(
+      <TaskDetailDialog task={doneTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    expect(screen.queryByText('Mark Complete')).not.toBeInTheDocument();
+  });
+
+  it('calls onComplete when Mark Complete is clicked', async () => {
+    const user = userEvent.setup();
+    const onComplete = jest.fn();
+    render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={onComplete} onSave={jest.fn()} />,
+    );
+    await user.click(screen.getByText('Mark Complete'));
+    expect(onComplete).toHaveBeenCalledWith('2');
+  });
+
+  it('switches to edit mode when Edit Details is clicked', async () => {
+    const user = userEvent.setup();
+    render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    await user.click(screen.getByText('Edit Details'));
+    expect(screen.getByDisplayValue('Eye Doctor Checkup')).toBeInTheDocument();
+    expect(screen.getByText('Save Changes')).toBeInTheDocument();
+  });
+
+  it('renders in add mode with empty form', () => {
+    const newTask = {
+      id: 'new-1',
+      title: '',
+      date: 'Today',
+      time: '',
+      location: '',
+      notes: '',
+      type: 'health-task',
+      status: 'todo',
+      actionLabel: 'View Details',
+    };
+    render(
+      <TaskDetailDialog task={newTask} open={true} mode="add" onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    const addLabels = screen.getAllByText('Add Reminder');
+    expect(addLabels.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('has close button with accessible label', () => {
+    render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    expect(screen.getByLabelText('Close dialog')).toBeInTheDocument();
+  });
+
+  it('calls onSave with form data in edit mode', async () => {
+    const user = userEvent.setup();
+    const onSave = jest.fn(() => true);
+    render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={onSave} />,
+    );
+    await user.click(screen.getByText('Edit Details'));
+    await user.click(screen.getByText('Save Changes'));
+    expect(onSave).toHaveBeenCalled();
+  });
+});
