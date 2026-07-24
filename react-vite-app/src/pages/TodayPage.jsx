@@ -25,22 +25,24 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     }
   }, []);
 
-  // Derived from the full plan array -- memoized because the find + fallback
-  // runs on every render even when plan hasn't changed.
-  const nextTask = useMemo(
-    () => plan.find((t) => t.status === 'todo') ?? plan[0],
-    [plan],
-  );
+  // One pass produces the plan-derived values consumed by several sections;
+  // keeping this stable avoids re-filtering while dialog and notice state changes.
+  const planSummary = useMemo(() => {
+    const pendingTasks = plan.filter((task) => task.status === 'todo');
+    const upcomingAppointments = pendingTasks.filter((task) => task.type === 'appointment');
+
+    return {
+      hasTasks: plan.length > 0,
+      hasUpcomingAppointments: upcomingAppointments.length > 0,
+      nextTask: pendingTasks[0] ?? plan[0],
+    };
+  }, [plan]);
 
   const isAddingTask = selectedId === 'new';
   const selectedTask = isAddingTask
     ? draftTask
     : plan.find((t) => t.id === selectedId) ?? null;
   const helperName = helpers[0]?.name ?? 'Helper';
-  const hasTasks = plan.length > 0;
-  const hasUpcomingAppointments = plan.some(
-    (task) => task.type === 'appointment' && task.status !== 'done',
-  );
 
   function openTaskDetail(id, event) {
     triggerRef.current = event?.currentTarget ?? taskButtonRefs.current[id] ?? null;
@@ -171,11 +173,11 @@ export default function TodayPage({ plan, setPlan, helpers }) {
               </button>
             </div>
 
-            {hasTasks ? (
+            {planSummary.hasTasks ? (
               <>
-                <HeroCard task={nextTask} onClick={openTaskDetail} />
+                <HeroCard task={planSummary.nextTask} onClick={openTaskDetail} />
                 <StatsRow tasks={plan} />
-                {!hasUpcomingAppointments && (
+                {!planSummary.hasUpcomingAppointments && (
                   <EmptyState
                     title="No upcoming appointments"
                     message="Add an appointment reminder to keep visit details and timing in your daily plan."

@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TaskDetailDialog from '../components/TaskDetailDialog';
 
@@ -68,6 +68,17 @@ describe('TaskDetailDialog', () => {
       <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
     );
     expect(screen.getByText('Mark Complete')).toBeInTheDocument();
+  });
+
+  it('keeps the view footer focused on complete, edit, and delete actions', () => {
+    const { container } = render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+    const footer = container.querySelector('.dialog__footer');
+
+    expect(within(footer).queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    expect(within(footer).getAllByRole('button').map((button) => button.textContent.trim()))
+      .toEqual(['Mark Complete', 'Edit Details', 'Delete Reminder']);
   });
 
   it('hides Mark Complete button for done tasks', () => {
