@@ -88,6 +88,42 @@ describe('TaskDetailDialog', () => {
     expect(onComplete).toHaveBeenCalledWith('2');
   });
 
+  it('shows completion feedback and offers retry after a failed completion', async () => {
+    const user = userEvent.setup();
+    const onComplete = jest.fn()
+      .mockRejectedValueOnce(new Error('Completion failed'))
+      .mockResolvedValueOnce(true);
+    render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={onComplete} onSave={jest.fn()} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Mark Complete' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not mark this reminder complete.');
+    await user.click(screen.getByRole('button', { name: 'Try Again' }));
+    await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(2));
+  });
+
+  it('keeps the reminder available and offers retry when deletion fails', async () => {
+    const user = userEvent.setup();
+    const onDelete = jest.fn()
+      .mockRejectedValueOnce(new Error('Delete failed'))
+      .mockResolvedValueOnce(true);
+    render(
+      <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onDelete={onDelete} onSave={jest.fn()} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Delete Reminder' }));
+    const deleteConfirmation = screen.getAllByRole('button', { name: 'Delete Reminder' })
+      .find((button) => button.closest('dialog.dialog--confirm'));
+    await user.click(deleteConfirmation);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not delete this reminder.');
+    expect(screen.getByText('Eye Doctor Checkup')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try Again' }));
+    await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(2));
+  });
+
   it('switches to edit mode when Edit Details is clicked', async () => {
     const user = userEvent.setup();
     render(

@@ -212,4 +212,42 @@ describe('SettingsPanel', () => {
     const notifCheckbox = checkboxes[checkboxes.length - 1];
     expect(notifCheckbox).toBeDisabled();
   });
+
+  it('shows notification permission progress and disables only notification controls', () => {
+    render(
+      <SettingsPanel
+        settings={defaultSettings}
+        onChange={jest.fn()}
+        onSave={jest.fn()}
+        onReset={jest.fn()}
+        notifications={{ ...notifications, isRequesting: true }}
+      />,
+    );
+
+    expect(screen.getByRole('status')).toHaveTextContent('Requesting notification permission...');
+    expect(screen.getByRole('button', { name: 'Requesting permission...' })).toBeDisabled();
+    expect(screen.getAllByRole('checkbox').at(-1)).toBeDisabled();
+  });
+
+  it('shows notification permission failure with a retry action', async () => {
+    const user = userEvent.setup();
+    const retryPermission = jest.fn();
+    render(
+      <SettingsPanel
+        settings={defaultSettings}
+        onChange={jest.fn()}
+        onSave={jest.fn()}
+        onReset={jest.fn()}
+        notifications={{
+          ...notifications,
+          notificationError: 'Could not request notification permission. Please try again.',
+          retryPermission,
+        }}
+      />,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not request notification permission.');
+    await user.click(screen.getByRole('button', { name: 'Try Again' }));
+    expect(retryPermission).toHaveBeenCalledTimes(1);
+  });
 });

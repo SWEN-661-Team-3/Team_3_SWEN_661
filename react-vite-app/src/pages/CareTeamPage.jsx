@@ -58,8 +58,8 @@ export default function CareTeamPage({ helpers, setHelpers }) {
       ));
       announce(`Saved details for ${savedMember.name}`);
       setSaveNotice({
-        title: `${savedMember.name} Saved`,
-        message: `${savedMember.name} was saved.`,
+        title: `${updatedMember.name} Saved`,
+        message: `${updatedMember.name} was saved.`,
       });
     }
     setDetailOpen(false);

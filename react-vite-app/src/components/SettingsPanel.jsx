@@ -1,3 +1,6 @@
+import InlineError from './InlineError';
+import SavingStatus from './SavingStatus';
+
 export default function SettingsPanel({ settings, onChange, onSave, onReset, notifications }) {
   function handleToggle(key) {
     onChange({ ...settings, [key]: !settings[key] });
@@ -76,7 +79,7 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             <input
               type="checkbox"
               checked={notifications.enabled}
-              disabled={!notifications.supported || notifications.permission === 'denied'}
+              disabled={!notifications.supported || notifications.permission === 'denied' || notifications.isRequesting}
               onChange={notifications.toggle}
               aria-describedby="notif-desc"
             />
@@ -93,9 +96,16 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             </span>
           </label>
           {notifications.supported && notifications.permission === 'default' && (
-            <button type="button" className="secondary-btn" onClick={notifications.toggle}>
-              Enable Task Reminders
+            <button type="button" className="secondary-btn" onClick={notifications.toggle} disabled={notifications.isRequesting}>
+              {notifications.isRequesting ? 'Requesting permission...' : 'Enable Task Reminders'}
             </button>
+          )}
+          {notifications.isRequesting && <SavingStatus message="Requesting notification permission..." />}
+          {notifications.notificationError && (
+            <InlineError message={notifications.notificationError} onRetry={notifications.retryPermission} />
+          )}
+          {notifications.notificationSuccess && (
+            <div className="operation-status" role="status"><p>{notifications.notificationSuccess}</p></div>
           )}
         </fieldset>
       )}

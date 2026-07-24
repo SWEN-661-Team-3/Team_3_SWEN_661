@@ -80,7 +80,7 @@ describe('TodayPage', () => {
     const taskBtn = screen.getByLabelText(/Eye Doctor Checkup.*Pending/);
     await user.click(taskBtn);
     await user.click(screen.getByText('Mark Complete'));
-    expect(setPlan).toHaveBeenCalled();
+    await waitFor(() => expect(setPlan).toHaveBeenCalled());
   });
 
   it('shows completion notice after marking complete', async () => {
@@ -89,7 +89,7 @@ describe('TodayPage', () => {
     const taskBtn = screen.getByLabelText(/Eye Doctor Checkup.*Pending/);
     await user.click(taskBtn);
     await user.click(screen.getByText('Mark Complete'));
-    expect(screen.getByText('Reminder Complete')).toBeInTheDocument();
+    expect(await screen.findByText('Reminder Complete')).toBeInTheDocument();
   });
 
   it('dismisses completion notice', async () => {

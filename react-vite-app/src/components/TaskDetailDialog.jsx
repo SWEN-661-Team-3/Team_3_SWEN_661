@@ -15,7 +15,7 @@ function describedBy(...ids) {
   return ids.filter(Boolean).join(' ');
 }
 
-export default function TaskDetailDialog({ task, open, mode = 'view', onClose, onComplete, onSave }) {
+export default function TaskDetailDialog({ task, open, mode = 'view', onClose, onComplete, onDelete = async () => false, onSave }) {
   const dialogRef = useRef(null);
   const titleRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -26,6 +26,11 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [completeError, setCompleteError] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   // Focus management: when the dialog opens, focus moves to the heading
   // (via tabIndex="-1") so screen readers announce the dialog context
@@ -118,6 +123,36 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
       setSaveError('Could not save this reminder. Your changes are still here. Please try again.');
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  async function handleComplete() {
+    setCompleteError(null);
+    setIsCompleting(true);
+    try {
+      const didComplete = await onComplete(task.id);
+      if (didComplete) dialogRef.current?.close();
+    } catch {
+      setCompleteError('Could not mark this reminder complete. Please try again.');
+    } finally {
+      setIsCompleting(false);
+    }
+  }
+
+  async function handleDelete() {
+    setDeleteError(null);
+    setIsDeleting(true);
+    try {
+      const didDelete = await onDelete(task.id);
+      if (didDelete) {
+        setConfirmDeleteOpen(false);
+        dialogRef.current?.close();
+      }
+    } catch {
+      setConfirmDeleteOpen(false);
+      setDeleteError('Could not delete this reminder. It is still available. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -303,6 +338,10 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
         <div className="dialog__footer">
           {!isEditing ? (
             <>
+              {isCompleting && <SavingStatus message="Marking reminder complete..." />}
+              {completeError && <InlineError message={completeError} onRetry={handleComplete} />}
+              {isDeleting && <SavingStatus message="Deleting reminder..." />}
+              {deleteError && <InlineError message={deleteError} onRetry={handleDelete} />}
               <button type="button" className="secondary-btn" onClick={requestClose}>
                 Close
               </button>
@@ -317,17 +356,24 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                 Edit Details
               </button>
               {task.status === 'todo' && (
-                <button
-                  type="button"
-                  className="primary-btn"
-                  onClick={() => {
-                    onComplete(task.id);
-                    dialogRef.current?.close();
-                  }}
-                >
-                  Mark Complete
-                </button>
+                isCompleting ? (
+                  <button type="button" className="primary-btn" disabled>
+                    Marking Complete...
+                  </button>
+                ) : (
+                  <button type="button" className="primary-btn" onClick={handleComplete}>
+                    Mark Complete
+                  </button>
+                )
               )}
+              <button
+                type="button"
+                className="danger-btn"
+                onClick={() => setConfirmDeleteOpen(true)}
+                disabled={isDeleting}
+              >
+                Delete Reminder
+              </button>
             </>
           ) : (
             <>
@@ -360,6 +406,18 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
           setConfirmCloseOpen(false);
           dialogRef.current?.close();
         }}
+      />
+      <CareConnectDialog
+        open={confirmDeleteOpen}
+        title="Delete Reminder?"
+        message="Delete this reminder? This cannot be undone."
+        cancelLabel="Keep Reminder"
+        confirmLabel={isDeleting ? 'Deleting...' : 'Delete Reminder'}
+        variant="destructive"
+        onCancel={() => setConfirmDeleteOpen(false)}
+        onConfirm={handleDelete}
+        confirmDisabled={isDeleting}
+        cancelDisabled={isDeleting}
       />
     </>
   );

@@ -54,7 +54,7 @@ describe('useNotifications', () => {
     const { result } = renderHook(() => useNotifications([]));
 
     await act(async () => {
-      result.current.toggle();
+      await result.current.toggle();
     });
 
     expect(window.Notification.requestPermission).toHaveBeenCalled();
@@ -70,12 +70,12 @@ describe('useNotifications', () => {
     const { result } = renderHook(() => useNotifications([]));
 
     await act(async () => {
-      result.current.toggle();
+      await result.current.toggle();
     });
     expect(result.current.enabled).toBe(true);
 
-    act(() => {
-      result.current.toggle();
+    await act(async () => {
+      await result.current.toggle();
     });
     expect(result.current.enabled).toBe(false);
   });
@@ -88,7 +88,7 @@ describe('useNotifications', () => {
     const { result } = renderHook(() => useNotifications([]));
 
     await act(async () => {
-      result.current.toggle();
+      await result.current.toggle();
     });
 
     expect(result.current.enabled).toBe(false);
@@ -96,7 +96,6 @@ describe('useNotifications', () => {
   });
 
   it('schedules notifications for upcoming tasks when enabled', async () => {
-    jest.useFakeTimers();
     window.Notification.permission = 'default';
     window.Notification.requestPermission = jest.fn(() => {
       window.Notification.permission = 'granted';
@@ -116,10 +115,9 @@ describe('useNotifications', () => {
     const { result } = renderHook(() => useNotifications(tasks));
 
     await act(async () => {
-      result.current.toggle();
+      await result.current.toggle();
     });
 
     expect(result.current.enabled).toBe(true);
-    jest.useRealTimers();
   });
 });

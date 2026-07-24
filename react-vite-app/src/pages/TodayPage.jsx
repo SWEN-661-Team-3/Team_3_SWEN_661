@@ -6,7 +6,7 @@ import StatsRow from '../components/StatsRow';
 import TaskDetailDialog from '../components/TaskDetailDialog';
 import CareConnectDialog from '../components/CareConnectDialog';
 import EmptyState from '../components/EmptyState';
-import { saveReminder } from '../services/carePlanService';
+import { deleteReminder, markReminderComplete, saveReminder } from '../services/carePlanService';
 
 export default function TodayPage({ plan, setPlan, helpers }) {
   const [selectedId, setSelectedId] = useState(null);
@@ -14,6 +14,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
   const [draftTask, setDraftTask] = useState(null);
   const [saveNotice, setSaveNotice] = useState(null);
   const [completeNotice, setCompleteNotice] = useState(null);
+  const [deleteNotice, setDeleteNotice] = useState(null);
   const statusRef = useRef(null);
   const taskButtonRefs = useRef({});
   const triggerRef = useRef(null);
@@ -47,9 +48,11 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     setDetailOpen(true);
   }
 
-  function completeTask(id) {
+  async function completeTask(id) {
     const task = plan.find((t) => t.id === id);
-    if (!task) return;
+    if (!task) return false;
+    const completedTask = await markReminderComplete(id);
+    if (!completedTask) throw new Error('Reminder not found');
     setPlan((prev) =>
       prev.map((t) => (t.id === id ? { ...t, status: 'done' } : t)),
     );
@@ -57,6 +60,17 @@ export default function TodayPage({ plan, setPlan, helpers }) {
       id,
       title: task.title,
     });
+    return true;
+  }
+
+  async function deleteTask(id) {
+    const task = plan.find((item) => item.id === id);
+    if (!task) return false;
+
+    await deleteReminder(id);
+    setPlan((prev) => prev.filter((item) => item.id !== id));
+    setDeleteNotice({ title: task.title });
+    return true;
   }
 
   function closeCompleteNotice() {
@@ -194,6 +208,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
         mode={isAddingTask ? 'add' : 'view'}
         onClose={closeTaskDetail}
         onComplete={completeTask}
+        onDelete={deleteTask}
         onSave={saveTask}
       />
 
@@ -210,6 +225,14 @@ export default function TodayPage({ plan, setPlan, helpers }) {
         message={`"${completeNotice?.title ?? 'Reminder'}" was marked complete.`}
         variant="success"
         onConfirm={closeCompleteNotice}
+      />
+
+      <CareConnectDialog
+        open={Boolean(deleteNotice)}
+        title="Reminder Deleted"
+        message={`"${deleteNotice?.title ?? 'Reminder'}" was deleted.`}
+        variant="success"
+        onConfirm={() => setDeleteNotice(null)}
       />
     </>
   );

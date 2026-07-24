@@ -1,7 +1,13 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SettingsPage from '../pages/SettingsPage';
 import { renderWithProviders } from './testUtils';
+import { saveSettings } from '../services/settingsService';
+
+jest.mock('../services/settingsService', () => {
+  const actual = jest.requireActual('../services/settingsService');
+  return { ...actual, saveSettings: jest.fn(actual.saveSettings) };
+});
 
 const defaultSettings = {
   largeText: false,
@@ -18,6 +24,10 @@ const notifications = {
 };
 
 describe('SettingsPage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders the settings panel', () => {
     renderWithProviders(
       <SettingsPage settings={defaultSettings} onSettingsChange={jest.fn()} notifications={notifications} />,
@@ -69,8 +79,29 @@ describe('SettingsPage', () => {
     );
     if (confirmBtn) {
       await user.click(confirmBtn);
-      expect(onSettingsChange).toHaveBeenCalled();
+      await waitFor(() => expect(onSettingsChange).toHaveBeenCalled());
     }
+  });
+
+  it('keeps settings context and offers retry when saving fails', async () => {
+    const user = userEvent.setup();
+    const onSettingsChange = jest.fn();
+    saveSettings
+      .mockRejectedValueOnce(new Error('Save failed'))
+      .mockResolvedValueOnce({ ...defaultSettings });
+    renderWithProviders(
+      <SettingsPage settings={defaultSettings} onSettingsChange={onSettingsChange} notifications={notifications} />,
+    );
+
+    await user.click(screen.getAllByRole('button', { name: 'Save Settings' })[0]);
+    const confirmButton = screen.getAllByRole('button', { name: 'Save Settings' })
+      .find((button) => button.closest('dialog'));
+    await user.click(confirmButton);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not save settings.');
+    expect(screen.getByText('Settings')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try Again' }));
+    await waitFor(() => expect(onSettingsChange).toHaveBeenCalledTimes(1));
   });
 
   it('calls onSettingsChange on reset', async () => {

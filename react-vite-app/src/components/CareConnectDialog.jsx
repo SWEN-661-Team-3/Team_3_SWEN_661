@@ -9,6 +9,8 @@ export default function CareConnectDialog({
   variant,
   onConfirm,
   onCancel,
+  confirmDisabled = false,
+  cancelDisabled = false,
 }) {
   const dialogRef = useRef(null);
   const confirmButtonClass = variant === 'destructive' ? 'danger-btn' : 'primary-btn';
@@ -33,7 +35,7 @@ export default function CareConnectDialog({
       aria-labelledby="careconnect-dialog-title"
       onCancel={(event) => {
         event.preventDefault();
-        if (cancelLabel) {
+        if (cancelLabel && !cancelDisabled) {
           onCancel();
         } else {
           onConfirm();
@@ -52,13 +54,19 @@ export default function CareConnectDialog({
         </div>
         <div className="dialog__footer">
           {cancelLabel && (
-            <button type="button" className="secondary-btn" onClick={onCancel}>
+            <button type="button" className="secondary-btn" onClick={onCancel} disabled={cancelDisabled}>
               {cancelLabel}
             </button>
           )}
-          <button type="button" className={confirmButtonClass} onClick={onConfirm}>
-            {confirmLabel}
-          </button>
+          {confirmDisabled ? (
+            <button type="button" className={confirmButtonClass} onClick={onConfirm} disabled>
+              {confirmLabel}
+            </button>
+          ) : (
+            <button type="button" className={confirmButtonClass} onClick={onConfirm}>
+              {confirmLabel}
+            </button>
+          )}
         </div>
       </div>
     </dialog>
