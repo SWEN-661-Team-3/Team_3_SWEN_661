@@ -3,7 +3,7 @@ import { Navigate, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import AppLayout from './components/AppLayout';
 import ErrorBoundary from './components/ErrorBoundary';
-import GlobalErrorBanner from './components/GlobalErrorBanner';
+import { GlobalFeedbackProvider, useGlobalFeedback } from './components/GlobalFeedbackContext';
 import LoadingStatus from './components/LoadingStatus';
 import NotificationRouteGuard from './components/NotificationRouteGuard';
 import useNotifications from './hooks/useNotifications';
@@ -20,12 +20,21 @@ const EmergencyPage = lazy(() => import('./pages/EmergencyPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 export default function App() {
+  return (
+    <GlobalFeedbackProvider>
+      <AppContent />
+    </GlobalFeedbackProvider>
+  );
+}
+
+function AppContent() {
   const [plan, setPlan] = useState(null);
   const [helpers, setHelpers] = useState(null);
   const [settings, setSettings] = useState(() => structuredClone(defaultSettings));
   const [loadError, setLoadError] = useState(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const notifications = useNotifications(plan ?? []);
+  const { dismissFeedback, showFeedback } = useGlobalFeedback();
 
   useEffect(() => {
     let isCurrent = true;
@@ -37,15 +46,22 @@ export default function App() {
         setHelpers(loadedTeam);
         setSettings(loadedSettings);
         setLoadError(null);
+        dismissFeedback();
       })
       .catch((error) => {
-        if (isCurrent) setLoadError(error);
+        if (!isCurrent) return;
+        setLoadError(error);
+        showFeedback({
+          type: 'error',
+          text: 'CareConnect could not load your session data. Please try again.',
+          onRetry: () => setLoadAttempt((attempt) => attempt + 1),
+        });
       });
 
     return () => {
       isCurrent = false;
     };
-  }, [loadAttempt]);
+  }, [loadAttempt, dismissFeedback, showFeedback]);
 
   // Accessibility classes are applied to the document body so CSS can target
   // the entire page. Reduced motion must not remove functionality -- it only
@@ -64,13 +80,7 @@ export default function App() {
   if (loadError) {
     return (
       <AppLayout>
-        <div className="main-content">
-          <GlobalErrorBanner
-            title="Unable to Load Care Data"
-            message="CareConnect could not load your session data. Please try again."
-            onRetry={() => setLoadAttempt((attempt) => attempt + 1)}
-          />
-        </div>
+        <div className="main-content" />
       </AppLayout>
     );
   }

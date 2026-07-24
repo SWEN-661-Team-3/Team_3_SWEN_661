@@ -295,6 +295,7 @@ body.large-text {
    indicators, so they remain understandable when reduced motion is enabled. */
 .operation-status,
 .global-error-banner,
+.global-operation-banner,
 .empty-state {
   display: flex;
   align-items: center;
@@ -309,8 +310,10 @@ body.large-text {
 
 .operation-status p,
 .global-error-banner p,
+.global-operation-banner p,
 .empty-state p,
 .global-error-banner h2,
+.global-operation-banner h2,
 .empty-state h2 {
   margin: 0;
 }
@@ -322,14 +325,32 @@ body.large-text {
 }
 
 .operation-status--error,
-.global-error-banner {
+.global-error-banner,
+.global-operation-banner--error {
   border-color: var(--color-emergency);
   background: var(--color-emergency-bg);
 }
 
 .global-error-banner h2,
+.global-operation-banner h2,
 .empty-state h2 {
   font-size: var(--font-size-md);
+}
+
+.global-operation-banner--success {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.global-operation-banner--info {
+  border-color: var(--color-primary);
+  background: var(--color-blue-bg);
+}
+
+.global-operation-banner__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-3);
 }
 
 .empty-state {

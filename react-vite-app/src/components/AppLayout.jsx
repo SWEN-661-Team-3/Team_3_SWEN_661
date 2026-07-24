@@ -4,6 +4,8 @@ import AppHeader from './AppHeader';
 import AppFooter from './AppFooter';
 import OfflineStatusBanner from './OfflineStatusBanner';
 import ErrorBoundary from './ErrorBoundary';
+import GlobalOperationBanner from './GlobalOperationBanner';
+import { useGlobalFeedback } from './GlobalFeedbackContext';
 import { ROUTES } from '../routes';
 
 function PageLoader() {
@@ -17,6 +19,7 @@ function PageLoader() {
 export default function AppLayout({ children }) {
   const { pathname } = useLocation();
   const isTodayRoute = pathname === ROUTES.today;
+  const { message, dismissFeedback } = useGlobalFeedback();
 
   return (
     <>
@@ -25,6 +28,14 @@ export default function AppLayout({ children }) {
       </a>
       <OfflineStatusBanner />
       <AppHeader />
+      {message && (
+        <GlobalOperationBanner
+          type={message.type}
+          message={message.text}
+          onDismiss={dismissFeedback}
+          onRetry={message.onRetry}
+        />
+      )}
       <main
         id="main-content"
         className={`app-layout${isTodayRoute ? '' : ' app-layout--wide'}`}
