@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import CareMemberDetailDialog from '../components/CareMemberDetailDialog';
 import CareConnectDialog from '../components/CareConnectDialog';
+import EmptyState from '../components/EmptyState';
 
 const HELPER_COLORS = ['#1d4ed8', '#046c50', '#9333ea', '#c2410c', '#0e7490'];
 const availabilityLabels = {
@@ -114,11 +115,22 @@ export default function CareTeamPage({ helpers, setHelpers }) {
               </button>
             </div>
 
-            <section
-              className="care-team-grid"
-              aria-label="Team members"
-            >
-              {helpers.map((helper) => (
+            {helpers.length === 0 ? (
+              <EmptyState
+                title="No care-team members yet"
+                message="Add a helper, doctor, or family contact so their details are available when you need them."
+                action={(
+                  <button type="button" className="primary-btn" onClick={openAddMember}>
+                    Add Member
+                  </button>
+                )}
+              />
+            ) : (
+              <section
+                className="care-team-grid"
+                aria-label="Team members"
+              >
+                {helpers.map((helper) => (
                 <button
                   type="button"
                   key={helper.id}
@@ -155,8 +167,9 @@ export default function CareTeamPage({ helpers, setHelpers }) {
                     <p className="care-helper-card__hint">Click to view and edit details</p>
                   </div>
                 </button>
-              ))}
-            </section>
+                ))}
+              </section>
+            )}
 
             <div
               ref={statusRef}

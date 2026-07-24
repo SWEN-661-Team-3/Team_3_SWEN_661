@@ -64,6 +64,12 @@ describe('CareTeamPage', () => {
     expect(liveRegion).toBeInTheDocument();
   });
 
+  it('shows guidance when there are no care-team members', () => {
+    renderWithProviders(<CareTeamPage helpers={[]} setHelpers={jest.fn()} />);
+    expect(screen.getByRole('heading', { name: 'No care-team members yet', level: 2 })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'Add Member' }).length).toBeGreaterThanOrEqual(1);
+  });
+
   it('opens member detail when a card is clicked', async () => {
     const user = userEvent.setup();
     renderWithProviders(<CareTeamPage helpers={getHelpers()} setHelpers={jest.fn()} />);

@@ -5,6 +5,7 @@ import HeroCard from '../components/HeroCard';
 import StatsRow from '../components/StatsRow';
 import TaskDetailDialog from '../components/TaskDetailDialog';
 import CareConnectDialog from '../components/CareConnectDialog';
+import EmptyState from '../components/EmptyState';
 
 export default function TodayPage({ plan, setPlan, helpers }) {
   const [selectedId, setSelectedId] = useState(null);
@@ -34,6 +35,10 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     ? draftTask
     : plan.find((t) => t.id === selectedId) ?? null;
   const helperName = helpers[0]?.name ?? 'Helper';
+  const hasTasks = plan.length > 0;
+  const hasUpcomingAppointments = plan.some(
+    (task) => task.type === 'appointment' && task.status !== 'done',
+  );
 
   function openTaskDetail(id, event) {
     triggerRef.current = event?.currentTarget ?? taskButtonRefs.current[id] ?? null;
@@ -152,8 +157,33 @@ export default function TodayPage({ plan, setPlan, helpers }) {
               </button>
             </div>
 
-            <HeroCard task={nextTask} onClick={openTaskDetail} />
-            <StatsRow tasks={plan} />
+            {hasTasks ? (
+              <>
+                <HeroCard task={nextTask} onClick={openTaskDetail} />
+                <StatsRow tasks={plan} />
+                {!hasUpcomingAppointments && (
+                  <EmptyState
+                    title="No upcoming appointments"
+                    message="Add an appointment reminder to keep visit details and timing in your daily plan."
+                    action={(
+                      <button type="button" className="secondary-btn" onClick={openAddReminder}>
+                        Add Appointment
+                      </button>
+                    )}
+                  />
+                )}
+              </>
+            ) : (
+              <EmptyState
+                title="No reminders yet"
+                message="Add a reminder to start building today’s care plan."
+                action={(
+                  <button type="button" className="primary-btn" onClick={openAddReminder}>
+                    Add Reminder
+                  </button>
+                )}
+              />
+            )}
         </div>
       </>
 

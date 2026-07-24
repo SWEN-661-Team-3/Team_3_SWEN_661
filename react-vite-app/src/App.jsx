@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy } from 'react';
-import { Navigate, Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import AppLayout from './components/AppLayout';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -29,6 +29,7 @@ export default function App() {
 }
 
 function AppContent() {
+  const { pathname } = useLocation();
   const [plan, setPlan] = useState(null);
   const [helpers, setHelpers] = useState(null);
   const [settings, setSettings] = useState(() => structuredClone(defaultSettings));
@@ -36,6 +37,13 @@ function AppContent() {
   const [loadAttempt, setLoadAttempt] = useState(0);
   const notifications = useNotifications(plan ?? []);
   const { dismissFeedback, showFeedback } = useGlobalFeedback();
+  const loadingMessage = pathname.startsWith(ROUTES.careTeam)
+    ? 'Loading care team...'
+    : pathname.startsWith(ROUTES.settings)
+      ? 'Loading settings...'
+      : pathname === ROUTES.emergency
+        ? 'Loading emergency contacts...'
+        : "Loading today's plan...";
 
   useEffect(() => {
     let isCurrent = true;
@@ -90,7 +98,7 @@ function AppContent() {
     return (
       <AppLayout>
         <div className="main-content">
-          <LoadingStatus message="Loading care data..." />
+          <LoadingStatus message={loadingMessage} />
         </div>
       </AppLayout>
     );
