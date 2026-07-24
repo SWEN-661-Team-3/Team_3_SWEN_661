@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { statusLabels, typeLabels, typeOptions } from '../data/careData';
 import CareConnectDialog from './CareConnectDialog';
+import { validateReminder } from '../utils/formValidation';
 
 export default function TaskDetailDialog({ task, open, mode = 'view', onClose, onComplete, onSave }) {
   const dialogRef = useRef(null);
   const titleRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const fieldRefs = useRef({});
   const [isEditing, setIsEditing] = useState(mode === 'add');
   const [form, setForm] = useState(() => (task ? { ...task } : null));
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // Focus management: when the dialog opens, focus moves to the heading
   // (via tabIndex="-1") so screen readers announce the dialog context
@@ -64,6 +67,11 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
+    setErrors((current) => {
+      if (!current[field]) return current;
+      const { [field]: _message, ...remaining } = current;
+      return remaining;
+    });
   }
 
   function requestClose() {
@@ -75,6 +83,14 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
   }
 
   function handleSave() {
+    const nextErrors = validateReminder(currentForm);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      const firstInvalidField = Object.keys(nextErrors)[0];
+      requestAnimationFrame(() => fieldRefs.current[firstInvalidField]?.focus());
+      return;
+    }
+    setErrors({});
     const didSave = onSave(currentForm);
     if (didSave) setIsEditing(false);
   }
@@ -139,18 +155,29 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
             </dl>
           ) : (
             <div className="edit-form">
-              <label className="edit-field edit-field--full">
+              {Object.keys(errors).length > 0 && (
+                <div className="operation-status operation-status--error" role="alert" tabIndex="-1">
+                  <p>Please correct the highlighted reminder fields.</p>
+                </div>
+              )}
+              <label className="edit-field edit-field--full" htmlFor="reminder-title">
                 <span className="edit-field__label">Reminder</span>
                 <input
+                  id="reminder-title"
+                  ref={(element) => { fieldRefs.current.title = element; }}
                   className="edit-field__control"
                   value={form.title}
                   onChange={(event) => updateField('title', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.title)}
+                  aria-describedby={errors.title ? 'reminder-title-error' : undefined}
                 />
+                {errors.title && <span id="reminder-title-error" className="field-error">{errors.title}</span>}
               </label>
-              <label className="edit-field">
+              <label className="edit-field" htmlFor="reminder-type">
                 <span className="edit-field__label">Type</span>
                 <select
+                  id="reminder-type"
                   className="edit-field__control"
                   value={form.type}
                   onChange={(event) => updateField('type', event.target.value)}
@@ -162,9 +189,10 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                   ))}
                 </select>
               </label>
-              <label className="edit-field">
+              <label className="edit-field" htmlFor="reminder-status">
                 <span className="edit-field__label">Status</span>
                 <select
+                  id="reminder-status"
                   className="edit-field__control"
                   value={form.status}
                   onChange={(event) => updateField('status', event.target.value)}
@@ -173,40 +201,60 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                   <option value="done">Done</option>
                 </select>
               </label>
-              <label className="edit-field">
+              <label className="edit-field" htmlFor="reminder-date">
                 <span className="edit-field__label">Date</span>
                 <input
+                  id="reminder-date"
+                  ref={(element) => { fieldRefs.current.date = element; }}
                   className="edit-field__control"
                   value={form.date}
                   onChange={(event) => updateField('date', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.date)}
+                  aria-describedby={errors.date ? 'reminder-date-error' : undefined}
                 />
+                {errors.date && <span id="reminder-date-error" className="field-error">{errors.date}</span>}
               </label>
-              <label className="edit-field">
+              <label className="edit-field" htmlFor="reminder-time">
                 <span className="edit-field__label">Time</span>
                 <input
+                  id="reminder-time"
+                  ref={(element) => { fieldRefs.current.time = element; }}
                   className="edit-field__control"
                   value={form.time}
                   onChange={(event) => updateField('time', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.time)}
+                  aria-describedby={errors.time ? 'reminder-time-error' : undefined}
                 />
+                {errors.time && <span id="reminder-time-error" className="field-error">{errors.time}</span>}
               </label>
-              <label className="edit-field edit-field--full">
+              <label className="edit-field edit-field--full" htmlFor="reminder-location">
                 <span className="edit-field__label">Location</span>
                 <input
+                  id="reminder-location"
+                  ref={(element) => { fieldRefs.current.location = element; }}
                   className="edit-field__control"
                   value={form.location}
                   onChange={(event) => updateField('location', event.target.value)}
+                  aria-invalid={Boolean(errors.location)}
+                  aria-describedby={errors.location ? 'reminder-location-error' : undefined}
                 />
+                {errors.location && <span id="reminder-location-error" className="field-error">{errors.location}</span>}
               </label>
-              <label className="edit-field edit-field--full">
+              <label className="edit-field edit-field--full" htmlFor="reminder-notes">
                 <span className="edit-field__label">Notes</span>
                 <textarea
+                  id="reminder-notes"
+                  ref={(element) => { fieldRefs.current.notes = element; }}
                   className="edit-field__control"
                   rows="4"
                   value={form.notes}
                   onChange={(event) => updateField('notes', event.target.value)}
+                  aria-invalid={Boolean(errors.notes)}
+                  aria-describedby={errors.notes ? 'reminder-notes-error' : undefined}
                 />
+                {errors.notes && <span id="reminder-notes-error" className="field-error">{errors.notes}</span>}
               </label>
             </div>
           )}

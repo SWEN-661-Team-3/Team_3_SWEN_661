@@ -122,4 +122,27 @@ describe('CareMemberDetailDialog', () => {
     await user.click(screen.getByText('Save Changes'));
     expect(onSave).toHaveBeenCalled();
   });
+
+  it('shows field-specific accessible errors for an invalid caregiver', async () => {
+    const user = userEvent.setup();
+    const invalidMember = {
+      ...mockMember,
+      name: ' ',
+      relationship: ' ',
+      phone: '123',
+      email: 'not-an-email',
+    };
+    render(
+      <CareMemberDetailDialog member={invalidMember} open mode="add" onClose={jest.fn()} onSave={jest.fn()} onRemove={jest.fn()} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Add Member' }));
+
+    const name = screen.getByRole('textbox', { name: /Name/ });
+    const email = screen.getByRole('textbox', { name: /Email/ });
+    expect(screen.getByRole('alert')).toHaveTextContent('Please correct the highlighted caregiver fields.');
+    expect(name).toHaveAttribute('aria-invalid', 'true');
+    expect(email).toHaveAttribute('aria-describedby', 'caregiver-email-error');
+    expect(screen.getByText('Enter a valid email address.')).toBeInTheDocument();
+  });
 });

@@ -120,6 +120,7 @@ describe('CareTeamPage', () => {
     const dialog = document.querySelector('dialog[open]');
     const nameInput = dialog.querySelector('input.edit-field__control');
     await user.type(nameInput, 'New Person');
+    await user.type(screen.getByRole('textbox', { name: 'Phone' }), '5551234567');
 
     const addMemberBtns = screen.getAllByText('Add Member');
     const dialogBtn = addMemberBtns.find((el) => el.closest('dialog'));

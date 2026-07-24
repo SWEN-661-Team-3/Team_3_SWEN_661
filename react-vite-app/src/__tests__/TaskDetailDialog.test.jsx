@@ -134,4 +134,31 @@ describe('TaskDetailDialog', () => {
     await user.click(screen.getByText('Save Changes'));
     expect(onSave).toHaveBeenCalled();
   });
+
+  it('shows accessible field errors and focuses the first invalid reminder field', async () => {
+    const user = userEvent.setup();
+    const onSave = jest.fn(() => true);
+    const invalidTask = { ...mockTask, title: ' ', time: '', location: '' };
+    render(
+      <TaskDetailDialog task={invalidTask} open mode="add" onClose={jest.fn()} onComplete={jest.fn()} onSave={onSave} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Add Reminder' }));
+
+    const title = screen.getByRole('textbox', { name: /Reminder/ });
+    expect(screen.getByRole('alert')).toHaveTextContent('Please correct the highlighted reminder fields.');
+    expect(title).toHaveAttribute('aria-invalid', 'true');
+    expect(title).toHaveAttribute('aria-describedby', 'reminder-title-error');
+    expect(screen.getByText('Enter a reminder title.')).toBeInTheDocument();
+    expect(onSave).not.toHaveBeenCalled();
+
+    await user.clear(title);
+    await user.type(title, 'Follow-up appointment');
+    await user.type(screen.getByRole('textbox', { name: /Time/ }), '10:30 AM');
+    await user.type(screen.getByRole('textbox', { name: /Location/ }), 'Clinic');
+    await user.click(screen.getByRole('button', { name: 'Add Reminder' }));
+
+    expect(onSave).toHaveBeenCalled();
+    expect(screen.queryByText('Enter a reminder title.')).not.toBeInTheDocument();
+  });
 });

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import CareConnectDialog from './CareConnectDialog';
+import { validateCaregiver } from '../utils/formValidation';
 
 const availabilityLabels = {
   available: 'Available',
@@ -18,10 +19,12 @@ function getInitials(name) {
 
 export default function CareMemberDetailDialog({ member, open, mode = 'view', onClose, onSave, onRemove }) {
   const dialogRef = useRef(null);
+  const fieldRefs = useRef({});
   const [isEditing, setIsEditing] = useState(mode === 'add');
   const [form, setForm] = useState(() => (member ? { ...member } : null));
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const el = dialogRef.current;
@@ -47,7 +50,8 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     role: member.role.trim(),
     relationship: member.relationship.trim(),
     phone: member.phone.trim(),
-    notes: member.notes.trim(),
+    notes: (member.notes ?? '').trim(),
+    email: (member.email ?? '').trim(),
   };
   const currentForm = {
     ...form,
@@ -55,12 +59,18 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     role: form.role.trim(),
     relationship: form.relationship.trim(),
     phone: form.phone.trim(),
-    notes: form.notes.trim(),
+    notes: (form.notes ?? '').trim(),
+    email: (form.email ?? '').trim(),
   };
   const hasUnsavedChanges = isEditing && JSON.stringify(currentForm) !== JSON.stringify(savedForm);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
+    setErrors((current) => {
+      if (!current[field]) return current;
+      const { [field]: _message, ...remaining } = current;
+      return remaining;
+    });
   }
 
   function requestClose() {
@@ -72,6 +82,14 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
   }
 
   function handleSave() {
+    const nextErrors = validateCaregiver(currentForm);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      const firstInvalidField = Object.keys(nextErrors)[0];
+      requestAnimationFrame(() => fieldRefs.current[firstInvalidField]?.focus());
+      return;
+    }
+    setErrors({});
     const nextMember = {
       ...currentForm,
       initials: getInitials(currentForm.name) || member.initials,
@@ -137,46 +155,82 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
             </dl>
           ) : (
             <div className="edit-form">
-              <label className="edit-field">
+              {Object.keys(errors).length > 0 && (
+                <div className="operation-status operation-status--error" role="alert" tabIndex="-1">
+                  <p>Please correct the highlighted caregiver fields.</p>
+                </div>
+              )}
+              <label className="edit-field" htmlFor="caregiver-name">
                 <span className="edit-field__label">Name</span>
                 <input
+                  id="caregiver-name"
+                  ref={(element) => { fieldRefs.current.name = element; }}
                   className="edit-field__control"
                   value={form.name}
                   onChange={(event) => updateField('name', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.name)}
+                  aria-describedby={errors.name ? 'caregiver-name-error' : undefined}
                 />
+                {errors.name && <span id="caregiver-name-error" className="field-error">{errors.name}</span>}
               </label>
-              <label className="edit-field">
+              <label className="edit-field" htmlFor="caregiver-role">
                 <span className="edit-field__label">Role</span>
                 <input
+                  id="caregiver-role"
                   className="edit-field__control"
                   value={form.role}
                   onChange={(event) => updateField('role', event.target.value)}
                   required
                 />
               </label>
-              <label className="edit-field">
+              <label className="edit-field" htmlFor="caregiver-relationship">
                 <span className="edit-field__label">Relationship</span>
                 <input
+                  id="caregiver-relationship"
+                  ref={(element) => { fieldRefs.current.relationship = element; }}
                   className="edit-field__control"
                   value={form.relationship}
                   onChange={(event) => updateField('relationship', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.relationship)}
+                  aria-describedby={errors.relationship ? 'caregiver-relationship-error' : undefined}
                 />
+                {errors.relationship && <span id="caregiver-relationship-error" className="field-error">{errors.relationship}</span>}
               </label>
-              <label className="edit-field">
+              <label className="edit-field" htmlFor="caregiver-phone">
                 <span className="edit-field__label">Phone</span>
                 <input
+                  id="caregiver-phone"
+                  ref={(element) => { fieldRefs.current.phone = element; }}
                   className="edit-field__control"
                   type="tel"
                   value={form.phone}
                   onChange={(event) => updateField('phone', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.phone)}
+                  aria-describedby={errors.phone ? 'caregiver-phone-error' : undefined}
                 />
+                {errors.phone && <span id="caregiver-phone-error" className="field-error">{errors.phone}</span>}
               </label>
-              <label className="edit-field edit-field--full">
+              <label className="edit-field edit-field--full" htmlFor="caregiver-email">
+                <span className="edit-field__label">Email (optional)</span>
+                <input
+                  id="caregiver-email"
+                  ref={(element) => { fieldRefs.current.email = element; }}
+                  className="edit-field__control"
+                  type="email"
+                  value={form.email ?? ''}
+                  onChange={(event) => updateField('email', event.target.value)}
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? 'caregiver-email-error' : undefined}
+                />
+                {errors.email && <span id="caregiver-email-error" className="field-error">{errors.email}</span>}
+              </label>
+              <label className="edit-field edit-field--full" htmlFor="caregiver-notes">
                 <span className="edit-field__label">Notes</span>
                 <textarea
+                  id="caregiver-notes"
                   className="edit-field__control"
                   rows="4"
                   value={form.notes}
