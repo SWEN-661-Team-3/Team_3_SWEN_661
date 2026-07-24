@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import CareConnectDialog from './CareConnectDialog';
 import FieldHelpText from './FieldHelpText';
+import InlineError from './InlineError';
+import SavingStatus from './SavingStatus';
 import { CAREGIVER_PHONE_MIN_DIGITS, validateCaregiver } from '../utils/formValidation';
 
 function describedBy(...ids) {
@@ -30,6 +32,8 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   useEffect(() => {
     const el = dialogRef.current;
@@ -86,7 +90,7 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     onClose();
   }
 
-  function handleSave() {
+  async function handleSave() {
     const nextErrors = validateCaregiver(currentForm);
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
@@ -99,8 +103,16 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
       ...currentForm,
       initials: getInitials(currentForm.name) || member.initials,
     };
-    const didSave = onSave(nextMember);
-    if (didSave) setIsEditing(false);
+    setSaveError(null);
+    setIsSaving(true);
+    try {
+      const didSave = await onSave(nextMember);
+      if (didSave) setIsEditing(false);
+    } catch {
+      setSaveError('Could not save this caregiver. Your changes are still here. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -278,15 +290,18 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
             </>
           ) : (
             <>
+              {isSaving && <SavingStatus message="Saving caregiver..." />}
+              {saveError && <InlineError message={saveError} onRetry={handleSave} />}
               <button
                 type="button"
                 className="secondary-btn"
                 onClick={requestClose}
+                disabled={isSaving}
               >
                 Close
               </button>
-              <button type="button" className="primary-btn" onClick={handleSave}>
-                {isAdding ? 'Add Member' : 'Save Changes'}
+              <button type="button" className="primary-btn" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? 'Saving...' : isAdding ? 'Add Member' : 'Save Changes'}
               </button>
             </>
           )}

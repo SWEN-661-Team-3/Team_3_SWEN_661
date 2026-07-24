@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import CareMemberDetailDialog from '../components/CareMemberDetailDialog';
 import CareConnectDialog from '../components/CareConnectDialog';
 import EmptyState from '../components/EmptyState';
+import { saveCaregiver } from '../services/careTeamService';
 
 const HELPER_COLORS = ['#1d4ed8', '#046c50', '#9333ea', '#c2410c', '#0e7490'];
 const availabilityLabels = {
@@ -42,22 +43,23 @@ export default function CareTeamPage({ helpers, setHelpers }) {
     setDraftMember(null);
   }
 
-  function saveMember(updatedMember) {
+  async function saveMember(updatedMember) {
+    const savedMember = await saveCaregiver(updatedMember);
     if (isAddingMember) {
-      setHelpers((prev) => [...prev, updatedMember]);
-      announce(`${updatedMember.name} added to the care team`);
+      setHelpers((prev) => [...prev, savedMember]);
+      announce(`${savedMember.name} added to the care team`);
       setSaveNotice({
-        title: `${updatedMember.name} Added`,
-        message: `${updatedMember.name} was added.`,
+        title: `${savedMember.name} Added`,
+        message: `${savedMember.name} was added.`,
       });
     } else {
       setHelpers((prev) => (
-        prev.map((helper) => (helper.id === updatedMember.id ? updatedMember : helper))
+        prev.map((helper) => (helper.id === savedMember.id ? savedMember : helper))
       ));
-      announce(`Saved details for ${updatedMember.name}`);
+      announce(`Saved details for ${savedMember.name}`);
       setSaveNotice({
-        title: `${updatedMember.name} Saved`,
-        message: `${updatedMember.name} was saved.`,
+        title: `${savedMember.name} Saved`,
+        message: `${savedMember.name} was saved.`,
       });
     }
     setDetailOpen(false);

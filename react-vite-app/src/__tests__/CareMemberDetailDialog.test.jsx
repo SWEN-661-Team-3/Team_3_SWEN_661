@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CareMemberDetailDialog from '../components/CareMemberDetailDialog';
 
@@ -158,5 +158,48 @@ describe('CareMemberDetailDialog', () => {
     expect(email).toHaveAttribute('aria-describedby', expect.stringContaining('caregiver-email-error'));
     expect(screen.getByText('Enter a valid email address.')).toBeInTheDocument();
     expect(screen.getByText('Optional. Example: name@example.com.')).toBeInTheDocument();
+  });
+
+  it('shows saving feedback and prevents duplicate caregiver submissions', async () => {
+    const user = userEvent.setup();
+    let resolveSave;
+    const onSave = jest.fn(() => new Promise((resolve) => {
+      resolveSave = resolve;
+    }));
+    render(
+      <CareMemberDetailDialog member={mockMember} open onClose={jest.fn()} onSave={onSave} onRemove={jest.fn()} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Edit Details' }));
+    await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+
+    expect(screen.getByRole('status')).toHaveTextContent('Saving caregiver...');
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeDisabled();
+    expect(onSave).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolveSave(true);
+    });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Edit Details' })).toBeInTheDocument());
+  });
+
+  it('preserves caregiver content and offers retry after a failed save', async () => {
+    const user = userEvent.setup();
+    const onSave = jest.fn()
+      .mockRejectedValueOnce(new Error('Save failed'))
+      .mockResolvedValueOnce(true);
+    render(
+      <CareMemberDetailDialog member={mockMember} open onClose={jest.fn()} onSave={onSave} onRemove={jest.fn()} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Edit Details' }));
+    await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not save this caregiver.');
+    expect(screen.getByDisplayValue('Sarah Johnson')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try Again' }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Edit Details' })).toBeInTheDocument());
   });
 });

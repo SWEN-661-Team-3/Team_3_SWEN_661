@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Route, Routes } from 'react-router-dom';
 import CaregiverDetailPage from '../pages/CaregiverDetailPage';
@@ -42,6 +42,6 @@ describe('CaregiverDetailPage', () => {
     await user.click(screen.getByRole('button', { name: 'Edit Details' }));
     await user.click(screen.getAllByRole('button', { name: 'Edit Details' })[1]);
     await user.click(screen.getByRole('button', { name: 'Save Changes' }));
-    expect(setHelpers).toHaveBeenCalled();
+    await waitFor(() => expect(setHelpers).toHaveBeenCalled());
   });
 });

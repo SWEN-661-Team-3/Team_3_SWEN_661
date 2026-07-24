@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CareMemberDetailDialog from '../components/CareMemberDetailDialog';
 import { ROUTES } from '../routes';
+import { saveCaregiver as saveCaregiverRecord } from '../services/careTeamService';
 
 const availabilityLabels = {
   available: 'Available',
@@ -30,9 +31,10 @@ export default function CaregiverDetailPage({ helpers, setHelpers }) {
     );
   }
 
-  function saveCaregiver(updatedCaregiver) {
+  async function saveCaregiver(updatedCaregiver) {
+    const savedCaregiver = await saveCaregiverRecord(updatedCaregiver);
     setHelpers((current) => current.map((helper) => (
-      helper.id === updatedCaregiver.id ? updatedCaregiver : helper
+      helper.id === savedCaregiver.id ? savedCaregiver : helper
     )));
     setEditOpen(false);
     return true;

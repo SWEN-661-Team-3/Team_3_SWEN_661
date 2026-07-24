@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CareTeamPage from '../pages/CareTeamPage';
 import { caregivers } from '../data/careData';
@@ -92,7 +92,7 @@ describe('CareTeamPage', () => {
     await user.click(screen.getByLabelText('Sarah Johnson, Helper'));
     await user.click(screen.getByText('Edit Details'));
     await user.click(screen.getByText('Save Changes'));
-    expect(setHelpers).toHaveBeenCalled();
+    await waitFor(() => expect(setHelpers).toHaveBeenCalled());
   });
 
   it('shows save success notice after editing a member', async () => {
@@ -101,7 +101,7 @@ describe('CareTeamPage', () => {
     await user.click(screen.getByLabelText('Sarah Johnson, Helper'));
     await user.click(screen.getByText('Edit Details'));
     await user.click(screen.getByText('Save Changes'));
-    expect(screen.getByText(/Sarah Johnson Saved/)).toBeInTheDocument();
+    expect(await screen.findByText(/Sarah Johnson Saved/)).toBeInTheDocument();
   });
 
   it('opens add member dialog', async () => {
@@ -126,7 +126,7 @@ describe('CareTeamPage', () => {
     const dialogBtn = addMemberBtns.find((el) => el.closest('dialog'));
     if (dialogBtn) {
       await user.click(dialogBtn);
-      expect(setHelpers).toHaveBeenCalled();
+      await waitFor(() => expect(setHelpers).toHaveBeenCalled());
     }
   });
 
