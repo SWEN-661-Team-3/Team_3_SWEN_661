@@ -44,12 +44,18 @@ export default function EmergencyPanel({ contacts }) {
     return () => clearInterval(intervalRef.current);
   }, [phase]);
 
+  // Countdown announcements: only the 2-second mark is announced to avoid
+  // overwhelming screen reader users with per-second updates. The visual
+  // countdown still updates every second for sighted users.
   useEffect(() => {
     if (phase === 'countdown' && countdown === 2) {
       announce('2 seconds remaining');
     }
   }, [phase, countdown, announce]);
 
+  // The sent-state announcement uses aria-live="assertive" (set on the
+  // status region above) because this is a critical safety transition that
+  // must interrupt whatever the screen reader is currently saying.
   useEffect(() => {
     if (phase === 'confirmed') {
       announce('Emergency alert sent');

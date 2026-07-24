@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "test": "node --test \"test/*.test.mjs\"",
     "test:unit": "jest --coverage",
+    "test:coverage": "jest --coverage --coverageReporters=text --coverageReporters=html --coverageReporters=lcov",
     "test:e2e": "npx playwright test",
     "preview": "vite preview"
   },

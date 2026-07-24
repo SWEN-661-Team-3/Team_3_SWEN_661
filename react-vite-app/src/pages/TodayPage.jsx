@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Sidebar from '../components/Sidebar';
 import HeroCard from '../components/HeroCard';
@@ -23,7 +23,13 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     }
   }, []);
 
-  const nextTask = plan.find((t) => t.status === 'todo') ?? plan[0];
+  // Derived from the full plan array -- memoized because the find + fallback
+  // runs on every render even when plan hasn't changed.
+  const nextTask = useMemo(
+    () => plan.find((t) => t.status === 'todo') ?? plan[0],
+    [plan],
+  );
+
   const isAddingTask = selectedId === 'new';
   const selectedTask = isAddingTask
     ? draftTask

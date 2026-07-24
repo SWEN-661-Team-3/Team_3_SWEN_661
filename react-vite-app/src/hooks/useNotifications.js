@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
+// Notifications are scheduled as browser setTimeout timers, not through a
+// backend push service. This means scheduling is session-dependent: timers
+// are cleared when the tab closes or the component unmounts, and they will
+// not fire after the browser is closed. This is an intentional scope
+// limitation -- real server-side scheduling is outside the project scope.
 const REMINDER_LEAD_MINUTES = 15;
 
 function parseTime(timeStr) {
@@ -18,6 +23,10 @@ function parseTime(timeStr) {
   return date;
 }
 
+// Both Notification API and ServiceWorker must be available. Environments
+// that lack either (e.g. older browsers, insecure contexts) are treated as
+// "unsupported" rather than failing silently. When permission is "denied",
+// the UI shows recovery instructions instead of hiding the toggle entirely.
 function getNotificationSupport() {
   return 'Notification' in window && 'serviceWorker' in navigator;
 }

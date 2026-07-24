@@ -29,24 +29,29 @@ describe('App', () => {
     expect(screen.getByText(/Helping you manage daily care/)).toBeInTheDocument();
   });
 
-  it('renders TodayPage on the root route', () => {
+  it('renders TodayPage on the root route', async () => {
     renderApp('/');
-    expect(screen.getByRole('heading', { name: "Today's Plan", level: 1 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: "Today's Plan", level: 1 })).toBeInTheDocument();
   });
 
-  it('renders CareTeamPage on /care-team', () => {
+  it('renders CareTeamPage on /care-team', async () => {
     renderApp('/care-team');
-    expect(screen.getByRole('heading', { name: 'Care Team', level: 1 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Care Team', level: 1 })).toBeInTheDocument();
   });
 
-  it('renders SettingsPage on /settings', () => {
+  it('renders SettingsPage on /settings', async () => {
     renderApp('/settings');
-    expect(screen.getByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument();
   });
 
-  it('renders EmergencyPage on /emergency', () => {
+  it('renders EmergencyPage on /emergency', async () => {
     renderApp('/emergency');
-    expect(screen.getByRole('heading', { name: 'Emergency', level: 1 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Emergency', level: 1 })).toBeInTheDocument();
+  });
+
+  it('renders NotFoundPage for unknown routes', async () => {
+    renderApp('/some-nonexistent-page');
+    expect(await screen.findByRole('heading', { name: 'Page Not Found', level: 1 })).toBeInTheDocument();
   });
 
   it('applies accessibility classes to document.body', () => {

@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 const offlineMessage = 'You are offline. Some information may be outdated, and some actions may be unavailable.';
 
-export default function OfflineStatusBanner() {
+// Memoized because this component manages its own state and receives
+// no props -- prevents re-renders from parent state changes.
+export default memo(function OfflineStatusBanner() {
   const [isOffline, setIsOffline] = useState(() =>
     typeof navigator !== 'undefined' && !navigator.onLine,
   );
@@ -28,4 +30,4 @@ export default function OfflineStatusBanner() {
       <p><strong>Offline status:</strong> {offlineMessage}</p>
     </div>
   );
-}
+});

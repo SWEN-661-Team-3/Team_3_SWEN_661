@@ -1,6 +1,12 @@
-export default function StatsRow({ tasks }) {
-  const done = tasks.filter((t) => t.status === 'done').length;
-  const pending = tasks.filter((t) => t.status === 'todo').length;
+import { memo, useMemo } from 'react';
+
+// Memoized component + derived counts: this row only changes when the
+// tasks array reference changes, avoiding unnecessary DOM updates.
+export default memo(function StatsRow({ tasks }) {
+  const { done, pending } = useMemo(() => ({
+    done: tasks.filter((t) => t.status === 'done').length,
+    pending: tasks.filter((t) => t.status === 'todo').length,
+  }), [tasks]);
 
   return (
     <section className="stats-row" aria-label="Plan completion statistics">
@@ -24,4 +30,4 @@ export default function StatsRow({ tasks }) {
       </article>
     </section>
   );
-}
+});

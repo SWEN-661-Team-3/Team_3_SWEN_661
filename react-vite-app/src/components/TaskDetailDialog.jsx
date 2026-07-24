@@ -10,6 +10,13 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
   const [form, setForm] = useState(() => (task ? { ...task } : null));
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
 
+  // Focus management: when the dialog opens, focus moves to the heading
+  // (via tabIndex="-1") so screen readers announce the dialog context
+  // immediately. The close button is the fallback if the heading ref is
+  // missing. Focus is restored to the triggering element when the dialog
+  // closes (handled in the parent page's closeTaskDetail callback).
+  // The rAF delay ensures the DOM has painted after showModal() before
+  // attempting to focus an element inside the now-visible dialog.
   useEffect(() => {
     const el = dialogRef.current;
     if (!el) return;
