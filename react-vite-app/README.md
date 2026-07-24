@@ -57,7 +57,9 @@ react-vite-app/
 | `/emergency` | Emergency alert panel |
 | `*` | 404 Not Found |
 
-All routes are client-side. The Vercel SPA rewrite (`vercel.json`) ensures direct URL access works in production. The service worker provides the same fallback when offline.
+All routes are client-side. The Vercel SPA rewrite (`vercel.json`) ensures a direct request for an application route receives `index.html`, allowing React Router to take over. React Router's final `*` route then renders the dedicated **Page Not Found** screen for unknown client-side paths. In other words, the host rewrite delivers the application; it does not decide which client route is a 404. Static assets and the offline fallback remain excluded from the rewrite.
+
+Unknown caregiver IDs are handled separately by `/care-team/:caregiverId`, which renders its care-team-specific not-found message instead of the general 404 page. The service worker provides the corresponding application-shell fallback when offline.
 
 `/settings/notifications` is protected by a capability-based route guard. It requires both the browser Notification API and service workers; it does not use accounts, authentication, or persistent permissions.
 
@@ -144,7 +146,7 @@ Playwright tests cover navigation, accessibility (skip link, keyboard, landmarks
 
 ## Deployment
 
-The app is deployed to Vercel. The `vercel.json` file configures SPA rewrites so all routes resolve to `index.html`.
+The app is deployed to Vercel. The `vercel.json` file configures SPA rewrites so application routes resolve to `index.html`; the client-side catch-all route renders the dedicated 404 page after React loads.
 
 To deploy manually:
 

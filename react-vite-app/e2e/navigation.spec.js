@@ -46,6 +46,16 @@ test.describe('Navigation', () => {
     await expect(page).toHaveURL('/today');
   });
 
+  test('renders the client-side 404 page for a direct invalid URL', async ({ page }) => {
+    await page.goto('/this-page-does-not-exist');
+
+    await expect(page).toHaveTitle('Page Not Found - CareConnect');
+    await expect(page.getByRole('heading', { name: 'Page Not Found', level: 1 })).toBeVisible();
+    await expect(page.getByText('/this-page-does-not-exist')).toBeVisible();
+    await page.getByRole('link', { name: /Go to Today's Plan/ }).click();
+    await expect(page).toHaveURL('/today');
+  });
+
   test('renders header and footer on every page', async ({ page }) => {
     await page.goto('/today');
     await expect(page.locator('header')).toBeVisible();

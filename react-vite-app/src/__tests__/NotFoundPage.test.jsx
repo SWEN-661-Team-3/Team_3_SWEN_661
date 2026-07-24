@@ -8,6 +8,11 @@ describe('NotFoundPage', () => {
     expect(screen.getByRole('heading', { name: 'Page Not Found', level: 1 })).toBeInTheDocument();
   });
 
+  it('sets a unique document title', () => {
+    renderWithProviders(<NotFoundPage />);
+    expect(document.title).toBe('Page Not Found - CareConnect');
+  });
+
   it('displays an explanation message', () => {
     renderWithProviders(<NotFoundPage />);
     expect(screen.getByText(/does not exist or has been moved/)).toBeInTheDocument();
@@ -28,5 +33,10 @@ describe('NotFoundPage', () => {
   it('leaves the main landmark to the shared layout', () => {
     renderWithProviders(<NotFoundPage />);
     expect(screen.queryByRole('main')).not.toBeInTheDocument();
+  });
+
+  it('shows the requested path when it is safe to display', () => {
+    renderWithProviders(<NotFoundPage />, { route: '/missing-page' });
+    expect(screen.getByText('/missing-page')).toBeInTheDocument();
   });
 });

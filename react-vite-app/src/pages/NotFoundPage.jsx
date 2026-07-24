@@ -1,8 +1,11 @@
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../routes';
 
 export default function NotFoundPage() {
+  const { pathname } = useLocation();
+  const requestedPath = pathname.length <= 120 ? pathname : null;
+
   return (
     <>
       <Helmet>
@@ -14,6 +17,11 @@ export default function NotFoundPage() {
         <p style={{ margin: '1rem 0' }}>
           The page you are looking for does not exist or has been moved.
         </p>
+        {requestedPath && (
+          <p>
+            Requested path: <code>{requestedPath}</code>
+          </p>
+        )}
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
           <Link to={ROUTES.today} className="primary-btn" style={{ textDecoration: 'none' }}>
             Go to Today&apos;s Plan
