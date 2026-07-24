@@ -85,6 +85,19 @@ describe('CareMemberDetailDialog', () => {
     expect(screen.getByText('Add Member')).toBeInTheDocument();
   });
 
+  it('shows proactive caregiver guidance before submission', () => {
+    render(
+      <CareMemberDetailDialog member={mockMember} open mode="add" onClose={jest.fn()} onSave={jest.fn()} onRemove={jest.fn()} />,
+    );
+
+    const phone = screen.getByRole('textbox', { name: /Phone/ });
+    const email = screen.getByRole('textbox', { name: /Email/ });
+    expect(screen.getByText('Enter at least 7 digits.')).toBeInTheDocument();
+    expect(screen.getByText('Optional. Example: name@example.com.')).toBeInTheDocument();
+    expect(phone).toHaveAttribute('aria-describedby', 'caregiver-phone-help');
+    expect(email).toHaveAttribute('aria-describedby', 'caregiver-email-help');
+  });
+
   it('does not show Remove Helper button in the main dialog in add mode', () => {
     const newMember = {
       id: 'new-1',
@@ -142,7 +155,8 @@ describe('CareMemberDetailDialog', () => {
     const email = screen.getByRole('textbox', { name: /Email/ });
     expect(screen.getByRole('alert')).toHaveTextContent('Please correct the highlighted caregiver fields.');
     expect(name).toHaveAttribute('aria-invalid', 'true');
-    expect(email).toHaveAttribute('aria-describedby', 'caregiver-email-error');
+    expect(email).toHaveAttribute('aria-describedby', expect.stringContaining('caregiver-email-error'));
     expect(screen.getByText('Enter a valid email address.')).toBeInTheDocument();
+    expect(screen.getByText('Optional. Example: name@example.com.')).toBeInTheDocument();
   });
 });

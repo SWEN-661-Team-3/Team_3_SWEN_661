@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import CareConnectDialog from './CareConnectDialog';
-import { validateCaregiver } from '../utils/formValidation';
+import FieldHelpText from './FieldHelpText';
+import { CAREGIVER_PHONE_MIN_DIGITS, validateCaregiver } from '../utils/formValidation';
+
+function describedBy(...ids) {
+  return ids.filter(Boolean).join(' ');
+}
 
 const availabilityLabels = {
   available: 'Available',
@@ -161,7 +166,7 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
                 </div>
               )}
               <label className="edit-field" htmlFor="caregiver-name">
-                <span className="edit-field__label">Name</span>
+                <span className="edit-field__label"><strong>Name</strong> <em>(required)</em></span>
                 <input
                   id="caregiver-name"
                   ref={(element) => { fieldRefs.current.name = element; }}
@@ -175,7 +180,7 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
                 {errors.name && <span id="caregiver-name-error" className="field-error">{errors.name}</span>}
               </label>
               <label className="edit-field" htmlFor="caregiver-role">
-                <span className="edit-field__label">Role</span>
+                <span className="edit-field__label"><strong>Role</strong> <em>(required)</em></span>
                 <input
                   id="caregiver-role"
                   className="edit-field__control"
@@ -185,7 +190,7 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
                 />
               </label>
               <label className="edit-field" htmlFor="caregiver-relationship">
-                <span className="edit-field__label">Relationship</span>
+                <span className="edit-field__label"><strong>Relationship</strong> <em>(required)</em></span>
                 <input
                   id="caregiver-relationship"
                   ref={(element) => { fieldRefs.current.relationship = element; }}
@@ -199,7 +204,7 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
                 {errors.relationship && <span id="caregiver-relationship-error" className="field-error">{errors.relationship}</span>}
               </label>
               <label className="edit-field" htmlFor="caregiver-phone">
-                <span className="edit-field__label">Phone</span>
+                <span className="edit-field__label"><strong>Phone</strong> <em>(required)</em></span>
                 <input
                   id="caregiver-phone"
                   ref={(element) => { fieldRefs.current.phone = element; }}
@@ -209,8 +214,11 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
                   onChange={(event) => updateField('phone', event.target.value)}
                   required
                   aria-invalid={Boolean(errors.phone)}
-                  aria-describedby={errors.phone ? 'caregiver-phone-error' : undefined}
+                  aria-describedby={describedBy('caregiver-phone-help', errors.phone && 'caregiver-phone-error')}
                 />
+                <FieldHelpText id="caregiver-phone-help">
+                  Enter at least {CAREGIVER_PHONE_MIN_DIGITS} digits.
+                </FieldHelpText>
                 {errors.phone && <span id="caregiver-phone-error" className="field-error">{errors.phone}</span>}
               </label>
               <label className="edit-field edit-field--full" htmlFor="caregiver-email">
@@ -223,8 +231,9 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
                   value={form.email ?? ''}
                   onChange={(event) => updateField('email', event.target.value)}
                   aria-invalid={Boolean(errors.email)}
-                  aria-describedby={errors.email ? 'caregiver-email-error' : undefined}
+                  aria-describedby={describedBy('caregiver-email-help', errors.email && 'caregiver-email-error')}
                 />
+                <FieldHelpText id="caregiver-email-help">Optional. Example: name@example.com.</FieldHelpText>
                 {errors.email && <span id="caregiver-email-error" className="field-error">{errors.email}</span>}
               </label>
               <label className="edit-field edit-field--full" htmlFor="caregiver-notes">

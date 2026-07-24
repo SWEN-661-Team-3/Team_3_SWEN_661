@@ -117,6 +117,42 @@ describe('TaskDetailDialog', () => {
     expect(addLabels.length).toBeGreaterThanOrEqual(1);
   });
 
+  it('shows proactive reminder guidance and non-live character counters', async () => {
+    const user = userEvent.setup();
+    const newTask = {
+      ...mockTask,
+      id: 'new-2',
+      title: '',
+      notes: '',
+      type: 'health-task',
+    };
+    const { container } = render(
+      <TaskDetailDialog task={newTask} open mode="add" onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+
+    const title = screen.getByRole('textbox', { name: /Reminder/ });
+    expect(title).toHaveAttribute('aria-describedby', expect.stringContaining('reminder-title-count'));
+    expect(screen.getByText('0 of 120 characters.')).toBeInTheDocument();
+    expect(screen.getByText('0 of 1000 characters.')).toBeInTheDocument();
+    expect(document.querySelector('label[for="reminder-location"]')).toHaveTextContent('Location');
+    expect(container.querySelectorAll('.field-help[aria-live]')).toHaveLength(0);
+
+    await user.type(title, 'Call clinic');
+    expect(screen.getByText('11 of 120 characters.')).toBeInTheDocument();
+  });
+
+  it('updates appointment location guidance when the type changes', async () => {
+    const user = userEvent.setup();
+    const newTask = { ...mockTask, id: 'new-3', type: 'health-task' };
+    render(
+      <TaskDetailDialog task={newTask} open mode="add" onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
+    );
+
+    expect(document.querySelector('label[for="reminder-location"]')).toHaveTextContent('Location');
+    await user.selectOptions(screen.getByRole('combobox', { name: /Type/ }), 'appointment');
+    expect(document.querySelector('label[for="reminder-location"]')).toHaveTextContent('Location (required)');
+  });
+
   it('has close button with accessible label', () => {
     render(
       <TaskDetailDialog task={mockTask} open={true} onClose={jest.fn()} onComplete={jest.fn()} onSave={jest.fn()} />,
@@ -148,12 +184,13 @@ describe('TaskDetailDialog', () => {
     const title = screen.getByRole('textbox', { name: /Reminder/ });
     expect(screen.getByRole('alert')).toHaveTextContent('Please correct the highlighted reminder fields.');
     expect(title).toHaveAttribute('aria-invalid', 'true');
-    expect(title).toHaveAttribute('aria-describedby', 'reminder-title-error');
+    expect(title).toHaveAttribute('aria-describedby', expect.stringContaining('reminder-title-error'));
     expect(screen.getByText('Enter a reminder title.')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
 
     await user.clear(title);
     await user.type(title, 'Follow-up appointment');
+    expect(screen.queryByText('Enter a reminder title.')).not.toBeInTheDocument();
     await user.type(screen.getByRole('textbox', { name: /Time/ }), '10:30 AM');
     await user.type(screen.getByRole('textbox', { name: /Location/ }), 'Clinic');
     await user.click(screen.getByRole('button', { name: 'Add Reminder' }));

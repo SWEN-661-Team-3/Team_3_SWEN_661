@@ -128,7 +128,7 @@ describe('TodayPage', () => {
     const dialog = document.querySelector('dialog[open]');
     const titleInput = dialog.querySelector('input.edit-field__control');
     await user.type(titleInput, 'New Task');
-    await user.type(screen.getByRole('textbox', { name: 'Time' }), '2:00 PM');
+    await user.type(screen.getByRole('textbox', { name: /^Time/ }), '2:00 PM');
 
     const addButtons = screen.getAllByText('Add Reminder');
     const addBtn = addButtons.find((el) => el.tagName === 'BUTTON' && el.closest('dialog'));

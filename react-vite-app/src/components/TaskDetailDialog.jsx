@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { statusLabels, typeLabels, typeOptions } from '../data/careData';
 import CareConnectDialog from './CareConnectDialog';
-import { validateReminder } from '../utils/formValidation';
+import CharacterCount from './CharacterCount';
+import FieldHelpText from './FieldHelpText';
+import {
+  REMINDER_NOTES_MAX_LENGTH,
+  REMINDER_TITLE_MAX_LENGTH,
+  validateReminder,
+} from '../utils/formValidation';
+
+function describedBy(...ids) {
+  return ids.filter(Boolean).join(' ');
+}
 
 export default function TaskDetailDialog({ task, open, mode = 'view', onClose, onComplete, onSave }) {
   const dialogRef = useRef(null);
@@ -68,6 +78,10 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
     setErrors((current) => {
+      if (field === 'type' && value !== 'appointment' && current.location) {
+        const { location: _locationError, ...remaining } = current;
+        return remaining;
+      }
       if (!current[field]) return current;
       const { [field]: _message, ...remaining } = current;
       return remaining;
@@ -161,7 +175,7 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                 </div>
               )}
               <label className="edit-field edit-field--full" htmlFor="reminder-title">
-                <span className="edit-field__label">Reminder</span>
+                <span className="edit-field__label"><strong>Reminder</strong> <em>(required)</em></span>
                 <input
                   id="reminder-title"
                   ref={(element) => { fieldRefs.current.title = element; }}
@@ -170,8 +184,12 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                   onChange={(event) => updateField('title', event.target.value)}
                   required
                   aria-invalid={Boolean(errors.title)}
-                  aria-describedby={errors.title ? 'reminder-title-error' : undefined}
+                  aria-describedby={describedBy(
+                    'reminder-title-count',
+                    errors.title && 'reminder-title-error',
+                  )}
                 />
+                <CharacterCount id="reminder-title-count" value={form.title} maxLength={REMINDER_TITLE_MAX_LENGTH} />
                 {errors.title && <span id="reminder-title-error" className="field-error">{errors.title}</span>}
               </label>
               <label className="edit-field" htmlFor="reminder-type">
@@ -202,7 +220,7 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                 </select>
               </label>
               <label className="edit-field" htmlFor="reminder-date">
-                <span className="edit-field__label">Date</span>
+                <span className="edit-field__label"><strong>Date</strong> <em>(required)</em></span>
                 <input
                   id="reminder-date"
                   ref={(element) => { fieldRefs.current.date = element; }}
@@ -211,12 +229,13 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                   onChange={(event) => updateField('date', event.target.value)}
                   required
                   aria-invalid={Boolean(errors.date)}
-                  aria-describedby={errors.date ? 'reminder-date-error' : undefined}
+                  aria-describedby={describedBy('reminder-date-help', errors.date && 'reminder-date-error')}
                 />
+                <FieldHelpText id="reminder-date-help">Enter a valid date, such as Today.</FieldHelpText>
                 {errors.date && <span id="reminder-date-error" className="field-error">{errors.date}</span>}
               </label>
               <label className="edit-field" htmlFor="reminder-time">
-                <span className="edit-field__label">Time</span>
+                <span className="edit-field__label"><strong>Time</strong> <em>(required)</em></span>
                 <input
                   id="reminder-time"
                   ref={(element) => { fieldRefs.current.time = element; }}
@@ -225,12 +244,15 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                   onChange={(event) => updateField('time', event.target.value)}
                   required
                   aria-invalid={Boolean(errors.time)}
-                  aria-describedby={errors.time ? 'reminder-time-error' : undefined}
+                  aria-describedby={describedBy('reminder-time-help', errors.time && 'reminder-time-error')}
                 />
+                <FieldHelpText id="reminder-time-help">Enter a time such as 9:30 AM.</FieldHelpText>
                 {errors.time && <span id="reminder-time-error" className="field-error">{errors.time}</span>}
               </label>
               <label className="edit-field edit-field--full" htmlFor="reminder-location">
-                <span className="edit-field__label">Location</span>
+                <span className="edit-field__label">
+                  <strong>Location</strong>{form.type === 'appointment' && <> <em>(required)</em></>}
+                </span>
                 <input
                   id="reminder-location"
                   ref={(element) => { fieldRefs.current.location = element; }}
@@ -252,8 +274,14 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                   value={form.notes}
                   onChange={(event) => updateField('notes', event.target.value)}
                   aria-invalid={Boolean(errors.notes)}
-                  aria-describedby={errors.notes ? 'reminder-notes-error' : undefined}
+                  aria-describedby={describedBy(
+                    'reminder-notes-help',
+                    'reminder-notes-count',
+                    errors.notes && 'reminder-notes-error',
+                  )}
                 />
+                <FieldHelpText id="reminder-notes-help">Optional.</FieldHelpText>
+                <CharacterCount id="reminder-notes-count" value={form.notes} maxLength={REMINDER_NOTES_MAX_LENGTH} />
                 {errors.notes && <span id="reminder-notes-error" className="field-error">{errors.notes}</span>}
               </label>
             </div>

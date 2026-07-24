@@ -1,6 +1,6 @@
-const REMINDER_TITLE_MAX_LENGTH = 120;
-const REMINDER_NOTES_MAX_LENGTH = 1000;
-const CAREGIVER_PHONE_MIN_DIGITS = 7;
+export const REMINDER_TITLE_MAX_LENGTH = 120;
+export const REMINDER_NOTES_MAX_LENGTH = 1000;
+export const CAREGIVER_PHONE_MIN_DIGITS = 7;
 const BASIC_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const TIME_PATTERN = /^(1[0-2]|[1-9]):[0-5]\d\s?(AM|PM)$/i;
 
