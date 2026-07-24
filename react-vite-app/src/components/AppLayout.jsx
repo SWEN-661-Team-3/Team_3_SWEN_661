@@ -6,14 +6,11 @@ import OfflineStatusBanner from './OfflineStatusBanner';
 import ErrorBoundary from './ErrorBoundary';
 import GlobalOperationBanner from './GlobalOperationBanner';
 import { useGlobalFeedback } from './GlobalFeedbackContext';
+import LoadingStatus from './LoadingStatus';
 import { ROUTES } from '../routes';
 
 function PageLoader() {
-  return (
-    <div className="main-content" role="status" aria-label="Loading page">
-      <p>Loading...</p>
-    </div>
-  );
+  return <LoadingStatus message="Loading page..." />;
 }
 
 export default function AppLayout({ children }) {
