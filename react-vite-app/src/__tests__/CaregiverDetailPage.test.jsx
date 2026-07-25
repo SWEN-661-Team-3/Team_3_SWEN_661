@@ -44,4 +44,18 @@ describe('CaregiverDetailPage', () => {
     await user.click(screen.getByRole('button', { name: 'Save Changes' }));
     await waitFor(() => expect(setHelpers).toHaveBeenCalled());
   });
+
+  it('removes the routed caregiver after destructive confirmation', async () => {
+    const user = userEvent.setup();
+    const setHelpers = jest.fn();
+    renderDetail('/care-team/sarah', setHelpers);
+
+    await user.click(screen.getByRole('button', { name: 'Edit Details' }));
+    await user.click(screen.getByRole('button', { name: 'Remove Helper' }));
+    const confirmation = screen.getAllByRole('button', { name: 'Remove Helper' })
+      .find((button) => button.closest('dialog.dialog--confirm'));
+    await user.click(confirmation);
+
+    expect(setHelpers).toHaveBeenCalledWith(expect.any(Function));
+  });
 });

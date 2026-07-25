@@ -92,6 +92,21 @@ describe('TodayPage', () => {
     expect(await screen.findByText('Reminder Complete')).toBeInTheDocument();
   });
 
+  it('deletes a reminder after destructive confirmation', async () => {
+    const user = userEvent.setup();
+    const setPlan = jest.fn();
+    renderWithProviders(<TodayPage plan={getPlan()} setPlan={setPlan} helpers={helpers} />);
+
+    await user.click(screen.getByLabelText(/Eye Doctor Checkup.*Pending/));
+    await user.click(screen.getByRole('button', { name: 'Delete Reminder' }));
+    const confirmation = screen.getAllByRole('button', { name: 'Delete Reminder' })
+      .find((button) => button.closest('dialog.dialog--confirm'));
+    await user.click(confirmation);
+
+    await waitFor(() => expect(setPlan).toHaveBeenCalled());
+    expect(await screen.findByRole('heading', { name: 'Reminder Deleted' })).toBeInTheDocument();
+  });
+
   it('dismisses completion notice', async () => {
     const user = userEvent.setup();
     renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);

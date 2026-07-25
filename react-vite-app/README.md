@@ -111,9 +111,10 @@ Build output goes to `dist/`. The preview command serves the production build lo
 | `npm run preview` | Preview production build locally |
 | `npm run lint` | Run ESLint |
 | `npm test` | Run Node.js source-level tests |
-| `npm run test:unit` | Run Jest tests with coverage |
+| `npm run test:unit` | Run Jest unit and component tests |
 | `npm run test:coverage` | Run Jest with text + HTML + lcov coverage reports |
 | `npm run test:e2e` | Run Playwright E2E tests |
+| `npm run test:ci` | Run coverage enforcement, then Chromium E2E tests |
 
 ## Testing
 
@@ -123,15 +124,15 @@ Build output goes to `dist/`. The preview command serves the production build lo
 npm run test:unit
 ```
 
-Runs Jest with React Testing Library. Coverage report is generated in `coverage/`. Open `coverage/index.html` to view the HTML report.
+Runs Jest with React Testing Library. To generate measurable coverage evidence, run `npm run test:coverage`. It writes `coverage/index.html` (open it in a browser) and `coverage/lcov.info`; the directory is ignored from source control.
 
 Coverage thresholds (enforced in `jest.config.cjs`):
-- Statements: 75%
-- Branches: 60%
-- Functions: 75%
-- Lines: 75%
+- Statements: 85%
+- Branches: 75%
+- Functions: 80%
+- Lines: 85%
 
-Current coverage exceeds these thresholds (86%+ statements).
+The function threshold is lower because a few route-wrapper and UI event branches are exercised end-to-end rather than through isolated unit calls; all thresholds are enforced by Jest.
 
 Excluded from coverage: `main.jsx` (entry point), `service-worker.js` (Workbox build output), test files, and mock files.
 
