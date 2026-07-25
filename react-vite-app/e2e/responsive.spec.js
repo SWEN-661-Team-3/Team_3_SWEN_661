@@ -42,4 +42,15 @@ test.describe('Responsive Layout', () => {
     await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
     await expect(page.getByText('Large Text')).toBeVisible();
   });
+
+  test('emergency contacts sit left of the centered help action on desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/emergency');
+
+    const contactsBox = await page.getByRole('heading', { name: 'Emergency Contacts', level: 3 }).boundingBox();
+    const helpButtonBox = await page.getByRole('button', { name: 'Send emergency alert' }).boundingBox();
+
+    expect(contactsBox?.x).toBeLessThan(helpButtonBox?.x ?? 0);
+    expect((helpButtonBox?.x ?? 0) + (helpButtonBox?.width ?? 0) / 2).toBe(720);
+  });
 });

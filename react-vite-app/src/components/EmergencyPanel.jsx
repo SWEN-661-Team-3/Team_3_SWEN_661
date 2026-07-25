@@ -75,22 +75,24 @@ export default function EmergencyPanel({ contacts }) {
 
       {phase === 'idle' && (
         <div className="emergency-panel">
-          <div className="emergency-panel__icon emergency-panel__icon--warning" aria-hidden="true">
-            !
+          <div className="emergency-panel__action">
+            <div className="emergency-panel__icon emergency-panel__icon--warning" aria-hidden="true">
+              !
+            </div>
+            <h2 id="emergency-panel-heading">Need Help?</h2>
+            <p className="emergency-panel__copy">
+              Press the button below to send an alert to your emergency contacts.
+              A {COUNTDOWN_SECONDS}-second countdown will begin before the alert is sent.
+            </p>
+            <button
+              type="button"
+              className="emergency-help-button"
+              onClick={startAlert}
+              aria-label="Send emergency alert"
+            >
+              Get Help Now
+            </button>
           </div>
-          <h2 id="emergency-panel-heading">Need Help?</h2>
-          <p className="emergency-panel__copy">
-            Press the button below to send an alert to your emergency contacts.
-            A {COUNTDOWN_SECONDS}-second countdown will begin before the alert is sent.
-          </p>
-          <button
-            type="button"
-            className="emergency-help-button"
-            onClick={startAlert}
-            aria-label="Send emergency alert"
-          >
-            Get Help Now
-          </button>
 
           {contacts.length > 0 && (
             <div className="emergency-contacts">

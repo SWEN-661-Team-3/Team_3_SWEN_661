@@ -12,7 +12,7 @@ export default function EmergencyPage({ contacts }) {
         <meta property="og:type" content="website" />
       </Helmet>
 
-      <div className="main-content">
+      <div className="main-content main-content--wide emergency-page">
         <div className="page-header">
           <h1 id="emergency-page-heading" className="page-title">Emergency</h1>
         </div>
