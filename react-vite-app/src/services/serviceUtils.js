@@ -1,4 +1,6 @@
-export const DEFAULT_DELAY_MS = 40;
+import { env } from '../env';
+
+export const DEFAULT_DELAY_MS = env.serviceDelayMs;
 
 /**
  * @typedef {{ delayMs?: number, fail?: boolean, errorMessage?: string }} ServiceOptions
@@ -21,7 +23,9 @@ export function simulateAsync(result, options = {}) {
 
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (options.fail) {
+      // An explicit option always wins, letting tests opt in or out safely;
+      // the environment flag is a development-only way to exercise failures.
+      if (options.fail ?? env.enableMockFailures) {
         reject(new Error(options.errorMessage ?? 'The requested service operation failed.'));
         return;
       }

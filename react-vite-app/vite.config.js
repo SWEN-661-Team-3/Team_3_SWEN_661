@@ -1,9 +1,38 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
-  plugins: [
+function parseDelay(value) {
+  const delay = Number(value ?? 40);
+  if (!Number.isFinite(delay) || delay < 0) {
+    throw new Error('VITE_SERVICE_DELAY_MS must be a non-negative number.');
+  }
+  return delay;
+}
+
+export default defineConfig(({ mode }) => {
+  const variables = loadEnv(mode, process.cwd(), 'VITE_');
+  const appEnv = variables.VITE_APP_ENV ?? mode;
+  const isProduction = mode === 'production' || appEnv === 'production';
+  const publicSiteUrl = variables.VITE_PUBLIC_SITE_URL?.replace(/\/$/, '')
+    ?? (isProduction ? '' : 'http://localhost:5173');
+
+  if (!publicSiteUrl) {
+    throw new Error('VITE_PUBLIC_SITE_URL is required for production builds. Set it in your deployment environment.');
+  }
+
+  const appEnvConfig = {
+    appEnv,
+    publicSiteUrl,
+    enableMockFailures: variables.VITE_ENABLE_MOCK_FAILURES === 'true',
+    serviceDelayMs: parseDelay(variables.VITE_SERVICE_DELAY_MS),
+  };
+
+  return {
+    define: {
+      __CARECONNECT_ENV__: JSON.stringify(appEnvConfig),
+    },
+    plugins: [
     react(),
     VitePWA({
       strategies: 'injectManifest',
@@ -45,5 +74,6 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
       },
     }),
-  ],
+    ],
+  };
 });

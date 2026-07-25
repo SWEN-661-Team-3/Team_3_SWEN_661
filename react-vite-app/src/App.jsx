@@ -11,6 +11,7 @@ import { ROUTES, ROUTE_SEGMENTS } from './routes';
 import { getCarePlan } from './services/carePlanService';
 import { getCareTeam } from './services/careTeamService';
 import { defaultSettings, getSettings } from './services/settingsService';
+import { env } from './env';
 
 const TodayPage = lazy(() => import('./pages/TodayPage'));
 const CareTeamPage = lazy(() => import('./pages/CareTeamPage'));
@@ -109,7 +110,7 @@ function AppContent() {
   return (
     <>
       <Helmet defaultTitle="CareConnect - Daily Care Management" titleTemplate="%s">
-        <meta property="og:url" content="https://careconnect.app" />
+        <meta property="og:url" content={env.publicSiteUrl} />
         <meta property="og:site_name" content="CareConnect" />
         <meta name="twitter:card" content="summary" />
       </Helmet>

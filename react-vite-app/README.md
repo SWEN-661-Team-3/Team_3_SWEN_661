@@ -78,11 +78,18 @@ cp .env.example .env.local
 
 ## Environment Variables
 
-| Variable | Purpose | Default |
-|----------|---------|---------|
-| `VITE_PUBLIC_SITE_URL` | Base URL for PWA manifest and OG meta tags | `http://localhost:5173` |
+| Variable | Purpose | Local default |
+|----------|---------|---------------|
+| `VITE_APP_ENV` | Human-readable application environment | `development` |
+| `VITE_PUBLIC_SITE_URL` | Base URL for PWA manifest and OG meta tags; required in production | `http://localhost:5173` |
+| `VITE_ENABLE_MOCK_FAILURES` | Makes simulated service calls fail unless an explicit test option overrides it | `false` |
+| `VITE_SERVICE_DELAY_MS` | Delay used by in-memory async services | `40` |
 
 Variables prefixed with `VITE_` are exposed to the browser. Do not store secrets in them.
+
+The project reads and validates these values once through `src/env.js`; components and services do not read Vite environment values directly. `.env.development` provides the checked-in local defaults. `.env.production` declares production behavior but intentionally omits `VITE_PUBLIC_SITE_URL`, so a production build fails clearly until the deployment supplies it. Copy `.env.example` to `.env.local` for machine-specific local overrides; `.env.local` is ignored by Git and overrides the checked-in mode file.
+
+For **Vercel**, set `VITE_PUBLIC_SITE_URL` to the deployed HTTPS origin in Project Settings → Environment Variables (Production), and optionally set the other variables explicitly. For **Netlify**, set the same `VITE_*` variables in Site configuration → Environment variables. Neither provider needs a secret for these public client-side values. Test code can safely use the service `fail` and `delayMs` options without changing the real environment.
 
 ## Development
 
@@ -155,7 +162,7 @@ To deploy manually:
 npx vercel --prod
 ```
 
-Set `VITE_PUBLIC_SITE_URL` in the Vercel project environment variables to your production URL.
+Set `VITE_PUBLIC_SITE_URL` in the Vercel project environment variables to your production URL; the production build intentionally fails without it.
 
 ## Accessibility
 
