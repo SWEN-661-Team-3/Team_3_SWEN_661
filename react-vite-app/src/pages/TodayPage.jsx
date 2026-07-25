@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Sidebar from '../components/Sidebar';
 import HeroCard from '../components/HeroCard';
@@ -15,15 +15,8 @@ export default function TodayPage({ plan, setPlan, helpers }) {
   const [saveNotice, setSaveNotice] = useState(null);
   const [completeNotice, setCompleteNotice] = useState(null);
   const [deleteNotice, setDeleteNotice] = useState(null);
-  const statusRef = useRef(null);
   const taskButtonRefs = useRef({});
   const triggerRef = useRef(null);
-
-  const announce = useCallback((message) => {
-    if (statusRef.current) {
-      statusRef.current.textContent = message;
-    }
-  }, []);
 
   // One pass produces plan-derived values used by several sections, avoiding
   // repeated filtering while dialog state changes.
@@ -162,7 +155,6 @@ export default function TodayPage({ plan, setPlan, helpers }) {
             </div>
 
             <div
-              ref={statusRef}
               className="visually-hidden"
               aria-live="polite"
               aria-atomic="true"

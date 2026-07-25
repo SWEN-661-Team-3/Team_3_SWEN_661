@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Serve the application shell for direct client-side routes; React Router then
+# chooses the matching page or the application's client-side 404 page.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

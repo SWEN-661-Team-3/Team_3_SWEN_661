@@ -23,7 +23,7 @@ A responsive, accessible Progressive Web App for daily care management built wit
 | PWA | vite-plugin-pwa + Workbox |
 | Unit/Component Testing | Jest + React Testing Library |
 | E2E Testing | Playwright |
-| Hosting | Vercel |
+| Hosting | Netlify (GitHub Actions deployment) |
 
 ## Project Structure
 
@@ -57,7 +57,7 @@ react-vite-app/
 | `/emergency` | Emergency alert panel |
 | `*` | 404 Not Found |
 
-All routes are client-side. The Vercel SPA rewrite (`vercel.json`) ensures a direct request for an application route receives `index.html`, allowing React Router to take over. React Router's final `*` route then renders the dedicated **Page Not Found** screen for unknown client-side paths. In other words, the host rewrite delivers the application; it does not decide which client route is a 404. Static assets and the offline fallback remain excluded from the rewrite.
+All routes are client-side. The Netlify SPA redirect (`netlify.toml`) ensures a direct request for an application route receives `index.html`, allowing React Router to take over. React Router's final `*` route then renders the dedicated **Page Not Found** screen for unknown client-side paths. In other words, the host redirect delivers the application; it does not decide which client route is a 404. Static assets and the offline fallback remain excluded from the redirect.
 
 Unknown caregiver IDs are handled separately by `/care-team/:caregiverId`, which renders its care-team-specific not-found message instead of the general 404 page. The service worker provides the corresponding application-shell fallback when offline.
 
@@ -89,7 +89,7 @@ Variables prefixed with `VITE_` are exposed to the browser. Do not store secrets
 
 The project reads and validates these values once through `src/env.js`; components and services do not read Vite environment values directly. `.env.development` provides the checked-in local defaults. `.env.production` declares production behavior but intentionally omits `VITE_PUBLIC_SITE_URL`, so a production build fails clearly until the deployment supplies it. Copy `.env.example` to `.env.local` for machine-specific local overrides; `.env.local` is ignored by Git and overrides the checked-in mode file.
 
-For **Vercel**, set `VITE_PUBLIC_SITE_URL` to the deployed HTTPS origin in Project Settings → Environment Variables (Production), and optionally set the other variables explicitly. For **Netlify**, set the same `VITE_*` variables in Site configuration → Environment variables. Neither provider needs a secret for these public client-side values. Test code can safely use the service `fail` and `delayMs` options without changing the real environment.
+For **Netlify**, set `VITE_PUBLIC_SITE_URL` to the deployed HTTPS origin in Site configuration → Environment variables, and optionally set the other variables explicitly. The GitHub Actions workflow also needs the same URL as a repository Actions variable named `VITE_PUBLIC_SITE_URL`, because it builds the deployable `dist/` artifact before Netlify receives it. Neither location needs a secret for these public client-side values. Test code can safely use the service `fail` and `delayMs` options without changing the real environment.
 
 ## Development
 
@@ -152,17 +152,22 @@ npm run test:e2e
 
 Playwright tests cover navigation, accessibility (skip link, keyboard, landmarks), task workflows, and responsive breakpoints (375px, 768px, 1440px).
 
-## Deployment
+## Deployment and CI/CD
 
-The app is deployed to Vercel. The `vercel.json` file configures SPA rewrites so application routes resolve to `index.html`; the client-side catch-all route renders the dedicated 404 page after React loads.
+`.github/workflows/netlify.yml` runs on every pull request and on pushes to `main`. It runs `npm ci`, linting, unit/component tests, coverage enforcement, a production build, and Playwright Chromium tests. Coverage and Playwright HTML reports are uploaded as workflow artifacts, even after a failed validation step.
 
-To deploy manually:
+Only a successful push to `main` continues to deployment. The deploy job downloads the exact validated `dist/` artifact and publishes it with the Netlify CLI; pull requests run validation only.
 
-```bash
-npx vercel --prod
-```
+Before enabling deployment, configure these GitHub repository secrets:
 
-Set `VITE_PUBLIC_SITE_URL` in the Vercel project environment variables to your production URL; the production build intentionally fails without it.
+- `NETLIFY_AUTH_TOKEN` — a Netlify personal access token authorized to deploy the site.
+- `NETLIFY_SITE_ID` — the target site's API ID from Netlify Site configuration.
+
+Also set the non-secret repository Actions variable `VITE_PUBLIC_SITE_URL` to the production HTTPS URL. Do not commit tokens or place secrets in `VITE_*` variables.
+
+To diagnose a failed run, open the first failing GitHub Actions step. Download `coverage-report` and open `coverage/index.html`, or download `playwright-report` and open its `index.html` locally. Re-run a transient failure from the Actions page after resolving its configuration or source cause.
+
+`netlify.toml` provides Netlify's build/publish settings and SPA redirect. The redirect serves `index.html` for direct client routes; React Router renders the matching route or the dedicated client-side 404 page.
 
 ## Accessibility
 
@@ -179,7 +184,7 @@ Reduced motion removes decorative animation and transitions only; it does not di
 
 The service worker precaches the application shell (`index.html`) and static assets. When offline, React Router handles client-side navigation using the cached shell; that shell may not match the newest deployment. A static `offline.html` page is the last resort when the cached shell is unavailable. An in-app banner informs the user of offline status.
 
-This is separate from the host-level Vercel SPA rewrite: the rewrite serves `index.html` for a direct online route request, while the service worker supplies a cached shell only after the app has been installed/visited and the network is unavailable.
+This is separate from the host-level Netlify SPA redirect: the redirect serves `index.html` for a direct online route request, while the service worker supplies a cached shell only after the app has been installed/visited and the network is unavailable.
 
 ## Known Limitations
 
