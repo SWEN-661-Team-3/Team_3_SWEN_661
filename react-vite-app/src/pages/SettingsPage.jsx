@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import SettingsPanel from '../components/SettingsPanel';
 import CareConnectDialog from '../components/CareConnectDialog';
@@ -8,24 +8,32 @@ import { defaultSettings, saveSettings } from '../services/settingsService';
 
 export default function SettingsPage({ settings, onSettingsChange, notifications }) {
   const [draftSettings, setDraftSettings] = useState(() => ({ ...settings }));
-  const [pendingSettings, setPendingSettings] = useState(null);
+  const savedSettingsRef = useRef({ ...settings });
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(null);
 
-  function handleSave(newSettings) {
-    setPendingSettings(newSettings);
+  // Preferences are previewed immediately. Leaving before Save restores the
+  // last persisted values, so previewing does not make a change permanent.
+  useEffect(() => () => {
+    onSettingsChange(savedSettingsRef.current);
+  }, [onSettingsChange]);
+
+  function handleChange(nextSettings) {
+    setDraftSettings(nextSettings);
+    onSettingsChange(nextSettings);
   }
 
-  async function confirmSaveSettings() {
-    if (!pendingSettings || isSaving) return;
+  async function handleSave() {
+    if (isSaving) return;
+    const settingsToSave = draftSettings;
     setIsSaving(true);
     setSaveError(null);
     try {
-      const savedSettings = await saveSettings(pendingSettings);
+      const savedSettings = await saveSettings(settingsToSave);
+      savedSettingsRef.current = savedSettings;
       onSettingsChange(savedSettings);
-      setPendingSettings(null);
-      setSaveSuccess('Settings saved.');
+      setSaveSuccess(true);
     } catch {
       setSaveError('Could not save settings. Your changes are still here. Please try again.');
     } finally {
@@ -34,8 +42,7 @@ export default function SettingsPage({ settings, onSettingsChange, notifications
   }
 
   function handleReset() {
-    setDraftSettings({ ...defaultSettings });
-    onSettingsChange({ ...defaultSettings });
+    handleChange({ ...defaultSettings });
   }
 
   return (
@@ -50,11 +57,10 @@ export default function SettingsPage({ settings, onSettingsChange, notifications
 
       <div className="main-content">
         {isSaving && <SavingStatus message="Saving settings..." />}
-        {saveError && <InlineError message={saveError} onRetry={confirmSaveSettings} />}
-        {saveSuccess && <div className="operation-status" role="status"><p>{saveSuccess}</p></div>}
+        {saveError && <InlineError message={saveError} onRetry={handleSave} />}
         <SettingsPanel
           settings={draftSettings}
-          onChange={setDraftSettings}
+          onChange={handleChange}
           onSave={handleSave}
           onReset={handleReset}
           notifications={notifications}
@@ -62,15 +68,10 @@ export default function SettingsPage({ settings, onSettingsChange, notifications
       </div>
 
       <CareConnectDialog
-        open={Boolean(pendingSettings)}
-        title="Save Settings?"
-        message="Save these settings?"
-        cancelLabel="Keep Editing"
-        confirmLabel={isSaving ? 'Saving...' : 'Save Settings'}
-        onCancel={() => setPendingSettings(null)}
-        onConfirm={confirmSaveSettings}
-        confirmDisabled={isSaving}
-        cancelDisabled={isSaving}
+        open={saveSuccess}
+        title="Settings Saved"
+        message="Your settings have been saved."
+        onConfirm={() => setSaveSuccess(false)}
       />
     </>
   );
