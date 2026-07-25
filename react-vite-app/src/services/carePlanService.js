@@ -1,10 +1,12 @@
 import { initialPlan } from '../data/careData';
+import { e2eOperationOptions, hasE2EMode } from './e2eTestMode';
 import { clone, simulateAsync } from './serviceUtils';
 
 let carePlan = clone(initialPlan);
 
 /** @param {import('./serviceUtils').ServiceOptions} [options] */
 export function getCarePlan(options) {
+  if (hasE2EMode('empty-plan')) return simulateAsync(() => [], options);
   return simulateAsync(() => carePlan, options);
 }
 
@@ -17,7 +19,7 @@ export function saveReminder(reminder, options) {
       ? [...carePlan, nextReminder]
       : carePlan.map((item) => (item.id === nextReminder.id ? nextReminder : item));
     return nextReminder;
-  }, options);
+  }, e2eOperationOptions('save-reminder', options));
 }
 
 /** @param {string} reminderId @param {import('./serviceUtils').ServiceOptions} [options] */
@@ -38,5 +40,5 @@ export function markReminderComplete(reminderId, options) {
       return completedReminder;
     });
     return completedReminder;
-  }, options);
+  }, e2eOperationOptions('complete', options));
 }

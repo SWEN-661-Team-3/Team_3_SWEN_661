@@ -1,6 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Navigation', () => {
+  test('loads Today directly', async ({ page }) => {
+    await page.goto('/today');
+    await expect(page.getByRole('heading', { name: "Today's Plan", level: 1 })).toBeVisible();
+    await expect(page).toHaveURL('/today');
+  });
+
   test('redirects the home page to Today\'s Plan', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: "Today's Plan", level: 1 })).toBeVisible();
@@ -35,8 +41,13 @@ test.describe('Navigation', () => {
     await page.getByRole('link', { name: 'Back to Care Team' }).click();
     await expect(page).toHaveURL('/care-team');
 
-    await page.goto('/settings/notifications');
-    await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
+  });
+
+  test('shows the notification capability guard when notifications are unavailable', async ({ page }) => {
+    await page.goto('/settings/notifications?__e2e=unsupported-notifications');
+
+    await expect(page.getByRole('heading', { name: 'Notification Settings Unavailable', level: 1 })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Back to Settings' })).toHaveAttribute('href', '/settings');
   });
 
   test('navigates back to Today via brand link', async ({ page }) => {
@@ -54,6 +65,12 @@ test.describe('Navigation', () => {
     await expect(page.getByText('/this-page-does-not-exist')).toBeVisible();
     await page.getByRole('link', { name: /Go to Today's Plan/ }).click();
     await expect(page).toHaveURL('/today');
+  });
+
+  test('shows the empty care-team state in controlled E2E mode', async ({ page }) => {
+    await page.goto('/care-team?__e2e=empty-team');
+    await expect(page.getByRole('heading', { name: 'No care-team members yet', level: 2 })).toBeVisible();
+    await expect(page.getByLabel('No care-team members yet').getByRole('button', { name: 'Add Member' })).toBeVisible();
   });
 
   test('renders header and footer on every page', async ({ page }) => {

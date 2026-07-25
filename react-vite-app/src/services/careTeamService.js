@@ -1,10 +1,12 @@
 import { caregivers } from '../data/careData';
+import { hasE2EMode } from './e2eTestMode';
 import { clone, simulateAsync } from './serviceUtils';
 
 let careTeam = clone(caregivers);
 
 /** @param {import('./serviceUtils').ServiceOptions} [options] */
 export function getCareTeam(options) {
+  if (hasE2EMode('empty-team')) return simulateAsync(() => [], options);
   return simulateAsync(() => careTeam, options);
 }
 

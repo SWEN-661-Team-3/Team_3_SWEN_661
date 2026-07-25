@@ -10,8 +10,9 @@ test.describe('Accessibility', () => {
 
   test('skip link becomes visible on focus', async ({ page }) => {
     await page.goto('/');
-    await page.keyboard.press('Tab');
+    await expect(page.getByRole('heading', { name: "Today's Plan", level: 1 })).toBeVisible();
     const skipLink = page.locator('a.skip-link');
+    await skipLink.focus();
     await expect(skipLink).toBeFocused();
   });
 

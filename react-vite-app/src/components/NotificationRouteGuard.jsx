@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../routes';
+import { hasE2EMode } from '../services/e2eTestMode';
 
 export function supportsNotificationSettings() {
   return (
@@ -11,7 +12,7 @@ export function supportsNotificationSettings() {
 }
 
 export default function NotificationRouteGuard({ children }) {
-  if (supportsNotificationSettings()) return children;
+  if (supportsNotificationSettings() && !hasE2EMode('unsupported-notifications')) return children;
 
   return (
     <div className="main-content">
