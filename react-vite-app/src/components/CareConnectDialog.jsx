@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 
 export default function CareConnectDialog({
   open,
@@ -15,7 +15,7 @@ export default function CareConnectDialog({
   const dialogRef = useRef(null);
   const confirmButtonClass = variant === 'destructive' ? 'danger-btn' : 'primary-btn';
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = dialogRef.current;
     if (!el) return;
     if (open) {

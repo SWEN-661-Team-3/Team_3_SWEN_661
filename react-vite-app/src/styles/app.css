@@ -827,6 +827,14 @@ body.large-text {
   animation: dialog-enter 180ms ease-out;
 }
 
+.dialog.dialog--exit {
+  animation: dialog-exit 180ms ease-out forwards;
+}
+
+.dialog.dialog--exit::backdrop {
+  background: transparent;
+}
+
 @keyframes dialog-enter {
   from {
     opacity: 0;
@@ -836,6 +844,13 @@ body.large-text {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes dialog-exit {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
   }
 }
 

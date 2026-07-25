@@ -131,7 +131,7 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
     setIsCompleting(true);
     try {
       const didComplete = await onComplete(task.id);
-      if (didComplete) dialogRef.current?.close();
+      if (didComplete) dialogRef.current?.classList.add('dialog--exit');
     } catch {
       setCompleteError('Could not mark this reminder complete. Please try again.');
     } finally {
@@ -162,6 +162,9 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
       ref={dialogRef}
       className="dialog"
       aria-labelledby="task-detail-title"
+      onAnimationEnd={(event) => {
+        if (event.animationName === 'dialog-exit') event.currentTarget.close();
+      }}
       onClose={onClose}
       onCancel={(event) => {
         event.preventDefault();
