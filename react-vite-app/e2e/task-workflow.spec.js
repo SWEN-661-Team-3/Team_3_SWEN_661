@@ -26,8 +26,8 @@ test.describe('Task Workflow', () => {
     await expect(page.locator('dialog[open]')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Close dialog' })).toBeVisible();
     await expect(page.locator('dialog[open] .dialog__footer').getByRole('button')).toHaveText([
-      'Mark Complete',
       'Edit Details',
+      'Mark Complete',
       'Delete Reminder',
     ]);
   });
@@ -81,6 +81,6 @@ test.describe('Task Workflow', () => {
   test('shows the empty reminder state in controlled E2E mode', async ({ page }) => {
     await page.goto('/today?__e2e=empty-plan');
     await expect(page.getByRole('heading', { name: 'No reminders yet', level: 2 })).toBeVisible();
-    await expect(page.getByLabel('No reminders yet').getByRole('button', { name: 'Add Reminder' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add Reminder' })).toHaveCount(1);
   });
 });

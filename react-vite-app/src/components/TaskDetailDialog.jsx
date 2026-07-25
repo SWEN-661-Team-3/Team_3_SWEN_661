@@ -342,6 +342,16 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
               {completeError && <InlineError message={completeError} onRetry={handleComplete} />}
               {isDeleting && <SavingStatus message="Deleting reminder..." />}
               {deleteError && <InlineError message={deleteError} onRetry={handleDelete} />}
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={() => {
+                  setForm({ ...task });
+                  setIsEditing(true);
+                }}
+              >
+                Edit Details
+              </button>
               {task.status === 'todo' && (
                 isCompleting ? (
                   <button type="button" className="primary-btn" disabled>
@@ -353,16 +363,6 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                   </button>
                 )
               )}
-              <button
-                type="button"
-                className="secondary-btn"
-                onClick={() => {
-                  setForm({ ...task });
-                  setIsEditing(true);
-                }}
-              >
-                Edit Details
-              </button>
               <button
                 type="button"
                 className="danger-btn"

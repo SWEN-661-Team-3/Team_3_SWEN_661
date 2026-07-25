@@ -373,6 +373,11 @@ body.large-text {
   text-align: center;
 }
 
+.empty-state--complete {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
 .task-list__status {
   flex-shrink: 0;
   width: 1.75rem;

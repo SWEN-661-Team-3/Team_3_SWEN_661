@@ -21,6 +21,15 @@ describe('TodayPage', () => {
     expect(matches.length).toBeGreaterThanOrEqual(1);
   });
 
+  it('does not show a completed reminder as Next up when no reminders remain', () => {
+    const completedPlan = getPlan().map((task) => ({ ...task, status: 'done' }));
+    renderWithProviders(<TodayPage plan={completedPlan} setPlan={jest.fn()} helpers={helpers} />);
+
+    expect(screen.queryByRole('button', { name: /Next up:/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('All caught up for today');
+    expect(screen.getByText(/You’ve completed all of today’s reminders/)).toBeInTheDocument();
+  });
+
   it('renders stats row', () => {
     renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
     expect(screen.getByText('Completed')).toBeInTheDocument();
@@ -172,13 +181,7 @@ describe('TodayPage', () => {
   it('shows guidance when there are no reminders', () => {
     renderWithProviders(<TodayPage plan={[]} setPlan={jest.fn()} helpers={helpers} />);
     expect(screen.getByRole('heading', { name: 'No reminders yet', level: 2 })).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: 'Add Reminder' }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole('button', { name: 'Add Reminder' })).toHaveLength(1);
   });
 
-  it('shows appointment guidance when reminders contain no upcoming appointment', () => {
-    const planWithoutAppointments = getPlan().filter((task) => task.type !== 'appointment');
-    renderWithProviders(<TodayPage plan={planWithoutAppointments} setPlan={jest.fn()} helpers={helpers} />);
-    expect(screen.getByRole('heading', { name: 'No upcoming appointments', level: 2 })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Add Appointment' })).toBeInTheDocument();
-  });
 });

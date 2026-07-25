@@ -25,16 +25,14 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     }
   }, []);
 
-  // One pass produces the plan-derived values consumed by several sections;
-  // keeping this stable avoids re-filtering while dialog and notice state changes.
+  // One pass produces plan-derived values used by several sections, avoiding
+  // repeated filtering while dialog state changes.
   const planSummary = useMemo(() => {
     const pendingTasks = plan.filter((task) => task.status === 'todo');
-    const upcomingAppointments = pendingTasks.filter((task) => task.type === 'appointment');
 
     return {
       hasTasks: plan.length > 0,
-      hasUpcomingAppointments: upcomingAppointments.length > 0,
-      nextTask: pendingTasks[0] ?? plan[0],
+      nextTask: pendingTasks[0] ?? null,
     };
   }, [plan]);
 
@@ -178,29 +176,25 @@ export default function TodayPage({ plan, setPlan, helpers }) {
 
             {planSummary.hasTasks ? (
               <>
-                <HeroCard task={planSummary.nextTask} onClick={openTaskDetail} />
-                <StatsRow tasks={plan} />
-                {!planSummary.hasUpcomingAppointments && (
-                  <EmptyState
-                    title="No upcoming appointments"
-                    message="Add an appointment reminder to keep visit details and timing in your daily plan."
-                    action={(
-                      <button type="button" className="secondary-btn" onClick={openAddReminder}>
-                        Add Appointment
-                      </button>
-                    )}
-                  />
+                {planSummary.nextTask && (
+                  <HeroCard task={planSummary.nextTask} onClick={openTaskDetail} />
                 )}
+                {!planSummary.nextTask && (
+                  <section
+                    className="empty-state empty-state--complete"
+                    role="status"
+                    aria-labelledby="completed-plan-title"
+                  >
+                    <h2 id="completed-plan-title">All caught up for today</h2>
+                    <p>You’ve completed all of today’s reminders. Add a reminder if something else comes up.</p>
+                  </section>
+                )}
+                <StatsRow tasks={plan} />
               </>
             ) : (
               <EmptyState
                 title="No reminders yet"
                 message="Add a reminder to start building today’s care plan."
-                action={(
-                  <button type="button" className="primary-btn" onClick={openAddReminder}>
-                    Add Reminder
-                  </button>
-                )}
               />
             )}
         </div>

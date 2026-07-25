@@ -78,7 +78,7 @@ describe('TaskDetailDialog', () => {
 
     expect(within(footer).queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
     expect(within(footer).getAllByRole('button').map((button) => button.textContent.trim()))
-      .toEqual(['Mark Complete', 'Edit Details', 'Delete Reminder']);
+      .toEqual(['Edit Details', 'Mark Complete', 'Delete Reminder']);
   });
 
   it('hides Mark Complete button for done tasks', () => {
