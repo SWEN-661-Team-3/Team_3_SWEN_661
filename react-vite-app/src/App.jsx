@@ -90,7 +90,19 @@ function AppContent() {
   if (loadError) {
     return (
       <AppLayout>
-        <div className="main-content" />
+        <section className="main-content" aria-labelledby="initial-load-error-heading">
+          <h1 id="initial-load-error-heading">Unable to load CareConnect</h1>
+          <p>
+            Your session data could not be loaded. Check your connection and try again.
+          </p>
+          <button
+            type="button"
+            className="primary-btn"
+            onClick={() => setLoadAttempt((attempt) => attempt + 1)}
+          >
+            Try again
+          </button>
+        </section>
       </AppLayout>
     );
   }

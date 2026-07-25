@@ -77,9 +77,10 @@ describe('initial application data states', () => {
 
     renderApp('/today');
     expect(await screen.findByRole('alert')).toHaveTextContent('CareConnect could not load your session data.');
+    expect(screen.getByRole('heading', { name: 'Unable to load CareConnect', level: 1 })).toBeInTheDocument();
 
     getCarePlan.mockResolvedValue(initialPlan.map((item) => ({ ...item })));
-    await user.click(screen.getByRole('button', { name: 'Try Again' }));
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByRole('heading', { name: "Today's Plan", level: 1 })).toBeInTheDocument();
   });
 
