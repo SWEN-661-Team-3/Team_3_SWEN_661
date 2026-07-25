@@ -169,6 +169,22 @@ To diagnose a failed run, open the first failing GitHub Actions step. Download `
 
 `netlify.toml` provides Netlify's build/publish settings and SPA redirect. The redirect serves `index.html` for direct client routes; React Router renders the matching route or the dedicated client-side 404 page.
 
+### Deployment evidence and rollback
+
+Current deployment status: **no live Netlify deployment has been verified from this workspace**. A production URL cannot be recorded until a repository maintainer configures `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, and `VITE_PUBLIC_SITE_URL` in GitHub Actions. Do not substitute a Vercel URL or a guessed `netlify.app` URL as Netlify deployment evidence.
+
+| Item | Current status |
+|---|---|
+| Production Netlify URL | Not available / not verified |
+| Netlify preview URL | Not available / not verified |
+| Custom domain | Not configured or verified; do not claim one |
+
+After the first successful Netlify deployment, record the exact production URL and custom-domain status above, then verify a browser refresh for `/`, `/today`, `/care-team/sarah`, `/settings/notifications`, and an unknown route such as `/not-a-page`. The first four must load the React application (with `/` redirecting to `/today`); the unknown route must render the client-side 404 page.
+
+Also verify the generated web manifest and service worker in browser DevTools (Application): confirm the app is installable, turn the network offline to confirm the in-app offline banner and cached app shell, then deploy a small change and reload to confirm the service worker's `autoUpdate` registration receives the update. On `/settings/notifications`, verify both the supported-capability flow and the accessible unsupported-capability message with an environment that lacks the Notification API or service workers.
+
+To roll back a bad production release, open the site's **Deploys** page in Netlify, find the last known-good published deploy, open its deploy menu, and choose **Publish deploy**. Netlify makes that deploy the live version without changing Git history. Re-run the route, PWA, offline, and notification checks above after the rollback, and record the restored deploy URL/timestamp in the final submission evidence.
+
 ## Accessibility
 
 - Semantic HTML: `<main>`, `<nav>`, `<aside>`, `<section>`, `<fieldset>`, `<dialog>`
