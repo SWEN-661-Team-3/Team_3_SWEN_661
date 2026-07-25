@@ -114,14 +114,36 @@ Copy-Item .env.example .env.local
 
 ## Environment setup
 
-| Variable | Purpose | Development default |
-| --- | --- | --- |
-| `VITE_APP_ENV` | Human-readable environment name | `development` |
-| `VITE_PUBLIC_SITE_URL` | Canonical URL used for PWA/metadata; required for production builds | `http://localhost:5173` |
-| `VITE_ENABLE_MOCK_FAILURES` | Enables controlled simulated service failures | `false` |
-| `VITE_SERVICE_DELAY_MS` | Delay in milliseconds for simulated services | `40` |
+Start by copying the tracked example. `.env.local` is intentionally ignored by Git and overrides the mode-specific defaults on your machine.
 
-These names match `.env.example`, `.env.development`, `.env.production`, and `src/env.js`. All `VITE_*` values are exposed to browser code, so never put a token, password, or other secret in them. `.env.local` is ignored by Git.
+```bash
+cp .env.example .env.local
+```
+
+On Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+Vite exposes every variable whose name starts with `VITE_` to browser JavaScript. Treat these values as public configuration: never put `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, passwords, API keys, or other secrets in a `VITE_` variable.
+
+| Variable | Required in development | Required in production | Example | Purpose |
+| --- | --- | --- | --- | --- |
+| `VITE_APP_ENV` | No | No | `development` or `production` | Sets the human-readable application environment. It defaults to Vite’s current mode when omitted. |
+| `VITE_PUBLIC_SITE_URL` | No | Yes | `https://careconnect.example.net` | Canonical public origin used for Open Graph metadata. Development falls back to `http://localhost:5173`; production intentionally has no fallback. |
+| `VITE_ENABLE_MOCK_FAILURES` | No | No | `false` | When exactly `true`, simulated service calls can fail for controlled development/test scenarios. Keep it `false` in production. |
+| `VITE_SERVICE_DELAY_MS` | No | No | `40` | Non-negative delay, in milliseconds, used by the session-only asynchronous service simulation. It defaults to `40`. |
+
+`.env.development` provides the checked-in local defaults used by `npm run dev` and Playwright’s development server. `.env.production` sets production-safe values but deliberately omits `VITE_PUBLIC_SITE_URL`. As a result, `npm run build` fails with a clear configuration error until the production URL is supplied by the command environment or hosting provider.
+
+The application validates and normalizes this configuration once in `src/env.js`; components and services do not read `import.meta.env` directly. `src/vite-env.d.ts` declares Vite’s client environment types and the build-time `__CARECONNECT_ENV__` object injected by `vite.config.js`, keeping the JavaScript configuration contract explicit for tooling and editors.
+
+### Hosting-provider configuration
+
+For **Netlify**, configure `VITE_PUBLIC_SITE_URL` in **Site configuration → Environment variables**. The GitHub Actions deployment workflow also requires the same public URL as the repository Actions variable `VITE_PUBLIC_SITE_URL`, because CI builds `dist/` before uploading it to Netlify. Keep `VITE_ENABLE_MOCK_FAILURES=false` in Netlify production configuration.
+
+For optional **Vercel** deployments, configure `VITE_PUBLIC_SITE_URL` in **Project Settings → Environment Variables** for Production, and keep `VITE_ENABLE_MOCK_FAILURES=false`. `vercel.json` remains as an optional legacy SPA-rewrite configuration; Netlify is the configured CI/CD target.
 
 ## Development versus production
 
