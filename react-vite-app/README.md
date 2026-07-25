@@ -209,7 +209,32 @@ Open the address printed by Vite. `npm run preview` only serves the local `dist/
 
 ## Testing overview
 
-The project uses Jest/React Testing Library for units and components, Node tests for source-level checks, and Playwright for browser journeys. Tests use controlled service delays, failure modes, and empty-data modes rather than a backend.
+Start from a clean checkout with:
+
+```bash
+npm ci
+```
+
+The suite has four complementary categories. Jest tests pure functions and services; React Testing Library tests components and route-level behavior in jsdom; workflow tests exercise multiple components together; Playwright verifies browser-visible journeys in Chromium. None of the tests require a backend.
+
+| Category | Tool | Command | Scope |
+| --- | --- | --- | --- |
+| Source-level tests | Node test runner | `npm test` | Tests in `test/` |
+| Unit tests | Jest | `npm run test:unit` | Validation utilities, services, hooks, and focused components |
+| Component and integration/workflow tests | Jest + React Testing Library | `npm run test:unit` | Routed pages, dialogs, guards, loading/error states, and user workflows in jsdom |
+| E2E tests | Playwright | `npm run test:e2e` | Direct routes, deep links, 404s, accessibility, responsive layouts, and browser task workflows |
+
+To run one workflow-focused Jest file, forward its path to the existing script:
+
+```bash
+npm run test:unit -- src/__tests__/TodayPage.test.jsx
+```
+
+To run the browser task workflow only:
+
+```bash
+npm run test:e2e -- e2e/task-workflow.spec.js
+```
 
 ## Unit and component tests
 
@@ -217,7 +242,7 @@ The project uses Jest/React Testing Library for units and components, Node tests
 npm run test:unit
 ```
 
-These tests cover route behavior, route guards, form validation, dialogs, loading/empty/error states, asynchronous service functions, global feedback, and accessibility behavior.
+These tests cover route behavior, route guards, form validation, dialogs, loading/empty/error states, asynchronous service functions, global feedback, and accessibility behavior. Jest uses jsdom plus the project setup files in `src/__tests__/polyfills.js` and `src/__tests__/setup.js` for browser APIs such as `TextEncoder` and native-dialog methods.
 
 ## Coverage instructions
 
@@ -253,6 +278,20 @@ npm run test:e2e
 
 Playwright starts the Vite development server from `playwright.config.js` and checks routes, deep links, 404 behavior, notification guarding, task workflows, accessibility, and responsive layouts.
 
+For visible browser debugging, run:
+
+```bash
+npx playwright test --headed
+```
+
+For Playwright Inspector debugging, run:
+
+```bash
+npx playwright test --debug
+```
+
+Both commands use the checked-in `playwright.config.js`; they are debugging variants of `npm run test:e2e` rather than additional package scripts.
+
 ## Opening the Playwright report
 
 After an E2E run, open:
@@ -262,6 +301,32 @@ playwright-report/index.html
 ```
 
 The report directory is ignored by Git. In CI, download the `playwright-report` artifact first.
+
+## Controlled test data and failures
+
+Service functions accept test options such as `{ delayMs: 0 }`, `{ fail: true }`, and `{ errorMessage: 'Planned failure' }`. Unit and component tests use these options or mock service modules to keep asynchronous tests fast and deterministic.
+
+Browser tests use the localhost-only `__e2e` query parameter handled by `src/services/e2eTestMode.js`. It is ignored outside `localhost`, so it does not change deployed behavior. Supported examples are:
+
+| URL suffix | Visible test state |
+| --- | --- |
+| `?__e2e=empty-plan` | No reminders |
+| `?__e2e=empty-team` | No care-team members |
+| `?__e2e=unsupported-notifications` | Notification capability guard |
+| `?__e2e=fail-complete` | Completion operation failure with retry feedback |
+| `?__e2e=slow-save-reminder` | Deliberately slow reminder save |
+
+Operation modes follow `fail-<operation>` and `slow-<operation>` when the affected service uses the helper. The development-only environment variable `VITE_ENABLE_MOCK_FAILURES=true` can force simulated service failures, but it must remain `false` in production.
+
+## Common test setup issues
+
+| Problem | Resolution |
+| --- | --- |
+| Jest reports missing browser APIs such as `TextEncoder` or dialog methods | Run the project command (`npm run test:unit` or `npm run test:coverage`) so Jest loads `jest.config.cjs` and its setup/polyfill files. |
+| Playwright cannot find Chromium | Run `npx playwright install chromium`, then rerun `npm run test:e2e`. |
+| Playwright cannot start the local server | Stop any conflicting process on port 5173, or let Playwright start Vite through the configured `webServer`. |
+| A browser test does not activate an `__e2e` mode | Use a localhost URL; test modes intentionally do nothing on deployed hosts. |
+| A report is missing | Run `npm run test:coverage` for `coverage/index.html` or `npm run test:e2e` for `playwright-report/index.html`. |
 
 ## CI/CD pipeline
 
