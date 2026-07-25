@@ -1,210 +1,336 @@
 # CareConnect
 
-A responsive, accessible Progressive Web App for daily care management built with React 19 and Vite 8.
+CareConnect is an accessible React Progressive Web App for managing a daily care plan, care-team contacts, settings, notifications, and emergency actions. It is a front-end demonstration: its asynchronous services simulate realistic short operations over seeded, session-only data.
 
-**Live deployment:** https://react-vite-app-sable.vercel.app
+## Current deployment
+
+No live Netlify deployment has been verified from this repository. A production URL and custom domain must not be claimed until a maintainer configures the Netlify site and GitHub Actions secrets described below.
+
+| Item | Status |
+| --- | --- |
+| Production Netlify URL | Not available / not verified |
+| Netlify preview URL | Not available / not verified |
+| Custom domain | Not configured or verified |
 
 ## Features
 
-- **Today's Plan** -- view, add, edit, and complete daily reminders and tasks
-- **Care Team** -- manage caregivers, doctors, and family contacts with availability status
-- **Settings** -- accessibility preferences (large text, high contrast, dark theme, reduced motion) and push notification toggle
-- **Emergency** -- 5-second countdown emergency alert to contacts
-- **PWA** -- installable app with offline support via service worker caching
-- **Accessibility** -- skip link, keyboard navigation, ARIA live regions, semantic landmarks, focus management in dialogs
+- Today’s Plan with reminders that can be added, edited, completed, and deleted.
+- Care Team list and direct caregiver-detail routes.
+- Settings for large text, high contrast, dark theme, reduced motion, and notifications.
+- Capability-based notification settings guard; no accounts or roles are involved.
+- Emergency countdown workflow.
+- Route-level loading, error, empty, and operation-feedback states.
+- Client-side 404 page and caregiver-specific not-found state.
+- PWA manifest, service worker, cached application shell, and offline status banner.
 
-## Technology Stack
+## Accessibility features
 
-| Category | Technology |
-|----------|-----------|
-| Framework | React 19 |
-| Build Tool | Vite 8 |
-| Routing | React Router DOM v7 |
-| PWA | vite-plugin-pwa + Workbox |
-| Unit/Component Testing | Jest + React Testing Library |
-| E2E Testing | Playwright |
-| Hosting | Netlify (GitHub Actions deployment) |
+- Semantic landmarks, a skip link to `#main-content`, and keyboard-operable controls.
+- Native dialogs with labelled headings, focus placement, and focus restoration.
+- Visible loading, saving, success, and error messages; routine updates use polite status regions and recovery errors use alerts.
+- Field-level form validation with `aria-invalid` and associated error descriptions.
+- Large-text, high-contrast, dark-theme, and reduced-motion preferences.
+- Dialog opening does not duplicate the context already conveyed through focus.
 
-## Project Structure
+## Technology stack
 
-```
-react-vite-app/
-├── src/
-│   ├── App.jsx              # Root state, routing, ErrorBoundary, lazy loading
-│   ├── main.jsx             # Entry point (StrictMode, HelmetProvider, BrowserRouter)
-│   ├── service-worker.js    # Workbox PWA caching and offline fallback
-│   ├── components/          # Reusable UI components
-│   ├── pages/               # Route-level page components
-│   ├── data/careData.js     # Seed data (session-only, no persistence)
-│   ├── hooks/               # Custom hooks (useNotifications)
-│   ├── styles/              # CSS tokens and app styles
-│   └── __tests__/           # Jest test suites and utilities
-├── e2e/                     # Playwright E2E test specs
-├── test/                    # Node.js source-level tests
-└── public/                  # Static assets, icons, offline.html
-```
+| Area | Technology |
+| --- | --- |
+| UI | React 19 |
+| Build tool | Vite 8 |
+| Routing | React Router DOM 7 |
+| PWA | `vite-plugin-pwa` and Workbox |
+| Unit/component tests | Jest and React Testing Library |
+| Browser tests | Playwright (Chromium) |
+| CI/CD target | GitHub Actions and Netlify |
 
-## Route Structure
+## Architecture overview
 
-| Path | Page |
-|------|------|
+`src/App.jsx` owns session state, initial asynchronous loading, route definitions, lazy route imports, and the application error boundary. `src/components/AppLayout.jsx` supplies the shared header, navigation, offline banner, main landmark, route loading fallback, global operation feedback, and footer.
+
+Pages receive the current session state and call Promise-based functions in `src/services/`. Those services clone their in-memory data and simulate a short delay; they do not call a backend or persist data. The validated environment object in `src/env.js` is the only application-level reader of Vite environment values.
+
+## Route structure
+
+| Path | Behavior |
+| --- | --- |
 | `/` | Redirects to `/today` |
-| `/today` | Today's Plan (dashboard) |
-| `/care-team` | Care Team member grid |
-| `/care-team/:caregiverId` | Care Team member details |
-| `/settings` | Accessibility and notification settings |
-| `/settings/notifications` | Notification settings |
-| `/emergency` | Emergency alert panel |
-| `*` | 404 Not Found |
+| `/today` | Today’s Plan |
+| `/care-team` | Care Team |
+| `/care-team/:caregiverId` | Caregiver detail; unknown IDs show a route-specific not-found state |
+| `/settings` | Settings |
+| `/settings/notifications` | Notification settings, guarded by browser capability |
+| `/emergency` | Emergency workflow |
+| `*` | Dedicated client-side 404 page |
 
-All routes are client-side. The Netlify SPA redirect (`netlify.toml`) ensures a direct request for an application route receives `index.html`, allowing React Router to take over. React Router's final `*` route then renders the dedicated **Page Not Found** screen for unknown client-side paths. In other words, the host redirect delivers the application; it does not decide which client route is a 404. Static assets and the offline fallback remain excluded from the redirect.
+Route paths are centralized in `src/routes.js`.
 
-Unknown caregiver IDs are handled separately by `/care-team/:caregiverId`, which renders its care-team-specific not-found message instead of the general 404 page. The service worker provides the corresponding application-shell fallback when offline.
+## Project structure
 
-`/settings/notifications` is protected by a capability-based route guard. It requires both the browser Notification API and service workers; it does not use accounts, authentication, or persistent permissions.
+```text
+react-vite-app/
+├── .github/workflows/netlify.yml  # CI validation and production deployment
+├── e2e/                           # Playwright browser scenarios
+├── public/                        # Static assets and offline fallback
+├── src/
+│   ├── components/                # Shared UI, layout, dialogs, feedback
+│   ├── data/                      # Seed data
+│   ├── hooks/                     # Notification behavior
+│   ├── pages/                     # Lazy route-level pages
+│   ├── services/                  # Session-only asynchronous service layer
+│   ├── styles/                    # Tokens and application styles
+│   ├── utils/                     # Form validation
+│   ├── App.jsx                    # State, routes, lazy loading
+│   ├── env.js                     # Validated environment object
+│   └── service-worker.js          # Workbox offline behavior
+├── netlify.toml                   # Netlify build and SPA redirect settings
+├── package.json
+└── vite.config.js
+```
 
 ## Prerequisites
 
-- Node.js 18+
-- npm 9+
+- Node.js 22 (the CI workflow uses Node 22).
+- npm.
+- Chromium for browser tests; Playwright installs it with the command below.
 
-## Setup
+## Initial setup
 
 ```bash
-cd react-vite-app
-npm install
+npm ci
+```
+
+For local environment overrides, copy the example file to `.env.local` and edit only non-secret values:
+
+```bash
 cp .env.example .env.local
 ```
 
-## Environment Variables
+On Windows PowerShell, use:
 
-| Variable | Purpose | Local default |
-|----------|---------|---------------|
-| `VITE_APP_ENV` | Human-readable application environment | `development` |
-| `VITE_PUBLIC_SITE_URL` | Base URL for PWA manifest and OG meta tags; required in production | `http://localhost:5173` |
-| `VITE_ENABLE_MOCK_FAILURES` | Makes simulated service calls fail unless an explicit test option overrides it | `false` |
-| `VITE_SERVICE_DELAY_MS` | Delay used by in-memory async services | `40` |
+```powershell
+Copy-Item .env.example .env.local
+```
 
-Variables prefixed with `VITE_` are exposed to the browser. Do not store secrets in them.
+## Environment setup
 
-The project reads and validates these values once through `src/env.js`; components and services do not read Vite environment values directly. `.env.development` provides the checked-in local defaults. `.env.production` declares production behavior but intentionally omits `VITE_PUBLIC_SITE_URL`, so a production build fails clearly until the deployment supplies it. Copy `.env.example` to `.env.local` for machine-specific local overrides; `.env.local` is ignored by Git and overrides the checked-in mode file.
+| Variable | Purpose | Development default |
+| --- | --- | --- |
+| `VITE_APP_ENV` | Human-readable environment name | `development` |
+| `VITE_PUBLIC_SITE_URL` | Canonical URL used for PWA/metadata; required for production builds | `http://localhost:5173` |
+| `VITE_ENABLE_MOCK_FAILURES` | Enables controlled simulated service failures | `false` |
+| `VITE_SERVICE_DELAY_MS` | Delay in milliseconds for simulated services | `40` |
 
-For **Netlify**, set `VITE_PUBLIC_SITE_URL` to the deployed HTTPS origin in Site configuration → Environment variables, and optionally set the other variables explicitly. The GitHub Actions workflow also needs the same URL as a repository Actions variable named `VITE_PUBLIC_SITE_URL`, because it builds the deployable `dist/` artifact before Netlify receives it. Neither location needs a secret for these public client-side values. Test code can safely use the service `fail` and `delayMs` options without changing the real environment.
+These names match `.env.example`, `.env.development`, `.env.production`, and `src/env.js`. All `VITE_*` values are exposed to browser code, so never put a token, password, or other secret in them. `.env.local` is ignored by Git.
 
-## Development
+## Development versus production
+
+`npm run dev` loads `.env.development`, which supplies safe local values. A production build loads `.env.production`; that file deliberately omits `VITE_PUBLIC_SITE_URL`, so production builds fail clearly until the deployment environment supplies the real HTTPS URL.
+
+For a one-off local production build, set the variable for the command session:
+
+```powershell
+$env:VITE_PUBLIC_SITE_URL = 'https://example.netlify.app'
+npm run build
+```
+
+Use your real deployed origin, not `example.netlify.app`, for a real release.
+
+## Full script reference
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Vite development server |
+| `npm run build` | Create the production build in `dist/` |
+| `npm run preview` | Serve the existing production build locally |
+| `npm run lint` | Lint application/configuration source files |
+| `npm test` | Run the Node source-level tests in `test/` |
+| `npm run test:unit` | Run Jest unit and component tests |
+| `npm run test:coverage` | Run Jest with enforced coverage thresholds and reports |
+| `npm run test:e2e` | Run Playwright browser tests |
+| `npm run test:ci` | Run coverage enforcement, then Playwright tests |
+
+## Running the application
 
 ```bash
 npm run dev
-npm run test:unit
 ```
 
-Opens at http://localhost:5173.
+Open the local address printed by Vite, normally `http://localhost:5173`.
 
-## Production Build
+## Production build
+
+Set `VITE_PUBLIC_SITE_URL`, then run:
 
 ```bash
 npm run build
+```
+
+The deployable output is written to `dist/`.
+
+## Previewing production output
+
+Build first, then run:
+
+```bash
 npm run preview
 ```
 
-Build output goes to `dist/`. The preview command serves the production build locally for verification.
+Open the address printed by Vite. This verifies the built assets locally; Netlify-specific headers, deploy history, and custom-domain behavior still require Netlify.
 
-## Scripts
+## Testing overview
 
-| Script | Purpose |
-|--------|---------|
-| `npm run dev` | Start development server |
-| `npm run build` | Production build |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint |
-| `npm test` | Run Node.js source-level tests |
-| `npm run test:unit` | Run Jest unit and component tests |
-| `npm run test:coverage` | Run Jest with text + HTML + lcov coverage reports |
-| `npm run test:e2e` | Run Playwright E2E tests |
-| `npm run test:ci` | Run coverage enforcement, then Chromium E2E tests |
+The project uses Jest/React Testing Library for units and components, Node tests for source-level checks, and Playwright for browser journeys. Tests use controlled service delays, failure modes, and empty-data modes rather than a backend.
 
-## Testing
-
-### Unit and Component Tests
+## Unit and component tests
 
 ```bash
 npm run test:unit
 ```
 
-Runs Jest with React Testing Library. To generate measurable coverage evidence, run `npm run test:coverage`. It writes `coverage/index.html` (open it in a browser) and `coverage/lcov.info`; the directory is ignored from source control.
+These tests cover route behavior, route guards, form validation, dialogs, loading/empty/error states, asynchronous service functions, global feedback, and accessibility behavior.
 
-Coverage thresholds (enforced in `jest.config.cjs`):
-- Statements: 85%
-- Branches: 75%
-- Functions: 80%
-- Lines: 85%
+## Coverage instructions
 
-The function threshold is lower because a few route-wrapper and UI event branches are exercised end-to-end rather than through isolated unit calls; all thresholds are enforced by Jest.
+```bash
+npm run test:coverage
+```
 
-Excluded from coverage: `main.jsx` (entry point), `service-worker.js` (Workbox build output), test files, and mock files.
+Jest enforces these global thresholds from `jest.config.cjs`:
 
-### E2E Tests
+| Statements | Branches | Functions | Lines |
+| --- | --- | --- | --- |
+| 85% | 75% | 80% | 85% |
+
+It produces text, HTML, and lcov reports. Entry-point, service-worker, test, and mock files are excluded because they are covered through build/browser behavior or are not application logic.
+
+## Opening the HTML coverage report
+
+After `npm run test:coverage`, open `coverage/index.html` in a browser. `coverage/` is ignored by Git.
+
+## E2E setup
+
+Install Chromium once for the current Playwright version:
 
 ```bash
 npx playwright install chromium
+```
+
+Then run:
+
+```bash
 npm run test:e2e
 ```
 
-Playwright tests cover navigation, accessibility (skip link, keyboard, landmarks), task workflows, and responsive breakpoints (375px, 768px, 1440px).
+Playwright starts the Vite development server from `playwright.config.js` and checks routes, deep links, 404 behavior, notification guarding, task workflows, accessibility, and responsive layouts.
 
-## Deployment and CI/CD
+## Opening the Playwright report
 
-`.github/workflows/netlify.yml` runs on every pull request and on pushes to `main`. It runs `npm ci`, linting, unit/component tests, coverage enforcement, a production build, and Playwright Chromium tests. Coverage and Playwright HTML reports are uploaded as workflow artifacts, even after a failed validation step.
+After an E2E run, open:
 
-Only a successful push to `main` continues to deployment. The deploy job downloads the exact validated `dist/` artifact and publishes it with the Netlify CLI; pull requests run validation only.
+```text
+playwright-report/index.html
+```
 
-Before enabling deployment, configure these GitHub repository secrets:
+The report directory is ignored by Git. In CI, download the `playwright-report` artifact first.
 
-- `NETLIFY_AUTH_TOKEN` — a Netlify personal access token authorized to deploy the site.
-- `NETLIFY_SITE_ID` — the target site's API ID from Netlify Site configuration.
+## CI/CD pipeline
 
-Also set the non-secret repository Actions variable `VITE_PUBLIC_SITE_URL` to the production HTTPS URL. Do not commit tokens or place secrets in `VITE_*` variables.
+`.github/workflows/netlify.yml` runs for pull requests and pushes to `main`.
 
-To diagnose a failed run, open the first failing GitHub Actions step. Download `coverage-report` and open `coverage/index.html`, or download `playwright-report` and open its `index.html` locally. Re-run a transient failure from the Actions page after resolving its configuration or source cause.
+1. Checks out the repository and sets up Node 22.
+2. Runs `npm ci`, linting, unit/component tests, coverage enforcement, and a production build.
+3. Installs Chromium and runs Playwright.
+4. Uploads coverage and Playwright HTML reports as artifacts.
+5. Deploys only successful pushes to `main`.
 
-`netlify.toml` provides Netlify's build/publish settings and SPA redirect. The redirect serves `index.html` for direct client routes; React Router renders the matching route or the dedicated client-side 404 page.
+The deployment job downloads the already validated `dist/` artifact; it does not rebuild it.
 
-### Deployment evidence and rollback
+## Netlify deployment
 
-Current deployment status: **no live Netlify deployment has been verified from this workspace**. A production URL cannot be recorded until a repository maintainer configures `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, and `VITE_PUBLIC_SITE_URL` in GitHub Actions. Do not substitute a Vercel URL or a guessed `netlify.app` URL as Netlify deployment evidence.
+`netlify.toml` defines the build command (`npm run build`), publish directory (`dist`), and SPA redirect.
 
-| Item | Current status |
-|---|---|
-| Production Netlify URL | Not available / not verified |
-| Netlify preview URL | Not available / not verified |
-| Custom domain | Not configured or verified; do not claim one |
+Before enabling the GitHub Actions deployment, configure:
 
-After the first successful Netlify deployment, record the exact production URL and custom-domain status above, then verify a browser refresh for `/`, `/today`, `/care-team/sarah`, `/settings/notifications`, and an unknown route such as `/not-a-page`. The first four must load the React application (with `/` redirecting to `/today`); the unknown route must render the client-side 404 page.
+- Repository secret `NETLIFY_AUTH_TOKEN`: a Netlify personal access token authorized to deploy the site.
+- Repository secret `NETLIFY_SITE_ID`: the Netlify site API ID.
+- Repository Actions variable `VITE_PUBLIC_SITE_URL`: the real production HTTPS URL.
+- Netlify environment variable `VITE_PUBLIC_SITE_URL`: the same production URL, for builds run by Netlify itself.
 
-Also verify the generated web manifest and service worker in browser DevTools (Application): confirm the app is installable, turn the network offline to confirm the in-app offline banner and cached app shell, then deploy a small change and reload to confirm the service worker's `autoUpdate` registration receives the update. On `/settings/notifications`, verify both the supported-capability flow and the accessible unsupported-capability message with an environment that lacks the Notification API or service workers.
+Optional non-secret Netlify environment variables are `VITE_APP_ENV=production`, `VITE_ENABLE_MOCK_FAILURES=false`, and `VITE_SERVICE_DELAY_MS=40`.
 
-To roll back a bad production release, open the site's **Deploys** page in Netlify, find the last known-good published deploy, open its deploy menu, and choose **Publish deploy**. Netlify makes that deploy the live version without changing Git history. Re-run the route, PWA, offline, and notification checks above after the rollback, and record the restored deploy URL/timestamp in the final submission evidence.
+For a manual artifact deployment after building locally, authenticate with Netlify and run:
 
-## Accessibility
+```bash
+npx netlify-cli@latest deploy --dir=dist --prod
+```
 
-- Semantic HTML: `<main>`, `<nav>`, `<aside>`, `<section>`, `<fieldset>`, `<dialog>`
-- Skip link to `#main-content`
-- Keyboard: Tab, Enter, Escape support throughout; focus trapped in native `<dialog>` elements
-- Focus management: dialog headings receive focus on open (`tabIndex="-1"`) so context is announced without adding headings to tab order; focus returns to the trigger on close.
-- ARIA: routine loading/success updates use polite live regions; errors and emergency state changes use assertive alerts only when prompt attention is needed. Dialog opening does not add a redundant live announcement when focus already conveys its context.
-- User preferences: large text, high contrast, dark mode, reduced motion (applied via body CSS classes)
+Never commit Netlify tokens.
 
-Reduced motion removes decorative animation and transitions only; it does not disable dialogs, countdowns, or actions. Large-text and contrast preferences apply to the shared document body so they remain consistent across routes.
+## Vercel deployment
 
-## Offline Behavior
+`vercel.json` remains in the repository and contains an SPA rewrite, so Vercel is an optional legacy deployment configuration. It is not the CI/CD target and no Vercel deployment is verified by this README.
 
-The service worker precaches the application shell (`index.html`) and static assets. When offline, React Router handles client-side navigation using the cached shell; that shell may not match the newest deployment. A static `offline.html` page is the last resort when the cached shell is unavailable. An in-app banner informs the user of offline status.
+If Vercel is used, configure the same required production variable, `VITE_PUBLIC_SITE_URL`, in the Vercel project environment before building. Verify direct route refreshes after deployment.
 
-This is separate from the host-level Netlify SPA redirect: the redirect serves `index.html` for a direct online route request, while the service worker supplies a cached shell only after the app has been installed/visited and the network is unavailable.
+## Custom-domain setup
 
-## Known Limitations
+No custom domain is configured or verified. In Netlify, add the domain in **Domain management**, follow Netlify’s DNS instructions, wait for HTTPS provisioning, set `VITE_PUBLIC_SITE_URL` to that HTTPS origin in both Netlify and the GitHub Actions variable, then trigger a new deployment.
 
-- Data is session-only. All care plan, care team, and settings data resets on page refresh.
-- No backend API, database, or authentication. Async services simulate short session-only operations against in-memory data.
-- Notification scheduling uses browser `setTimeout` timers. Notifications will not fire after the tab is closed.
-- PWA install prompt availability depends on the browser and platform.
+Record the final production URL and custom-domain status here only after they have been verified.
+
+## SPA rewrite behavior
+
+Netlify’s `/* → /index.html` redirect serves the React application for a direct request such as `/care-team/sarah`. React Router then selects the matching client route, or renders the client-side 404 page for an unknown path. The host redirect does not itself decide whether a path is a client-side 404.
+
+The Vercel rewrite follows the same host-level purpose. Static assets and the offline fallback are served as files rather than application routes.
+
+## PWA and service-worker update behavior
+
+The Vite PWA plugin generates the manifest and service worker during production builds. The manifest identifies CareConnect as an installable standalone application. Workbox precaches the application shell and static assets.
+
+The service worker uses `registerType: 'autoUpdate'`, `skipWaiting`, and `clientsClaim`, so an installed update can take control promptly. Offline navigation first attempts the network, then the cached `index.html` shell so React Router can resolve routes; `public/offline.html` is the final fallback when no shell is cached. Cached content can be older than the latest deployment.
+
+To verify an update after a live deployment, install or load the app once, deploy a small visible change, reload, and inspect the service worker in browser DevTools. To verify offline behavior, load the app once, switch DevTools to offline, navigate within the app, and confirm the offline banner. A first offline visit without cached content should show the static offline page.
+
+## Rollback process
+
+In Netlify, open the site’s **Deploys** page, find the last known-good published deploy, open its deploy menu, and select **Publish deploy**. Netlify makes that deploy live without rewriting Git history.
+
+After rollback, verify `/`, `/today`, `/care-team/sarah`, `/settings/notifications`, an invalid URL, and the install/offline behavior. Record the restored deploy URL and timestamp in release evidence.
+
+## Browser support
+
+Automated browser coverage targets Chromium. The app is intended for current evergreen browsers with ES modules and native dialog support. Notification settings are available only when both the Notification API and service workers exist; unsupported environments receive an accessible explanation instead of attempting the feature.
+
+## Known limitations
+
+- Care-plan, care-team, and settings data is session-only and resets after refresh.
+- There is no backend service, database, account system, or authentication.
+- Asynchronous service functions simulate network/processing delays over in-memory data; they are not API calls.
+- Notification scheduling is browser/tab-session dependent and uses timers; it does not continue after the tab is closed.
+- PWA installation, notification permission, and service-worker behavior vary by browser and device.
+- No live Netlify URL or custom domain is currently verified from this repository.
+
+## Troubleshooting guide
+
+| Problem | Check |
+| --- | --- |
+| Production build says `VITE_PUBLIC_SITE_URL` is required | Set the variable to the real HTTPS origin before `npm run build`. |
+| Direct Netlify route refresh returns a host 404 | Confirm `netlify.toml` is deployed and the publish directory is `dist`. |
+| Notification settings are unavailable | The browser must expose both `Notification` and `navigator.serviceWorker`; denied permission is a different state from unsupported capability. |
+| Playwright cannot start a browser | Run `npx playwright install chromium`, then rerun `npm run test:e2e`. |
+| Coverage report is missing | Run `npm run test:coverage`, then open `coverage/index.html`. |
+| A Netlify deploy fails in CI | Check the first failing action, then verify `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, and `VITE_PUBLIC_SITE_URL` are configured. |
+| Offline content looks stale | This is expected for a cached shell; reconnect, reload, and allow the service-worker update to apply. |
+
+## Contribution guidance
+
+Keep changes scoped, preserve accessibility semantics and live-region behavior, and add or update tests with every user-facing behavior change. Use the centralized route constants and environment module instead of duplicating paths or reading `import.meta.env` in components. Before opening a pull request, run:
+
+```bash
+npm run lint
+npm run test:unit
+npm run test:coverage
+npm run test:e2e
+```
