@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import CareMemberDetailDialog from '../components/CareMemberDetailDialog';
 import CareConnectDialog from '../components/CareConnectDialog';
@@ -11,6 +11,46 @@ const availabilityLabels = {
   away: 'Away',
   offline: 'Offline',
 };
+
+// Cards are repeated for every team member. Memoization lets unchanged cards
+// keep their rendered output while dialog-only state changes in this page.
+const CareTeamMemberCard = memo(function CareTeamMemberCard({ helper, onSelectMember }) {
+  return (
+    <button
+      type="button"
+      className="care-helper-card"
+      onClick={() => onSelectMember(helper.id)}
+      aria-label={`${helper.name}, ${helper.role}`}
+    >
+      <div className="care-helper-card__header">
+        <span
+          className="care-helper-card__avatar"
+          style={{ '--helper-color': HELPER_COLORS[helper.colorIndex % HELPER_COLORS.length] }}
+          aria-hidden="true"
+        >
+          {helper.initials}
+        </span>
+        <div>
+          <h3 className="care-helper-card__name">{helper.name}</h3>
+          <p className="care-helper-card__role">{helper.role}</p>
+        </div>
+      </div>
+
+      <span className={`availability-badge availability-badge--${helper.availability}`}>
+        {availabilityLabels[helper.availability]}
+      </span>
+
+      <div className="care-helper-card__details">
+        <p className="care-helper-card__phone">
+          <span className="care-helper-card__meta-label">Phone: </span>
+          {helper.phone}
+        </p>
+        {helper.notes && <p className="care-helper-card__notes">{helper.notes}</p>}
+        <p className="care-helper-card__hint">Click to view and edit details</p>
+      </div>
+    </button>
+  );
+});
 
 export default function CareTeamPage({ helpers, setHelpers }) {
   const [selectedId, setSelectedId] = useState(null);
@@ -30,12 +70,12 @@ export default function CareTeamPage({ helpers, setHelpers }) {
     ? draftMember
     : helpers.find((helper) => helper.id === selectedId) ?? null;
 
-  function openMemberDetail(id) {
+  const openMemberDetail = useCallback((id) => {
     setSelectedId(id);
     setDetailOpen(true);
     const member = helpers.find((helper) => helper.id === id);
     if (member) announce(`Opened details for ${member.name}`);
-  }
+  }, [announce, helpers]);
 
   function closeMemberDetail() {
     setDetailOpen(false);
@@ -133,42 +173,11 @@ export default function CareTeamPage({ helpers, setHelpers }) {
                 aria-label="Team members"
               >
                 {helpers.map((helper) => (
-                <button
-                  type="button"
+                <CareTeamMemberCard
                   key={helper.id}
-                  className="care-helper-card"
-                  onClick={() => openMemberDetail(helper.id)}
-                  aria-label={`${helper.name}, ${helper.role}`}
-                >
-                  <div className="care-helper-card__header">
-                    <span
-                      className="care-helper-card__avatar"
-                      style={{ '--helper-color': HELPER_COLORS[helper.colorIndex % HELPER_COLORS.length] }}
-                      aria-hidden="true"
-                    >
-                      {helper.initials}
-                    </span>
-                    <div>
-                      <h3 className="care-helper-card__name">{helper.name}</h3>
-                      <p className="care-helper-card__role">{helper.role}</p>
-                    </div>
-                  </div>
-
-                  <span className={`availability-badge availability-badge--${helper.availability}`}>
-                    {availabilityLabels[helper.availability]}
-                  </span>
-
-                  <div className="care-helper-card__details">
-                    <p className="care-helper-card__phone">
-                      <span className="care-helper-card__meta-label">Phone: </span>
-                      {helper.phone}
-                    </p>
-                    {helper.notes && (
-                      <p className="care-helper-card__notes">{helper.notes}</p>
-                    )}
-                    <p className="care-helper-card__hint">Click to view and edit details</p>
-                  </div>
-                </button>
+                  helper={helper}
+                  onSelectMember={openMemberDetail}
+                />
                 ))}
               </section>
             )}

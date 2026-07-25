@@ -61,7 +61,7 @@ describe('TodayPage', () => {
     renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
     const taskBtn = screen.getByLabelText(/Eye Doctor Checkup.*Pending/);
     await user.click(taskBtn);
-    expect(screen.getByText('Close')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Close dialog' })).toBeInTheDocument();
     expect(screen.getByText('Edit Details')).toBeInTheDocument();
   });
 
@@ -108,7 +108,7 @@ describe('TodayPage', () => {
     renderWithProviders(<TodayPage plan={getPlan()} setPlan={jest.fn()} helpers={helpers} />);
     const taskBtn = screen.getByLabelText(/Eye Doctor Checkup.*Pending/);
     await user.click(taskBtn);
-    await user.click(screen.getByText('Close'));
+    await user.click(screen.getByRole('button', { name: 'Close dialog' }));
   });
 
   it('opens the add reminder dialog', async () => {
