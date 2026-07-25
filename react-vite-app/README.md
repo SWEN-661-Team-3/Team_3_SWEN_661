@@ -415,15 +415,142 @@ Automated browser coverage targets Chromium. The app is intended for current eve
 
 ## Troubleshooting guide
 
-| Problem | Check |
-| --- | --- |
-| Production build says `VITE_PUBLIC_SITE_URL` is required | Set the variable to the real HTTPS origin before `npm run build`. |
-| Direct Netlify route refresh returns a host 404 | Confirm `netlify.toml` is deployed and the publish directory is `dist`. |
-| Notification settings are unavailable | The browser must expose both `Notification` and `navigator.serviceWorker`; denied permission is a different state from unsupported capability. |
-| Playwright cannot start a browser | Run `npx playwright install chromium`, then rerun `npm run test:e2e`. |
-| Coverage report is missing | Run `npm run test:coverage`, then open `coverage/index.html`. |
-| A Netlify deploy fails in CI | Check the first failing action, then verify `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, and `VITE_PUBLIC_SITE_URL` are configured. |
-| Offline content looks stale | This is expected for a cached shell; reconnect, reload, and allow the service-worker update to apply. |
+### Missing environment variables
+
+**Symptom:** `npm run build` reports that `VITE_PUBLIC_SITE_URL` is required, or metadata has the wrong origin.
+
+**Likely cause:** Production intentionally has no fallback for `VITE_PUBLIC_SITE_URL`.
+
+**Resolution:** Copy `.env.example` to `.env.local` for local work, or set the real HTTPS production origin in the hosting environment. For a PowerShell build:
+
+```powershell
+$env:VITE_PUBLIC_SITE_URL = 'https://your-site.netlify.app'
+npm run build
+```
+
+Do not place secrets in `VITE_` variables.
+
+### Vite startup errors
+
+**Symptom:** `npm run dev` exits before showing a local URL, or reports a malformed delay/configuration value.
+
+**Likely cause:** Dependencies are missing, or `.env.local` contains an invalid `VITE_SERVICE_DELAY_MS` value.
+
+**Resolution:** Run `npm ci`, ensure `VITE_SERVICE_DELAY_MS` is a non-negative number such as `40`, and restart with:
+
+```bash
+npm run dev
+```
+
+### Service worker caching an old build
+
+**Symptom:** A deployed change is not visible in an installed tab, or offline content looks older than the current deploy.
+
+**Likely cause:** The application shell is cached by the installed service worker. Cached content can legitimately be older until the update applies.
+
+**Resolution:** Reconnect to the network, reload the page, then inspect **DevTools → Application → Service Workers** for the active worker. Avoid judging a release from an already-open installed tab alone.
+
+### Notification permission failures
+
+**Symptom:** `/settings/notifications` shows “Notification Settings Unavailable,” permission is denied, or requesting permission does not enable reminders.
+
+**Likely cause:** The route requires both `window.Notification` and `navigator.serviceWorker`. A browser-level denied permission is different from unsupported capability.
+
+**Resolution:** Use a current browser on HTTPS (or localhost during development), confirm service workers are available, and reset the site’s notification permission in the browser’s site settings before trying again. If the route is unsupported, use **Back to Settings**; the app cannot add notification support to that browser.
+
+### Playwright browser installation
+
+**Symptom:** `npm run test:e2e` says Chromium is missing or cannot launch.
+
+**Likely cause:** Playwright’s bundled browser has not been installed for the current dependency version.
+
+**Resolution:** Run:
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```
+
+For interactive diagnosis, use `npx playwright test --headed` or `npx playwright test --debug`.
+
+### Jest or jsdom issues
+
+**Symptom:** Jest reports missing `TextEncoder`, native-dialog methods, or browser APIs.
+
+**Likely cause:** The test was not started with the project’s Jest configuration and setup files.
+
+**Resolution:** Use the project commands, which load `jest.config.cjs`, `src/__tests__/polyfills.js`, and `src/__tests__/setup.js`:
+
+```bash
+npm run test:unit
+npm run test:coverage
+```
+
+If dependencies are missing, run `npm ci` first.
+
+### SPA 404 errors after deployment
+
+**Symptom:** Refreshing `/care-team/sarah` or another application route returns a host-provider 404 instead of the React page.
+
+**Likely cause:** The deployed host is not using the SPA fallback or is publishing the wrong directory.
+
+**Resolution:** For Netlify, deploy `netlify.toml`, use `dist` as the publish directory, and keep the `/* → /index.html` redirect. For Vercel, retain `vercel.json`. Redeploy, then directly refresh `/today`, `/care-team/sarah`, and `/not-a-page`; the last URL should render the app’s client-side 404 page.
+
+### Resetting local PWA data
+
+**Symptom:** Local service-worker behavior remains stale after a source or configuration change.
+
+**Likely cause:** The browser retains this app’s service worker and cached site storage for the local origin.
+
+**Resolution:** In browser DevTools, open **Application → Service Workers**, select this site’s worker, and choose **Unregister**. Then open **Application → Storage**, verify the selected origin is the local CareConnect origin (for example `http://localhost:5173`), and choose **Clear site data**. Reload the app. These steps remove only this origin’s PWA cache/site storage; do not clear unrelated browser data.
+
+### Port conflicts
+
+**Symptom:** Vite or Playwright cannot bind to port `5173`.
+
+**Likely cause:** Another Vite/app process is already using the port. Playwright is configured to reuse an existing server on that port.
+
+**Resolution:** Stop the existing local development server, then run `npm run dev` or `npm run test:e2e` again. If you intentionally keep the server running, ensure it is the CareConnect Vite server at `http://localhost:5173`.
+
+### Offline testing
+
+**Symptom:** The offline banner or cached navigation does not appear as expected.
+
+**Likely cause:** The app was not loaded online first, the service worker is not active yet, or DevTools offline mode was enabled before assets could be cached.
+
+**Resolution:** Load the production build online once, confirm a service worker is active in **DevTools → Application**, then switch **DevTools → Network** to Offline and navigate within the app. Expect the offline status banner and cached shell. A first-ever offline visit may show `offline.html` instead.
+
+### Netlify build failure
+
+**Symptom:** A Netlify build or the GitHub Actions deploy job fails before publishing.
+
+**Likely cause:** Missing `VITE_PUBLIC_SITE_URL`, invalid environment values, missing Netlify credentials, or a failed lint/test/build step.
+
+**Resolution:** Read the first failed log line. Confirm the Netlify build command is `npm run build`, the publish directory is `dist`, and GitHub has `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, and the non-secret `VITE_PUBLIC_SITE_URL` Actions variable. Reproduce locally with `npm ci`, `npm run lint`, `npm run test:coverage`, and `npm run build` after setting the public URL.
+
+### CI test failure
+
+**Symptom:** A pull-request workflow fails at Jest, coverage, or Playwright.
+
+**Likely cause:** A test regression, unmet coverage threshold, or unavailable Playwright browser.
+
+**Resolution:** Open the first failed GitHub Actions step, download the `coverage-report` or `playwright-report` artifact when available, and reproduce the named command locally. Use `npm run test:coverage` for coverage failures and `npx playwright install chromium` followed by `npm run test:e2e` for browser failures.
+
+### Custom-domain or SSL delay
+
+**Symptom:** A newly connected domain does not resolve, shows a certificate warning, or does not yet serve the current site.
+
+**Likely cause:** DNS records have not propagated, Netlify has not validated the records, or HTTPS/SSL provisioning is still pending.
+
+**Resolution:** Compare the registrar’s DNS records with the values in Netlify **Domain management**, wait for Netlify to report the domain as configured and HTTPS-ready, then set `VITE_PUBLIC_SITE_URL` to the verified custom HTTPS origin and redeploy. Do not claim the custom domain is live before the HTTPS URL loads successfully.
+
+### Stale preview deployment
+
+**Symptom:** A preview URL shows an older commit than the pull request or branch you expect.
+
+**Likely cause:** The URL belongs to an earlier deploy, or the newest workflow did not finish successfully.
+
+**Resolution:** In Netlify **Deploys** and GitHub Actions, compare the deploy’s commit SHA and timestamp with the intended commit. Open the newest successful deploy rather than reusing a bookmarked preview URL. For production, only the deploy labelled **Published** is active; publish a known-good deploy or rerun the successful pipeline when appropriate.
 
 ## Contribution guidance
 
