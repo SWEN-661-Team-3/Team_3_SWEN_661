@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import App from '../App';
@@ -69,6 +70,7 @@ describe('initial application data states', () => {
   });
 
   it('shows a retryable global error and loads after retry', async () => {
+    const user = userEvent.setup();
     getCarePlan.mockRejectedValueOnce(new Error('Service unavailable'));
     getCareTeam.mockResolvedValue(caregivers.map((item) => ({ ...item })));
     getSettings.mockResolvedValue({ ...defaultSettings });
@@ -77,7 +79,7 @@ describe('initial application data states', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('CareConnect could not load your session data.');
 
     getCarePlan.mockResolvedValue(initialPlan.map((item) => ({ ...item })));
-    await screen.getByRole('button', { name: 'Try Again' }).click();
+    await user.click(screen.getByRole('button', { name: 'Try Again' }));
     expect(await screen.findByRole('heading', { name: "Today's Plan", level: 1 })).toBeInTheDocument();
   });
 

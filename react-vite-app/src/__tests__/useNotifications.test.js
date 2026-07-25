@@ -1,5 +1,10 @@
 import { renderHook, act } from '@testing-library/react';
 import useNotifications from '../hooks/useNotifications';
+import { requestNotificationPermission } from '../services/notificationService';
+
+jest.mock('../services/notificationService', () => ({
+  requestNotificationPermission: jest.fn(),
+}));
 
 describe('useNotifications', () => {
   let originalNotification;
@@ -14,6 +19,7 @@ describe('useNotifications', () => {
     window.Notification.requestPermission = jest.fn(() =>
       Promise.resolve('granted'),
     );
+    requestNotificationPermission.mockImplementation(() => window.Notification.requestPermission());
     Object.defineProperty(navigator, 'serviceWorker', {
       value: {},
       writable: true,
@@ -93,6 +99,32 @@ describe('useNotifications', () => {
 
     expect(result.current.enabled).toBe(false);
     expect(result.current.permission).toBe('denied');
+  });
+
+  it('reports pending permission, surfaces a failure, and recovers on retry', async () => {
+    let resolvePermission;
+    requestNotificationPermission.mockImplementationOnce(() => new Promise((resolve) => {
+      resolvePermission = resolve;
+    }));
+    const { result } = renderHook(() => useNotifications([]));
+
+    act(() => {
+      void result.current.toggle();
+    });
+    expect(result.current.isRequesting).toBe(true);
+
+    await act(async () => {
+      resolvePermission(Promise.reject(new Error('Permission request failed')));
+    });
+    expect(result.current.notificationError).toMatch(/could not request/i);
+    expect(result.current.enabled).toBe(false);
+
+    requestNotificationPermission.mockResolvedValueOnce('granted');
+    await act(async () => {
+      await result.current.retryPermission();
+    });
+    expect(result.current.enabled).toBe(true);
+    expect(result.current.notificationError).toBeNull();
   });
 
   it('schedules notifications for upcoming tasks when enabled', async () => {

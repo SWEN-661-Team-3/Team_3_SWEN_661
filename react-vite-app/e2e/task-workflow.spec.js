@@ -24,7 +24,12 @@ test.describe('Task Workflow', () => {
     await page.goto('/');
     await page.locator('.task-list__btn').nth(1).click();
     await expect(page.locator('dialog[open]')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Close', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Close dialog' })).toBeVisible();
+    await expect(page.locator('dialog[open] .dialog__footer').getByRole('button')).toHaveText([
+      'Mark Complete',
+      'Edit Details',
+      'Delete Reminder',
+    ]);
   });
 
   test('marks a task complete and shows confirmation', async ({ page }) => {
