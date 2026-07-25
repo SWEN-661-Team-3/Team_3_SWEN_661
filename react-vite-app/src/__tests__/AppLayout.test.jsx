@@ -16,6 +16,8 @@ describe('AppLayout', () => {
       </GlobalFeedbackProvider>,
     );
 
-    expect(screen.getByRole('status')).toHaveTextContent('Loading page...');
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent('Loading page...');
+    expect(status.closest('.app-layout__loading')).toBeInTheDocument();
   });
 });

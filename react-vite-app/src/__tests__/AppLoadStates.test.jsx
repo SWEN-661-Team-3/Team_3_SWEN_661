@@ -43,7 +43,9 @@ describe('initial application data states', () => {
     getSettings.mockImplementation(() => new Promise(() => {}));
 
     renderApp('/today');
-    expect(screen.getByRole('status')).toHaveTextContent("Loading today's plan...");
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent("Loading today's plan...");
+    expect(status.closest('.app-layout__loading')).toBeInTheDocument();
   });
 
   it.each([

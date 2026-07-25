@@ -74,7 +74,7 @@ export default function EmergencyPanel({ contacts }) {
       />
 
       {phase === 'idle' && (
-        <div className="emergency-panel">
+        <div className="emergency-panel emergency-panel--idle">
           <div className="emergency-panel__action">
             <div className="emergency-panel__icon emergency-panel__icon--warning" aria-hidden="true">
               !

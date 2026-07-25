@@ -110,7 +110,7 @@ function AppContent() {
   if (!plan || !helpers) {
     return (
       <AppLayout>
-        <div className="main-content">
+        <div className="main-content app-layout__loading">
           <LoadingStatus message={loadingMessage} />
         </div>
       </AppLayout>

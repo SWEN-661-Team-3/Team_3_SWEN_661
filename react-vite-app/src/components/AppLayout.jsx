@@ -10,7 +10,11 @@ import LoadingStatus from './LoadingStatus';
 import { ROUTES } from '../routes';
 
 function PageLoader() {
-  return <LoadingStatus message="Loading page..." />;
+  return (
+    <div className="app-layout__loading">
+      <LoadingStatus message="Loading page..." />
+    </div>
+  );
 }
 
 export default function AppLayout({ children }) {

@@ -13,6 +13,9 @@ test.describe('Responsive Layout', () => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: "Today's Plan", level: 1 })).toBeVisible();
     await expect(page.locator('.app-header')).toBeVisible();
+    const sidebarBox = await page.locator('.sidebar').boundingBox();
+    const headingBox = await page.getByRole('heading', { name: "Today's Plan", level: 1 }).boundingBox();
+    expect((sidebarBox?.x ?? 0) + (sidebarBox?.width ?? 0)).toBeLessThan(headingBox?.x ?? 0);
   });
 
   test('desktop layout at 1440px', async ({ page }) => {

@@ -207,6 +207,15 @@ body.large-text {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.app-layout__loading {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+}
+
 .sidebar {
   padding: var(--space-6) var(--space-5);
   background: var(--color-surface);
@@ -1317,10 +1326,40 @@ textarea.edit-field__control {
     max-width: none;
   }
 
-  .emergency-panel {
+  .emergency-panel--idle {
     display: grid;
     grid-template-columns: minmax(20rem, 1fr) auto minmax(20rem, 1fr);
     grid-template-areas: 'contacts action spacer';
+    align-items: start;
+  }
+
+  .emergency-panel__action {
+    grid-area: action;
+  }
+
+  .emergency-contacts {
+    grid-area: contacts;
+    width: min(20rem, 100%);
+  }
+}
+
+/* Tablet: keep contacts on the left while the help content uses the two
+   remaining columns, avoiding a cramped action area. */
+@media (min-width: 721px) and (max-width: 1024px) {
+  /* Today’s Plan keeps a compact desktop layout on tablets. */
+  .app-layout:not(.app-layout--wide) {
+    grid-template-columns: minmax(16rem, 18rem) minmax(0, 1fr);
+  }
+
+  .app-layout:not(.app-layout--wide) .sidebar {
+    border-right: var(--stroke-width) solid var(--color-border);
+    border-bottom: none;
+  }
+
+  .emergency-panel--idle {
+    display: grid;
+    grid-template-columns: minmax(18rem, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: 'contacts action action';
     align-items: start;
   }
 
