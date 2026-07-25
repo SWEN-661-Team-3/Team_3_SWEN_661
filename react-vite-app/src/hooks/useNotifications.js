@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { requestNotificationPermission } from '../services/notificationService';
 
-// Notifications are scheduled as browser setTimeout timers, not through a
-// backend push service. This means scheduling is session-dependent: timers
-// are cleared when the tab closes or the component unmounts, and they will
-// not fire after the browser is closed. This is an intentional scope
-// limitation -- real server-side scheduling is outside the project scope.
+// Notifications use browser setTimeout timers rather than backend push, so
+// schedules exist only for this open browser session. Cleanup prevents stale
+// timers after tasks change or the component unmounts; closed tabs cannot
+// deliver these reminders.
 const REMINDER_LEAD_MINUTES = 15;
 
 function parseTime(timeStr) {
@@ -24,10 +23,9 @@ function parseTime(timeStr) {
   return date;
 }
 
-// Both Notification API and ServiceWorker must be available. Environments
-// that lack either (e.g. older browsers, insecure contexts) are treated as
-// "unsupported" rather than failing silently. When permission is "denied",
-// the UI shows recovery instructions instead of hiding the toggle entirely.
+// Both Notification API and ServiceWorker must be available. Missing support
+// is an unsupported capability, while denied permission is recoverable in
+// browser settings; the UI keeps those states distinct rather than failing silently.
 function getNotificationSupport() {
   return 'Notification' in window && 'serviceWorker' in navigator;
 }
@@ -49,6 +47,8 @@ export default function useNotifications(tasks) {
 
   const scheduleTaskNotifications = useCallback(
     (taskList) => {
+      // Rebuild the session-only timer list from current tasks so completed,
+      // edited, or removed reminders cannot leave orphaned notifications.
       clearScheduled();
       if (!getNotificationSupport() || Notification.permission !== 'granted') return;
 

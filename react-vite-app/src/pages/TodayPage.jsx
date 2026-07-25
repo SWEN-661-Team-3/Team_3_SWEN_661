@@ -84,6 +84,9 @@ export default function TodayPage({ plan, setPlan, helpers }) {
   }
 
   function closeTaskDetail() {
+    // Returning focus to the trigger preserves the user's place after a
+    // modal closes; ordinary success/status messages intentionally do not
+    // move focus away from the control the user is using.
     setDetailOpen(false);
     setSelectedId(null);
     setDraftTask(null);

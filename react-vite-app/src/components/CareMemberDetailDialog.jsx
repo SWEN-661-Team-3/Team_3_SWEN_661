@@ -26,6 +26,7 @@ function getInitials(name) {
 
 export default function CareMemberDetailDialog({ member, open, mode = 'view', onClose, onSave, onRemove }) {
   const dialogRef = useRef(null);
+  const titleRef = useRef(null);
   const fieldRefs = useRef({});
   const [isEditing, setIsEditing] = useState(mode === 'add');
   const [form, setForm] = useState(() => (member ? { ...member } : null));
@@ -41,6 +42,9 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     if (open) {
       el.classList.remove('dialog--enter');
       el.showModal();
+      // Focus the labelled heading so opening context is announced without
+      // adding a non-control to the keyboard tab order.
+      requestAnimationFrame(() => titleRef.current?.focus({ preventScroll: true }));
       void el.offsetWidth;
       el.classList.add('dialog--enter');
     } else {
@@ -129,7 +133,7 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     >
       <div className="dialog__inner">
         <div className="dialog__header">
-          <h2 id={titleId}>{title}</h2>
+          <h2 ref={titleRef} id={titleId} tabIndex="-1">{title}</h2>
           <button
             type="button"
             className="dialog__close"

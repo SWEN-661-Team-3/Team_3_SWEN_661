@@ -32,11 +32,11 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
   const [deleteError, setDeleteError] = useState(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
-  // Focus management: when the dialog opens, focus moves to the heading
-  // (via tabIndex="-1") so screen readers announce the dialog context
-  // immediately. The close button is the fallback if the heading ref is
-  // missing. Focus is restored to the triggering element when the dialog
-  // closes (handled in the parent page's closeTaskDetail callback).
+  // Focus management: the heading receives focus via tabIndex="-1" so the
+  // dialog context is announced without putting a non-control in tab order.
+  // The close button is a fallback; the page restores focus to the opener on
+  // close. Routine save/error status updates stay in their live regions so
+  // they do not interrupt someone who is still editing a field.
   // The rAF delay ensures the DOM has painted after showModal() before
   // attempting to focus an element inside the now-visible dialog.
   useEffect(() => {

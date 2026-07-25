@@ -72,9 +72,9 @@ function AppContent() {
     };
   }, [loadAttempt, dismissFeedback, showFeedback]);
 
-  // Accessibility classes are applied to the document body so CSS can target
-  // the entire page. Reduced motion must not remove functionality -- it only
-  // disables decorative animations and transitions via CSS.
+  // These body classes let CSS apply preferences across route content. Large
+  // text and high contrast change readability, while reduced motion removes
+  // only decorative motion so controls and timing-dependent flows still work.
   useEffect(() => {
     document.body.classList.toggle('large-text', settings.largeText);
     document.body.classList.toggle('high-contrast', settings.highContrast);

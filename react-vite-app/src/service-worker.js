@@ -5,21 +5,18 @@ import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst, NetworkFirst } from 'workbox-strategies';
 
-// skipWaiting + clientsClaim ensures the new service worker takes over
-// immediately on update, so users always run the latest cached build
-// without needing to close all tabs. This is acceptable for a care-plan
-// app where stale cache data is low-risk.
+// skipWaiting + clientsClaim lets an installed update control open clients
+// promptly. Offline navigation can still use the installed worker's cached
+// shell, so cached content is not guaranteed to be the newest deployment.
 self.skipWaiting();
 clientsClaim();
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 
-// Offline routing strategy: all navigation requests fall back to the
-// precached /index.html application shell, which lets React Router handle
-// client-side routing even when offline. The static /offline.html page is
-// a last resort for when the shell itself is unavailable (e.g. first visit
-// with no cache). Host-level SPA rewrites (vercel.json) handle the same
-// concern on the server side for direct URL access while online.
+// Offline navigation falls back to the precached /index.html shell so React
+// Router can resolve client routes. /offline.html is only for a first/offline
+// visit with no shell. This service-worker fallback is separate from the
+// host SPA rewrite, which serves index.html for direct online requests.
 registerRoute(
   ({ request, url }) => request.mode === 'navigate' && /^\/(?!api)/.test(url.pathname),
   async ({ request }) => {

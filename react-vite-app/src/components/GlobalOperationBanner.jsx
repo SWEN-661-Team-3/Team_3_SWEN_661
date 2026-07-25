@@ -7,6 +7,9 @@ const titles = {
 export default function GlobalOperationBanner({ type = 'info', message, onDismiss, onRetry }) {
   const isError = type === 'error';
 
+  // Errors use an assertive alert because recovery needs prompt attention;
+  // success and informational updates are polite. Local forms announce their
+  // own validation, so this banner is reserved for cross-page operations.
   return (
     <section
       className={`global-operation-banner global-operation-banner--${type}`}

@@ -73,9 +73,9 @@ export default function CareTeamPage({ helpers, setHelpers }) {
   const openMemberDetail = useCallback((id) => {
     setSelectedId(id);
     setDetailOpen(true);
-    const member = helpers.find((helper) => helper.id === id);
-    if (member) announce(`Opened details for ${member.name}`);
-  }, [announce, helpers]);
+    // The dialog heading receives focus on open, so a second polite
+    // “opened” announcement would repeat context already conveyed by focus.
+  }, []);
 
   function closeMemberDetail() {
     setDetailOpen(false);
@@ -131,7 +131,6 @@ export default function CareTeamPage({ helpers, setHelpers }) {
     });
     setSelectedId('new');
     setDetailOpen(true);
-    announce('Opened add care team member form');
   }
 
   return (

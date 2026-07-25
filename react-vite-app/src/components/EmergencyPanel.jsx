@@ -20,6 +20,8 @@ export default function EmergencyPanel({ contacts }) {
     announce('Emergency alert countdown started');
   }
 
+  // Cancellation is announced immediately because it changes whether an
+  // alert will be sent; the visible countdown itself remains available too.
   function cancelAlert() {
     clearInterval(intervalRef.current);
     setPhase('idle');
@@ -53,9 +55,9 @@ export default function EmergencyPanel({ contacts }) {
     }
   }, [phase, countdown, announce]);
 
-  // The sent-state announcement uses aria-live="assertive" (set on the
-  // status region above) because this is a critical safety transition that
-  // must interrupt whatever the screen reader is currently saying.
+  // The sent transition is assertive because it is safety-critical. Start,
+  // cancellation, and the two-second warning share that urgent status region;
+  // per-second updates are deliberately omitted above to avoid noise.
   useEffect(() => {
     if (phase === 'confirmed') {
       announce('Emergency alert sent');

@@ -161,17 +161,21 @@ Set `VITE_PUBLIC_SITE_URL` in the Vercel project environment variables to your p
 - Semantic HTML: `<main>`, `<nav>`, `<aside>`, `<section>`, `<fieldset>`, `<dialog>`
 - Skip link to `#main-content`
 - Keyboard: Tab, Enter, Escape support throughout; focus trapped in native `<dialog>` elements
-- Focus management: dialog headings receive focus on open (`tabIndex="-1"`); focus returns to the trigger on close
-- ARIA: `aria-live` regions for status announcements, `aria-label`/`aria-labelledby` on landmarks, `aria-hidden` on decorative icons
+- Focus management: dialog headings receive focus on open (`tabIndex="-1"`) so context is announced without adding headings to tab order; focus returns to the trigger on close.
+- ARIA: routine loading/success updates use polite live regions; errors and emergency state changes use assertive alerts only when prompt attention is needed. Dialog opening does not add a redundant live announcement when focus already conveys its context.
 - User preferences: large text, high contrast, dark mode, reduced motion (applied via body CSS classes)
+
+Reduced motion removes decorative animation and transitions only; it does not disable dialogs, countdowns, or actions. Large-text and contrast preferences apply to the shared document body so they remain consistent across routes.
 
 ## Offline Behavior
 
-The service worker precaches the application shell (`index.html`) and static assets. When offline, React Router handles client-side navigation using the cached shell. A static `offline.html` page is the last resort when the cached shell is unavailable. An in-app banner informs the user of offline status.
+The service worker precaches the application shell (`index.html`) and static assets. When offline, React Router handles client-side navigation using the cached shell; that shell may not match the newest deployment. A static `offline.html` page is the last resort when the cached shell is unavailable. An in-app banner informs the user of offline status.
+
+This is separate from the host-level Vercel SPA rewrite: the rewrite serves `index.html` for a direct online route request, while the service worker supplies a cached shell only after the app has been installed/visited and the network is unavailable.
 
 ## Known Limitations
 
 - Data is session-only. All care plan, care team, and settings data resets on page refresh.
-- No backend API, database, or authentication. Async services are not implemented; all data is synchronous and in-memory.
+- No backend API, database, or authentication. Async services simulate short session-only operations against in-memory data.
 - Notification scheduling uses browser `setTimeout` timers. Notifications will not fire after the tab is closed.
 - PWA install prompt availability depends on the browser and platform.
