@@ -182,13 +182,20 @@ Open the local address printed by Vite, normally `http://localhost:5173`.
 
 ## Production build
 
-Set `VITE_PUBLIC_SITE_URL`, then run:
+Build the same artifact that Netlify publishes. A production build requires the real public origin:
 
 ```bash
 npm run build
 ```
 
-The deployable output is written to `dist/`.
+For PowerShell, set it for the current shell before building:
+
+```powershell
+$env:VITE_PUBLIC_SITE_URL = 'https://your-site.netlify.app'
+npm run build
+```
+
+The deployable output is written to `dist/`. Do not edit files in `dist/`; build them from source.
 
 ## Previewing production output
 
@@ -198,7 +205,7 @@ Build first, then run:
 npm run preview
 ```
 
-Open the address printed by Vite. This verifies the built assets locally; Netlify-specific headers, deploy history, and custom-domain behavior still require Netlify.
+Open the address printed by Vite. `npm run preview` only serves the local `dist/` output: it is useful for checking the production bundle, but it is not a Netlify deploy. It cannot prove Netlify deploy history, DNS/SSL, the Netlify redirect, or the active production version.
 
 ## Testing overview
 
@@ -270,14 +277,15 @@ The deployment job downloads the already validated `dist/` artifact; it does not
 
 ## Netlify deployment
 
-`netlify.toml` defines the build command (`npm run build`), publish directory (`dist`), and SPA redirect.
+`netlify.toml` defines the build command (`npm run build`), publish directory (`dist`), and SPA redirect. The GitHub Actions workflow validates each pull request, then deploys only a successful push to `main`.
 
-Before enabling the GitHub Actions deployment, configure:
+Set up a reproducible GitHub Actions deployment as follows:
 
-- Repository secret `NETLIFY_AUTH_TOKEN`: a Netlify personal access token authorized to deploy the site.
-- Repository secret `NETLIFY_SITE_ID`: the Netlify site API ID.
-- Repository Actions variable `VITE_PUBLIC_SITE_URL`: the real production HTTPS URL.
-- Netlify environment variable `VITE_PUBLIC_SITE_URL`: the same production URL, for builds run by Netlify itself.
+1. Create or select a Netlify site. Its publish directory is `dist` and its build command is `npm run build`.
+2. In the GitHub repository, add secret `NETLIFY_AUTH_TOKEN` (a Netlify personal access token authorized to deploy) and secret `NETLIFY_SITE_ID` (the target site API ID).
+3. Add the non-secret repository Actions variable `VITE_PUBLIC_SITE_URL` with the real production HTTPS URL. CI uses it while building the artifact.
+4. In Netlify **Site configuration → Environment variables**, add the same `VITE_PUBLIC_SITE_URL` for any build initiated by Netlify itself.
+5. Push the workflow and application changes to `main`; the **Deploy production site** GitHub Actions job runs only after all validation checks pass.
 
 Optional non-secret Netlify environment variables are `VITE_APP_ENV=production`, `VITE_ENABLE_MOCK_FAILURES=false`, and `VITE_SERVICE_DELAY_MS=40`.
 
@@ -289,15 +297,21 @@ npx netlify-cli@latest deploy --dir=dist --prod
 
 Never commit Netlify tokens.
 
+### Confirming the active production version
+
+In Netlify, open **Deploys** and identify the deploy marked **Published**. Open it to record its deploy URL, published timestamp, commit SHA, and deploy log. Visit the site’s production domain and refresh `/`, `/today`, `/care-team/sarah`, `/settings/notifications`, and `/not-a-page`; this confirms the active artifact serves the expected redirect, deep link, guard, and client-side 404. The URL is not known or verified for this repository yet, so do not add a guessed value to this README.
+
 ## Vercel deployment
 
 `vercel.json` remains in the repository and contains an SPA rewrite, so Vercel is an optional legacy deployment configuration. It is not the CI/CD target and no Vercel deployment is verified by this README.
 
-If Vercel is used, configure the same required production variable, `VITE_PUBLIC_SITE_URL`, in the Vercel project environment before building. Verify direct route refreshes after deployment.
+If Vercel is retained, create/import a Vercel project for this repository, use `npm run build` with `dist` as the output directory, and configure `VITE_PUBLIC_SITE_URL` in **Project Settings → Environment Variables** for Production. Deploy from the Vercel dashboard or an approved Vercel integration, then refresh the same direct routes listed above. The existing `vercel.json` supplies the SPA rewrite; it does not configure Netlify or replace the Netlify workflow.
 
 ## Custom-domain setup
 
-No custom domain is configured or verified. In Netlify, add the domain in **Domain management**, follow Netlify’s DNS instructions, wait for HTTPS provisioning, set `VITE_PUBLIC_SITE_URL` to that HTTPS origin in both Netlify and the GitHub Actions variable, then trigger a new deployment.
+No custom domain is configured or verified. In Netlify **Domain management**, add the domain, then create the DNS records Netlify displays at the domain registrar. Verify DNS propagation in Netlify and wait for Netlify to provision HTTPS/SSL. Do not mark the domain ready until Netlify reports it as configured and the HTTPS URL loads without a certificate warning.
+
+Once DNS and SSL are verified, set `VITE_PUBLIC_SITE_URL` to the custom HTTPS origin in both Netlify and the GitHub Actions variable, trigger a new deployment, and repeat the direct-route checks on the custom domain.
 
 Record the final production URL and custom-domain status here only after they have been verified.
 
@@ -313,13 +327,13 @@ The Vite PWA plugin generates the manifest and service worker during production 
 
 The service worker uses `registerType: 'autoUpdate'`, `skipWaiting`, and `clientsClaim`, so an installed update can take control promptly. Offline navigation first attempts the network, then the cached `index.html` shell so React Router can resolve routes; `public/offline.html` is the final fallback when no shell is cached. Cached content can be older than the latest deployment.
 
-To verify an update after a live deployment, install or load the app once, deploy a small visible change, reload, and inspect the service worker in browser DevTools. To verify offline behavior, load the app once, switch DevTools to offline, navigate within the app, and confirm the offline banner. A first offline visit without cached content should show the static offline page.
+Service-worker precaution: do not judge a deployment only by an already-open, installed tab. Before release verification, reload after deployment and check DevTools **Application → Service Workers** for the active worker. To verify an update, load the app once, deploy a small visible change, reload, and inspect the worker. To verify offline behavior, load the app once, switch DevTools to offline, navigate within the app, and confirm the offline banner. A first offline visit without cached content should show the static offline page.
 
 ## Rollback process
 
-In Netlify, open the site’s **Deploys** page, find the last known-good published deploy, open its deploy menu, and select **Publish deploy**. Netlify makes that deploy live without rewriting Git history.
+In Netlify, open the site’s **Deploys** page, find the last known-good deploy, open its deploy menu, and select **Publish deploy**. Confirm that it now carries the **Published** label; Netlify makes that artifact live without rewriting Git history.
 
-After rollback, verify `/`, `/today`, `/care-team/sarah`, `/settings/notifications`, an invalid URL, and the install/offline behavior. Record the restored deploy URL and timestamp in release evidence.
+After rollback, record the restored deploy URL, timestamp, and commit SHA from the published deploy. Refresh `/`, `/today`, `/care-team/sarah`, `/settings/notifications`, an invalid URL, and the install/offline behavior. This is how to confirm the previously known-good production version is active.
 
 ## Browser support
 
