@@ -9,7 +9,9 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
   return (
     <section aria-labelledby="settings-heading">
       <h1 id="settings-heading" className="page-title">Settings</h1>
-      <p>Adjust display and notification preferences.</p>
+      <p>Adjust display and notification preferences.
+      Tap a setting or press the Spacebar to toggle it. 
+      Tap the Save Settings button to keep your changes.</p>
 
       <fieldset className="settings-fieldset">
         <legend>Display Preferences</legend>
