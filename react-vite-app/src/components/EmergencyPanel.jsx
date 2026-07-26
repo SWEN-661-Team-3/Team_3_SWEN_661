@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 const COUNTDOWN_SECONDS = 5;
 
-export default function EmergencyPanel({ contacts }) {
+export default function EmergencyPanel({ contacts, onActionKeyDown }) {
   const [phase, setPhase] = useState('idle');
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
   const intervalRef = useRef(null);
@@ -88,6 +88,7 @@ export default function EmergencyPanel({ contacts }) {
               type="button"
               className="emergency-help-button"
               onClick={startAlert}
+              onKeyDown={onActionKeyDown}
               aria-label="Send emergency alert"
             >
               Get Help Now
@@ -127,6 +128,7 @@ export default function EmergencyPanel({ contacts }) {
             type="button"
             className="danger-btn"
             onClick={cancelAlert}
+            onKeyDown={onActionKeyDown}
           >
             Cancel Alert
           </button>
@@ -145,6 +147,7 @@ export default function EmergencyPanel({ contacts }) {
           <button
             type="button"
             className="primary-btn"
+            onKeyDown={onActionKeyDown}
             onClick={() => {
               setPhase('idle');
               setCountdown(COUNTDOWN_SECONDS);

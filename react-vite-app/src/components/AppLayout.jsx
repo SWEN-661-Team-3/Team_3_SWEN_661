@@ -48,7 +48,7 @@ export default function AppLayout({ children }) {
           </Suspense>
         </ErrorBoundary>
       </main>
-      <AppFooter />
+      <AppFooter isEmergency={pathname === ROUTES.emergency} />
     </>
   );
 }
