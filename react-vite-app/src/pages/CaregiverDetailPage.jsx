@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CareMemberDetailDialog from '../components/CareMemberDetailDialog';
@@ -15,6 +15,7 @@ export default function CaregiverDetailPage({ helpers, setHelpers }) {
   const { caregiverId } = useParams();
   const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
+  const editTriggerRef = useRef(null);
   const caregiver = helpers.find((helper) => helper.id === caregiverId);
 
   if (!caregiver) {
@@ -43,6 +44,11 @@ export default function CaregiverDetailPage({ helpers, setHelpers }) {
   function removeCaregiver(id) {
     setHelpers((current) => current.filter((helper) => helper.id !== id));
     navigate(ROUTES.careTeam);
+  }
+
+  function closeEdit() {
+    setEditOpen(false);
+    requestAnimationFrame(() => editTriggerRef.current?.focus());
   }
 
   return (
@@ -86,7 +92,12 @@ export default function CaregiverDetailPage({ helpers, setHelpers }) {
             )}
           </dl>
 
-          <button type="button" className="primary-btn" onClick={() => setEditOpen(true)}>
+          <button
+            ref={editTriggerRef}
+            type="button"
+            className="primary-btn"
+            onClick={() => setEditOpen(true)}
+          >
             Edit Details
           </button>
         </section>
@@ -96,7 +107,7 @@ export default function CaregiverDetailPage({ helpers, setHelpers }) {
         key={caregiver.id}
         member={caregiver}
         open={editOpen}
-        onClose={() => setEditOpen(false)}
+        onClose={closeEdit}
         onSave={saveCaregiver}
         onRemove={removeCaregiver}
       />

@@ -74,6 +74,18 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     });
   }
 
+  function closeSaveNotice() {
+    setSaveNotice(null);
+    requestAnimationFrame(() => {
+      const trigger = triggerRef.current;
+      if (trigger?.isConnected && !trigger.disabled) {
+        trigger.focus();
+      } else {
+        document.getElementById('main-content')?.focus();
+      }
+    });
+  }
+
   function closeTaskDetail() {
     // Returning focus to the trigger preserves the user's place after a
     // modal closes; ordinary success/status messages intentionally do not
@@ -91,7 +103,8 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     });
   }
 
-  function openAddReminder() {
+  function openAddReminder(event) {
+    triggerRef.current = event?.currentTarget ?? null;
     setDraftTask({
       id: `reminder-${Date.now()}`,
       title: '',
@@ -207,7 +220,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
         open={Boolean(saveNotice)}
         title={saveNotice?.title ?? ''}
         message={saveNotice?.message ?? ''}
-        onConfirm={() => setSaveNotice(null)}
+        onConfirm={closeSaveNotice}
       />
 
       <CareConnectDialog

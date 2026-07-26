@@ -19,7 +19,7 @@ const CareTeamMemberCard = memo(function CareTeamMemberCard({ helper, onSelectMe
     <button
       type="button"
       className="care-helper-card"
-      onClick={() => onSelectMember(helper.id)}
+      onClick={(event) => onSelectMember(helper.id, event)}
       aria-label={`${helper.name}, ${helper.role}`}
     >
       <div className="care-helper-card__header">
@@ -58,6 +58,7 @@ export default function CareTeamPage({ helpers, setHelpers }) {
   const [draftMember, setDraftMember] = useState(null);
   const [saveNotice, setSaveNotice] = useState(null);
   const statusRef = useRef(null);
+  const memberTriggerRef = useRef(null);
 
   const announce = useCallback((message) => {
     if (statusRef.current) {
@@ -70,7 +71,8 @@ export default function CareTeamPage({ helpers, setHelpers }) {
     ? draftMember
     : helpers.find((helper) => helper.id === selectedId) ?? null;
 
-  const openMemberDetail = useCallback((id) => {
+  const openMemberDetail = useCallback((id, event) => {
+    memberTriggerRef.current = event?.currentTarget ?? null;
     setSelectedId(id);
     setDetailOpen(true);
     // The dialog heading receives focus on open, so a second polite
@@ -81,6 +83,25 @@ export default function CareTeamPage({ helpers, setHelpers }) {
     setDetailOpen(false);
     setSelectedId(null);
     setDraftMember(null);
+    requestAnimationFrame(() => {
+      if (memberTriggerRef.current?.isConnected && !memberTriggerRef.current.disabled) {
+        memberTriggerRef.current.focus();
+      } else {
+        document.getElementById('main-content')?.focus();
+      }
+    });
+  }
+
+  function closeSaveNotice() {
+    setSaveNotice(null);
+    requestAnimationFrame(() => {
+      const trigger = memberTriggerRef.current;
+      if (trigger?.isConnected && !trigger.disabled) {
+        trigger.focus();
+      } else {
+        document.getElementById('main-content')?.focus();
+      }
+    });
   }
 
   async function saveMember(updatedMember) {
@@ -117,7 +138,8 @@ export default function CareTeamPage({ helpers, setHelpers }) {
     if (member) announce(`${member.name} removed from the care team`);
   }
 
-  function openAddMember() {
+  function openAddMember(event) {
+    memberTriggerRef.current = event?.currentTarget ?? null;
     setDraftMember({
       id: `care-member-${Date.now()}`,
       name: '',
@@ -204,7 +226,7 @@ export default function CareTeamPage({ helpers, setHelpers }) {
         title={saveNotice?.title ?? ''}
         message={saveNotice?.message ?? ''}
         variant="success"
-        onConfirm={() => setSaveNotice(null)}
+        onConfirm={closeSaveNotice}
       />
     </>
   );
