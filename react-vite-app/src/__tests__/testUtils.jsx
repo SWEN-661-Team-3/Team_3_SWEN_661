@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
 export function renderWithProviders(ui, { route = '/', ...options } = {}) {
@@ -7,7 +7,9 @@ export function renderWithProviders(ui, { route = '/', ...options } = {}) {
     return (
       <HelmetProvider>
         <MemoryRouter initialEntries={[route]}>
-          {children}
+          <Routes>
+            <Route path="*" element={children} />
+          </Routes>
         </MemoryRouter>
       </HelmetProvider>
     );

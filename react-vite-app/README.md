@@ -156,8 +156,6 @@ $env:VITE_PUBLIC_SITE_URL = 'https://example.netlify.app'
 npm run build
 ```
 
-Use your real deployed origin, not `example.netlify.app`, for a real release.
-
 ## Full script reference
 
 | Command | Purpose |
