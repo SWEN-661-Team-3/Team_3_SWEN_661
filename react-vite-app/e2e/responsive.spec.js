@@ -54,6 +54,7 @@ test.describe('Responsive Layout', () => {
     const helpButtonBox = await page.getByRole('button', { name: 'Send emergency alert' }).boundingBox();
 
     expect(contactsBox?.x).toBeLessThan(helpButtonBox?.x ?? 0);
-    expect((helpButtonBox?.x ?? 0) + (helpButtonBox?.width ?? 0) / 2).toBe(720);
+    const layoutViewportCenter = await page.evaluate(() => document.documentElement.clientWidth / 2);
+    expect((helpButtonBox?.x ?? 0) + (helpButtonBox?.width ?? 0) / 2).toBe(layoutViewportCenter);
   });
 });
