@@ -21,6 +21,7 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             type="checkbox"
             checked={settings.largeText}
             onChange={() => handleToggle('largeText')}
+            aria-label="Large Text"
             aria-describedby="large-text-desc"
           />
           <span>
@@ -35,6 +36,7 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             type="checkbox"
             checked={settings.highContrast}
             onChange={() => handleToggle('highContrast')}
+            aria-label="High Contrast"
             aria-describedby="contrast-desc"
           />
           <span>
@@ -49,6 +51,7 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             type="checkbox"
             checked={settings.darkTheme}
             onChange={() => handleToggle('darkTheme')}
+            aria-label="Dark Theme"
             aria-describedby="dark-desc"
           />
           <span>
@@ -63,6 +66,7 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             type="checkbox"
             checked={settings.reduceMotion}
             onChange={() => handleToggle('reduceMotion')}
+            aria-label="Reduce Motion"
             aria-describedby="motion-desc"
           />
           <span>
@@ -81,9 +85,10 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             <input
               type="checkbox"
               checked={notifications.enabled}
-              disabled={!notifications.supported || notifications.permission === 'denied' || notifications.isRequesting}
-              onChange={notifications.toggle}
-              aria-describedby="notif-desc"
+            disabled={!notifications.supported || notifications.permission === 'denied' || notifications.isRequesting}
+            onChange={notifications.toggle}
+            aria-label="Task Reminders"
+            aria-describedby="notif-desc"
             />
             <span>
               Task Reminders
