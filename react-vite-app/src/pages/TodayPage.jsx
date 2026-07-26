@@ -182,11 +182,13 @@ export default function TodayPage({ plan, setPlan, helpers }) {
             {planSummary.hasTasks ? (
               <>
                 {planSummary.nextTask && (
-                  <HeroCard task={planSummary.nextTask} onClick={openTaskDetail} />
+                  <HeroCard id="today-plan-content" task={planSummary.nextTask} onClick={openTaskDetail} />
                 )}
                 {!planSummary.nextTask && (
                   <section
                     className="empty-state empty-state--complete"
+                    id="today-plan-content"
+                    tabIndex="-1"
                     role="status"
                     aria-labelledby="completed-plan-title"
                   >
@@ -198,6 +200,8 @@ export default function TodayPage({ plan, setPlan, helpers }) {
               </>
             ) : (
               <EmptyState
+                id="today-plan-content"
+                tabIndex="-1"
                 title="No reminders yet"
                 message="Add a reminder to start building today’s care plan."
               />

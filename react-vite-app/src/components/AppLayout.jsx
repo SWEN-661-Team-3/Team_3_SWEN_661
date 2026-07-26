@@ -24,7 +24,7 @@ export default function AppLayout({ children }) {
 
   return (
     <>
-      <a className="skip-link" href="#main-content">
+      <a className="skip-link" href={isTodayRoute ? '#today-plan-content' : '#main-content'}>
         Skip to main content
       </a>
       <OfflineStatusBanner />
