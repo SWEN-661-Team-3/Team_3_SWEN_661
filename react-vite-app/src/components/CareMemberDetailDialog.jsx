@@ -52,6 +52,16 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     }
   }, [open]);
 
+  // Starting edit mode should place keyboard focus in the first form field,
+  // before the Close or Save controls in the dialog footer.
+  useEffect(() => {
+    if (!open || !isEditing) return undefined;
+    const frame = requestAnimationFrame(() => {
+      fieldRefs.current.name?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, isEditing]);
+
   if (!member || !form) return null;
 
   const titleId = `care-member-detail-title-${member.id}`;

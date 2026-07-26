@@ -58,6 +58,16 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
     }
   }, [open]);
 
+  // When view mode changes to edit mode, put the keyboard at the start of
+  // the form instead of leaving it on one of the dialog action buttons.
+  useEffect(() => {
+    if (!open || !isEditing) return undefined;
+    const frame = requestAnimationFrame(() => {
+      fieldRefs.current.title?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, isEditing]);
+
   if (!task || !form) return null;
 
   const status = statusLabels[task.status];
