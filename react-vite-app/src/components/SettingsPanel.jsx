@@ -1,3 +1,6 @@
+import InlineError from './InlineError';
+import SavingStatus from './SavingStatus';
+
 export default function SettingsPanel({ settings, onChange, onSave, onReset, notifications }) {
   function handleToggle(key) {
     onChange({ ...settings, [key]: !settings[key] });
@@ -6,7 +9,9 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
   return (
     <section aria-labelledby="settings-heading">
       <h1 id="settings-heading" className="page-title">Settings</h1>
-      <p>Adjust display and notification preferences.</p>
+      <p>Adjust display and notification preferences.
+      Tap a setting or press the Spacebar to toggle it. 
+      Tap the Save Settings button to keep your changes.</p>
 
       <fieldset className="settings-fieldset">
         <legend>Display Preferences</legend>
@@ -16,6 +21,7 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             type="checkbox"
             checked={settings.largeText}
             onChange={() => handleToggle('largeText')}
+            aria-label="Large Text"
             aria-describedby="large-text-desc"
           />
           <span>
@@ -30,6 +36,7 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             type="checkbox"
             checked={settings.highContrast}
             onChange={() => handleToggle('highContrast')}
+            aria-label="High Contrast"
             aria-describedby="contrast-desc"
           />
           <span>
@@ -44,6 +51,7 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             type="checkbox"
             checked={settings.darkTheme}
             onChange={() => handleToggle('darkTheme')}
+            aria-label="Dark Theme"
             aria-describedby="dark-desc"
           />
           <span>
@@ -58,6 +66,7 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             type="checkbox"
             checked={settings.reduceMotion}
             onChange={() => handleToggle('reduceMotion')}
+            aria-label="Reduce Motion"
             aria-describedby="motion-desc"
           />
           <span>
@@ -76,9 +85,10 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
             <input
               type="checkbox"
               checked={notifications.enabled}
-              disabled={!notifications.supported || notifications.permission === 'denied'}
-              onChange={notifications.toggle}
-              aria-describedby="notif-desc"
+            disabled={!notifications.supported || notifications.permission === 'denied' || notifications.isRequesting}
+            onChange={notifications.toggle}
+            aria-label="Task Reminders"
+            aria-describedby="notif-desc"
             />
             <span>
               Task Reminders
@@ -92,6 +102,18 @@ export default function SettingsPanel({ settings, onChange, onSave, onReset, not
               </small>
             </span>
           </label>
+          {notifications.supported && notifications.permission === 'default' && (
+            <button type="button" className="secondary-btn" onClick={notifications.toggle} disabled={notifications.isRequesting}>
+              {notifications.isRequesting ? 'Requesting permission...' : 'Enable Task Reminders'}
+            </button>
+          )}
+          {notifications.isRequesting && <SavingStatus message="Requesting notification permission..." />}
+          {notifications.notificationError && (
+            <InlineError message={notifications.notificationError} onRetry={notifications.retryPermission} />
+          )}
+          {notifications.notificationSuccess && (
+            <div className="operation-status" role="status"><p>{notifications.notificationSuccess}</p></div>
+          )}
         </fieldset>
       )}
 

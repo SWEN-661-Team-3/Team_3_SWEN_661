@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
+import { ROUTES } from '../routes';
 import MobileNavigation from './MobileNavigation';
 import { navigationItems } from './navigationItems';
 
 export default function AppHeader() {
   return (
     <header className="app-header">
-      <NavLink to="/" className="app-header__brand" aria-label="CareConnect home">
+      <NavLink to={ROUTES.today} className="app-header__brand" aria-label="CareConnect home">
         <img
           src="/icons/icon-192x192.svg"
           alt="CareConnect logo"

@@ -1,15 +1,44 @@
 import { useEffect, useRef, useState } from 'react';
 import { statusLabels, typeLabels, typeOptions } from '../data/careData';
 import CareConnectDialog from './CareConnectDialog';
+import CharacterCount from './CharacterCount';
+import FieldHelpText from './FieldHelpText';
+import InlineError from './InlineError';
+import SavingStatus from './SavingStatus';
+import {
+  REMINDER_NOTES_MAX_LENGTH,
+  REMINDER_TITLE_MAX_LENGTH,
+  validateReminder,
+} from '../utils/formValidation';
 
-export default function TaskDetailDialog({ task, open, mode = 'view', onClose, onComplete, onSave }) {
+function describedBy(...ids) {
+  return ids.filter(Boolean).join(' ');
+}
+
+export default function TaskDetailDialog({ task, open, mode = 'view', onClose, onComplete, onDelete = async () => false, onSave }) {
   const dialogRef = useRef(null);
   const titleRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const fieldRefs = useRef({});
   const [isEditing, setIsEditing] = useState(mode === 'add');
   const [form, setForm] = useState(() => (task ? { ...task } : null));
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [completeError, setCompleteError] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
+  // Focus management: the heading receives focus via tabIndex="-1" so the
+  // dialog context is announced without putting a non-control in tab order.
+  // The close button is a fallback; the page restores focus to the opener on
+  // close. Routine save/error status updates stay in their live regions so
+  // they do not interrupt someone who is still editing a field.
+  // The rAF delay ensures the DOM has painted after showModal() before
+  // attempting to focus an element inside the now-visible dialog.
   useEffect(() => {
     const el = dialogRef.current;
     if (!el) return;
@@ -28,6 +57,16 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
       el.close();
     }
   }, [open]);
+
+  // When view mode changes to edit mode, put the keyboard at the start of
+  // the form instead of leaving it on one of the dialog action buttons.
+  useEffect(() => {
+    if (!open || !isEditing) return undefined;
+    const frame = requestAnimationFrame(() => {
+      fieldRefs.current.title?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, isEditing]);
 
   if (!task || !form) return null;
 
@@ -57,6 +96,15 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
+    setErrors((current) => {
+      if (field === 'type' && value !== 'appointment' && current.location) {
+        const { location: _locationError, ...remaining } = current;
+        return remaining;
+      }
+      if (!current[field]) return current;
+      const { [field]: _message, ...remaining } = current;
+      return remaining;
+    });
   }
 
   function requestClose() {
@@ -67,9 +115,55 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
     dialogRef.current?.close();
   }
 
-  function handleSave() {
-    const didSave = onSave(currentForm);
-    if (didSave) setIsEditing(false);
+  async function handleSave() {
+    const nextErrors = validateReminder(currentForm);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      const firstInvalidField = Object.keys(nextErrors)[0];
+      requestAnimationFrame(() => fieldRefs.current[firstInvalidField]?.focus());
+      return;
+    }
+    setErrors({});
+    setSaveError(null);
+    setIsSaving(true);
+    try {
+      const didSave = await onSave(currentForm);
+      if (didSave) setIsEditing(false);
+    } catch {
+      setSaveError('Could not save this reminder. Your changes are still here. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleComplete() {
+    setCompleteError(null);
+    setIsCompleting(true);
+    try {
+      const didComplete = await onComplete(task.id);
+      if (didComplete) dialogRef.current?.classList.add('dialog--exit');
+    } catch {
+      setCompleteError('Could not mark this reminder complete. Please try again.');
+    } finally {
+      setIsCompleting(false);
+    }
+  }
+
+  async function handleDelete() {
+    setDeleteError(null);
+    setIsDeleting(true);
+    try {
+      const didDelete = await onDelete(task.id);
+      if (didDelete) {
+        setConfirmDeleteOpen(false);
+        dialogRef.current?.close();
+      }
+    } catch {
+      setConfirmDeleteOpen(false);
+      setDeleteError('Could not delete this reminder. It is still available. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   return (
@@ -78,6 +172,9 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
       ref={dialogRef}
       className="dialog"
       aria-labelledby="task-detail-title"
+      onAnimationEnd={(event) => {
+        if (event.animationName === 'dialog-exit') event.currentTarget.close();
+      }}
       onClose={onClose}
       onCancel={(event) => {
         event.preventDefault();
@@ -132,18 +229,33 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
             </dl>
           ) : (
             <div className="edit-form">
-              <label className="edit-field edit-field--full">
-                <span className="edit-field__label">Reminder</span>
+              {Object.keys(errors).length > 0 && (
+                <div className="operation-status operation-status--error" role="alert" tabIndex="-1">
+                  <p>Please correct the highlighted reminder fields.</p>
+                </div>
+              )}
+              <label className="edit-field edit-field--full" htmlFor="reminder-title">
+                <span className="edit-field__label"><strong>Reminder</strong> <em>(required)</em></span>
                 <input
+                  id="reminder-title"
+                  ref={(element) => { fieldRefs.current.title = element; }}
                   className="edit-field__control"
                   value={form.title}
                   onChange={(event) => updateField('title', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.title)}
+                  aria-describedby={describedBy(
+                    'reminder-title-count',
+                    errors.title && 'reminder-title-error',
+                  )}
                 />
+                <CharacterCount id="reminder-title-count" value={form.title} maxLength={REMINDER_TITLE_MAX_LENGTH} />
+                {errors.title && <span id="reminder-title-error" className="field-error">{errors.title}</span>}
               </label>
-              <label className="edit-field">
+              <label className="edit-field" htmlFor="reminder-type">
                 <span className="edit-field__label">Type</span>
                 <select
+                  id="reminder-type"
                   className="edit-field__control"
                   value={form.type}
                   onChange={(event) => updateField('type', event.target.value)}
@@ -155,9 +267,10 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                   ))}
                 </select>
               </label>
-              <label className="edit-field">
+              <label className="edit-field" htmlFor="reminder-status">
                 <span className="edit-field__label">Status</span>
                 <select
+                  id="reminder-status"
                   className="edit-field__control"
                   value={form.status}
                   onChange={(event) => updateField('status', event.target.value)}
@@ -166,40 +279,70 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                   <option value="done">Done</option>
                 </select>
               </label>
-              <label className="edit-field">
-                <span className="edit-field__label">Date</span>
+              <label className="edit-field" htmlFor="reminder-date">
+                <span className="edit-field__label"><strong>Date</strong> <em>(required)</em></span>
                 <input
+                  id="reminder-date"
+                  ref={(element) => { fieldRefs.current.date = element; }}
                   className="edit-field__control"
                   value={form.date}
                   onChange={(event) => updateField('date', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.date)}
+                  aria-describedby={describedBy('reminder-date-help', errors.date && 'reminder-date-error')}
                 />
+                <FieldHelpText id="reminder-date-help">Enter a valid date, such as Today.</FieldHelpText>
+                {errors.date && <span id="reminder-date-error" className="field-error">{errors.date}</span>}
               </label>
-              <label className="edit-field">
-                <span className="edit-field__label">Time</span>
+              <label className="edit-field" htmlFor="reminder-time">
+                <span className="edit-field__label"><strong>Time</strong> <em>(required)</em></span>
                 <input
+                  id="reminder-time"
+                  ref={(element) => { fieldRefs.current.time = element; }}
                   className="edit-field__control"
                   value={form.time}
                   onChange={(event) => updateField('time', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.time)}
+                  aria-describedby={describedBy('reminder-time-help', errors.time && 'reminder-time-error')}
                 />
+                <FieldHelpText id="reminder-time-help">Enter a time such as 9:30 AM.</FieldHelpText>
+                {errors.time && <span id="reminder-time-error" className="field-error">{errors.time}</span>}
               </label>
-              <label className="edit-field edit-field--full">
-                <span className="edit-field__label">Location</span>
+              <label className="edit-field edit-field--full" htmlFor="reminder-location">
+                <span className="edit-field__label">
+                  <strong>Location</strong>{form.type === 'appointment' && <> <em>(required)</em></>}
+                </span>
                 <input
+                  id="reminder-location"
+                  ref={(element) => { fieldRefs.current.location = element; }}
                   className="edit-field__control"
                   value={form.location}
                   onChange={(event) => updateField('location', event.target.value)}
+                  aria-invalid={Boolean(errors.location)}
+                  aria-describedby={errors.location ? 'reminder-location-error' : undefined}
                 />
+                {errors.location && <span id="reminder-location-error" className="field-error">{errors.location}</span>}
               </label>
-              <label className="edit-field edit-field--full">
+              <label className="edit-field edit-field--full" htmlFor="reminder-notes">
                 <span className="edit-field__label">Notes</span>
                 <textarea
+                  id="reminder-notes"
+                  ref={(element) => { fieldRefs.current.notes = element; }}
                   className="edit-field__control"
                   rows="4"
                   value={form.notes}
                   onChange={(event) => updateField('notes', event.target.value)}
+                  aria-invalid={Boolean(errors.notes)}
+                  aria-describedby={describedBy(
+                    'reminder-notes-help',
+                    'reminder-notes-count',
+                    errors.notes && 'reminder-notes-error',
+                  )}
                 />
+                <FieldHelpText id="reminder-notes-help">Optional.</FieldHelpText>
+                <CharacterCount id="reminder-notes-count" value={form.notes} maxLength={REMINDER_NOTES_MAX_LENGTH} />
+                {errors.notes && <span id="reminder-notes-error" className="field-error">{errors.notes}</span>}
               </label>
             </div>
           )}
@@ -208,9 +351,10 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
         <div className="dialog__footer">
           {!isEditing ? (
             <>
-              <button type="button" className="secondary-btn" onClick={requestClose}>
-                Close
-              </button>
+              {isCompleting && <SavingStatus message="Marking reminder complete..." />}
+              {completeError && <InlineError message={completeError} onRetry={handleComplete} />}
+              {isDeleting && <SavingStatus message="Deleting reminder..." />}
+              {deleteError && <InlineError message={deleteError} onRetry={handleDelete} />}
               <button
                 type="button"
                 className="secondary-btn"
@@ -222,29 +366,39 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
                 Edit Details
               </button>
               {task.status === 'todo' && (
-                <button
-                  type="button"
-                  className="primary-btn"
-                  onClick={() => {
-                    onComplete(task.id);
-                    dialogRef.current?.close();
-                  }}
-                >
-                  Mark Complete
-                </button>
+                isCompleting ? (
+                  <button type="button" className="primary-btn" disabled>
+                    Marking Complete...
+                  </button>
+                ) : (
+                  <button type="button" className="primary-btn" onClick={handleComplete}>
+                    Mark Complete
+                  </button>
+                )
               )}
+              <button
+                type="button"
+                className="danger-btn"
+                onClick={() => setConfirmDeleteOpen(true)}
+                disabled={isDeleting}
+              >
+                Delete Reminder
+              </button>
             </>
           ) : (
             <>
+              {isSaving && <SavingStatus message="Saving reminder..." />}
+              {saveError && <InlineError message={saveError} onRetry={handleSave} />}
               <button
                 type="button"
                 className="secondary-btn"
                 onClick={requestClose}
+                disabled={isSaving}
               >
                 Close
               </button>
-              <button type="button" className="primary-btn" onClick={handleSave}>
-                {isAdding ? 'Add Reminder' : 'Save Changes'}
+              <button type="button" className="primary-btn" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? 'Saving...' : isAdding ? 'Add Reminder' : 'Save Changes'}
               </button>
             </>
           )}
@@ -262,6 +416,18 @@ export default function TaskDetailDialog({ task, open, mode = 'view', onClose, o
           setConfirmCloseOpen(false);
           dialogRef.current?.close();
         }}
+      />
+      <CareConnectDialog
+        open={confirmDeleteOpen}
+        title="Delete Reminder?"
+        message="Delete this reminder? This cannot be undone."
+        cancelLabel="Keep Reminder"
+        confirmLabel={isDeleting ? 'Deleting...' : 'Delete Reminder'}
+        variant="destructive"
+        onCancel={() => setConfirmDeleteOpen(false)}
+        onConfirm={handleDelete}
+        confirmDisabled={isDeleting}
+        cancelDisabled={isDeleting}
       />
     </>
   );

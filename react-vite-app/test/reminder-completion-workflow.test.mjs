@@ -9,10 +9,10 @@ function source(path) {
   return readFileSync(join(root, path), 'utf8');
 }
 
-test('reminder details exposes the expected view actions', () => {
+test('reminder details keeps the top-right close control and expected view actions', () => {
   const dialog = source('src/components/TaskDetailDialog.jsx');
 
-  assert.match(dialog, />\s*Close\s*<\/button>/);
+  assert.match(dialog, /aria-label="Close dialog"/);
   assert.match(dialog, />\s*Edit Details\s*<\/button>/);
   assert.match(dialog, />\s*Mark Complete\s*<\/button>/);
 });

@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { requestNotificationPermission } from '../services/notificationService';
 
+// Notifications use browser setTimeout timers rather than backend push, so
+// schedules exist only for this open browser session. Cleanup prevents stale
+// timers after tasks change or the component unmounts; closed tabs cannot
+// deliver these reminders.
 const REMINDER_LEAD_MINUTES = 15;
 
 function parseTime(timeStr) {
@@ -18,6 +23,9 @@ function parseTime(timeStr) {
   return date;
 }
 
+// Both Notification API and ServiceWorker must be available. Missing support
+// is an unsupported capability, while denied permission is recoverable in
+// browser settings; the UI keeps those states distinct rather than failing silently.
 function getNotificationSupport() {
   return 'Notification' in window && 'serviceWorker' in navigator;
 }
@@ -27,6 +35,9 @@ export default function useNotifications(tasks) {
   const [permission, setPermission] = useState(() =>
     'Notification' in window ? Notification.permission : 'unsupported',
   );
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [notificationError, setNotificationError] = useState(null);
+  const [notificationSuccess, setNotificationSuccess] = useState(null);
   const timerIds = useRef([]);
 
   const clearScheduled = useCallback(() => {
@@ -36,6 +47,8 @@ export default function useNotifications(tasks) {
 
   const scheduleTaskNotifications = useCallback(
     (taskList) => {
+      // Rebuild the session-only timer list from current tasks so completed,
+      // edited, or removed reminders cannot leave orphaned notifications.
       clearScheduled();
       if (!getNotificationSupport() || Notification.permission !== 'granted') return;
 
@@ -67,32 +80,38 @@ export default function useNotifications(tasks) {
 
   async function requestAndEnable() {
     if (!getNotificationSupport()) return;
-
-    const result = await Notification.requestPermission();
-    setPermission(result);
-
-    if (result === 'granted') {
-      setEnabled(true);
-
-      new Notification('CareConnect', {
-        body: 'Notifications enabled. You will be reminded before upcoming tasks.',
-        icon: '/icons/icon-192x192.svg',
-        tag: 'welcome',
-      });
+    if (isRequesting) return;
+    setIsRequesting(true);
+    setNotificationError(null);
+    try {
+      const result = await requestNotificationPermission();
+      setPermission(result);
+      if (result === 'granted') {
+        setEnabled(true);
+        setNotificationSuccess('Notifications enabled. Upcoming reminders are scheduled.');
+      } else if (result === 'denied') {
+        setNotificationError('Notification permission was blocked. Enable it in your browser settings to receive reminders.');
+      }
+    } catch {
+      setNotificationError('Could not request notification permission. Please try again.');
+    } finally {
+      setIsRequesting(false);
     }
   }
 
   function disable() {
     setEnabled(false);
     clearScheduled();
+    setNotificationSuccess('Notifications disabled.');
   }
 
-  function toggle() {
+  async function toggle() {
     if (enabled) {
       disable();
-    } else {
-      requestAndEnable();
+      return;
     }
+
+    return requestAndEnable();
   }
 
   useEffect(() => {
@@ -107,5 +126,9 @@ export default function useNotifications(tasks) {
     enabled,
     permission,
     toggle,
+    isRequesting,
+    notificationError,
+    notificationSuccess,
+    retryPermission: requestAndEnable,
   };
 }

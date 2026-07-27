@@ -1,10 +1,12 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Sidebar from '../components/Sidebar';
 import HeroCard from '../components/HeroCard';
 import StatsRow from '../components/StatsRow';
 import TaskDetailDialog from '../components/TaskDetailDialog';
 import CareConnectDialog from '../components/CareConnectDialog';
+import EmptyState from '../components/EmptyState';
+import { deleteReminder, markReminderComplete, saveReminder } from '../services/carePlanService';
 
 export default function TodayPage({ plan, setPlan, helpers }) {
   const [selectedId, setSelectedId] = useState(null);
@@ -12,18 +14,21 @@ export default function TodayPage({ plan, setPlan, helpers }) {
   const [draftTask, setDraftTask] = useState(null);
   const [saveNotice, setSaveNotice] = useState(null);
   const [completeNotice, setCompleteNotice] = useState(null);
-  const statusRef = useRef(null);
+  const [deleteNotice, setDeleteNotice] = useState(null);
   const taskButtonRefs = useRef({});
   const triggerRef = useRef(null);
-  const mainContentRef = useRef(null);
 
-  const announce = useCallback((message) => {
-    if (statusRef.current) {
-      statusRef.current.textContent = message;
-    }
-  }, []);
+  // One pass produces plan-derived values used by several sections, avoiding
+  // repeated filtering while dialog state changes.
+  const planSummary = useMemo(() => {
+    const pendingTasks = plan.filter((task) => task.status === 'todo');
 
-  const nextTask = plan.find((t) => t.status === 'todo') ?? plan[0];
+    return {
+      hasTasks: plan.length > 0,
+      nextTask: pendingTasks[0] ?? null,
+    };
+  }, [plan]);
+
   const isAddingTask = selectedId === 'new';
   const selectedTask = isAddingTask
     ? draftTask
@@ -36,9 +41,11 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     setDetailOpen(true);
   }
 
-  function completeTask(id) {
+  async function completeTask(id) {
     const task = plan.find((t) => t.id === id);
-    if (!task) return;
+    if (!task) return false;
+    const completedTask = await markReminderComplete(id);
+    if (!completedTask) throw new Error('Reminder not found');
     setPlan((prev) =>
       prev.map((t) => (t.id === id ? { ...t, status: 'done' } : t)),
     );
@@ -46,6 +53,17 @@ export default function TodayPage({ plan, setPlan, helpers }) {
       id,
       title: task.title,
     });
+    return true;
+  }
+
+  async function deleteTask(id) {
+    const task = plan.find((item) => item.id === id);
+    if (!task) return false;
+
+    await deleteReminder(id);
+    setPlan((prev) => prev.filter((item) => item.id !== id));
+    setDeleteNotice({ title: task.title });
+    return true;
   }
 
   function closeCompleteNotice() {
@@ -56,7 +74,22 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     });
   }
 
+  function closeSaveNotice() {
+    setSaveNotice(null);
+    requestAnimationFrame(() => {
+      const trigger = triggerRef.current;
+      if (trigger?.isConnected && !trigger.disabled) {
+        trigger.focus();
+      } else {
+        document.getElementById('main-content')?.focus();
+      }
+    });
+  }
+
   function closeTaskDetail() {
+    // Returning focus to the trigger preserves the user's place after a
+    // modal closes; ordinary success/status messages intentionally do not
+    // move focus away from the control the user is using.
     setDetailOpen(false);
     setSelectedId(null);
     setDraftTask(null);
@@ -65,12 +98,13 @@ export default function TodayPage({ plan, setPlan, helpers }) {
       if (trigger?.isConnected && !trigger.disabled) {
         trigger.focus();
       } else {
-        mainContentRef.current?.focus();
+        document.getElementById('main-content')?.focus();
       }
     });
   }
 
-  function openAddReminder() {
+  function openAddReminder(event) {
+    triggerRef.current = event?.currentTarget ?? null;
     setDraftTask({
       id: `reminder-${Date.now()}`,
       title: '',
@@ -86,17 +120,16 @@ export default function TodayPage({ plan, setPlan, helpers }) {
     setDetailOpen(true);
   }
 
-  function saveTask(task) {
+  async function saveTask(task) {
+    const savedTask = await saveReminder(task);
     if (isAddingTask) {
-      setPlan((prev) => [...prev, task]);
-      announce(`${task.title} added to reminders`);
+      setPlan((prev) => [...prev, savedTask]);
       setSaveNotice({
         title: 'Reminder Added',
         message: 'Reminder was added.',
       });
     } else {
-      setPlan((prev) => prev.map((item) => (item.id === task.id ? task : item)));
-      announce(`${task.title} updated`);
+      setPlan((prev) => prev.map((item) => (item.id === savedTask.id ? savedTask : item)));
       setSaveNotice({
         title: 'Reminder Saved',
         message: 'Reminder was saved.',
@@ -118,7 +151,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
         <meta property="og:type" content="website" />
       </Helmet>
 
-      <div className="app-layout">
+      <>
         <Sidebar
           helperName={helperName}
           tasks={plan}
@@ -128,15 +161,13 @@ export default function TodayPage({ plan, setPlan, helpers }) {
           }}
         />
 
-        <main ref={mainContentRef} id="main-content" aria-labelledby="today-plan-heading" tabIndex="-1">
-          <div className="main-content">
+        <div className="main-content">
             <div className="page-header">
               <h1 id="today-plan-heading" className="page-title">Today&apos;s Plan</h1>
               <p className="page-subtitle">Here is today&apos;s plan.</p>
             </div>
 
             <div
-              ref={statusRef}
               className="visually-hidden"
               aria-live="polite"
               aria-atomic="true"
@@ -148,11 +179,35 @@ export default function TodayPage({ plan, setPlan, helpers }) {
               </button>
             </div>
 
-            <HeroCard task={nextTask} onClick={openTaskDetail} />
-            <StatsRow tasks={plan} />
-          </div>
-        </main>
-      </div>
+            {planSummary.hasTasks ? (
+              <>
+                {planSummary.nextTask && (
+                  <HeroCard id="today-plan-content" task={planSummary.nextTask} onClick={openTaskDetail} />
+                )}
+                {!planSummary.nextTask && (
+                  <section
+                    className="empty-state empty-state--complete"
+                    id="today-plan-content"
+                    tabIndex="-1"
+                    role="status"
+                    aria-labelledby="completed-plan-title"
+                  >
+                    <h2 id="completed-plan-title">All caught up for today</h2>
+                    <p>You’ve completed all of today’s reminders. Add a reminder if something else comes up.</p>
+                  </section>
+                )}
+                <StatsRow tasks={plan} />
+              </>
+            ) : (
+              <EmptyState
+                id="today-plan-content"
+                tabIndex="-1"
+                title="No reminders yet"
+                message="Add a reminder to start building today’s care plan."
+              />
+            )}
+        </div>
+      </>
 
       <TaskDetailDialog
         key={selectedId ?? 'closed'}
@@ -161,6 +216,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
         mode={isAddingTask ? 'add' : 'view'}
         onClose={closeTaskDetail}
         onComplete={completeTask}
+        onDelete={deleteTask}
         onSave={saveTask}
       />
 
@@ -168,7 +224,7 @@ export default function TodayPage({ plan, setPlan, helpers }) {
         open={Boolean(saveNotice)}
         title={saveNotice?.title ?? ''}
         message={saveNotice?.message ?? ''}
-        onConfirm={() => setSaveNotice(null)}
+        onConfirm={closeSaveNotice}
       />
 
       <CareConnectDialog
@@ -177,6 +233,14 @@ export default function TodayPage({ plan, setPlan, helpers }) {
         message={`"${completeNotice?.title ?? 'Reminder'}" was marked complete.`}
         variant="success"
         onConfirm={closeCompleteNotice}
+      />
+
+      <CareConnectDialog
+        open={Boolean(deleteNotice)}
+        title="Reminder Deleted"
+        message={`"${deleteNotice?.title ?? 'Reminder'}" was deleted.`}
+        variant="success"
+        onConfirm={() => setDeleteNotice(null)}
       />
     </>
   );

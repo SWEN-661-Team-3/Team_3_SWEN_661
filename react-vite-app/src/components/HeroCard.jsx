@@ -1,6 +1,9 @@
+import { memo } from 'react';
 import { typeLabels } from '../data/careData';
 
-export default function HeroCard({ task, onClick }) {
+// Memoized because this card only depends on a single task object and a
+// stable onClick handler -- avoids re-rendering when sibling state changes.
+export default memo(function HeroCard({ task, onClick, id }) {
   if (!task) return null;
 
   const typeInfo = typeLabels[task.type] ?? { label: task.type, icon: '?' };
@@ -8,6 +11,7 @@ export default function HeroCard({ task, onClick }) {
   return (
     <button
       type="button"
+      id={id}
       className="hero-card"
       onClick={(event) => onClick(task.id, event)}
       aria-label={`Next up: ${task.title} at ${task.time}. Click for details.`}
@@ -20,4 +24,4 @@ export default function HeroCard({ task, onClick }) {
       <p className="hero-card__hint">Click to view details</p>
     </button>
   );
-}
+});

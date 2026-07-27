@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import CareConnectDialog from './CareConnectDialog';
+import FieldHelpText from './FieldHelpText';
+import InlineError from './InlineError';
+import SavingStatus from './SavingStatus';
+import { CAREGIVER_PHONE_MIN_DIGITS, validateCaregiver } from '../utils/formValidation';
+
+function describedBy(...ids) {
+  return ids.filter(Boolean).join(' ');
+}
 
 const availabilityLabels = {
   available: 'Available',
@@ -18,10 +26,15 @@ function getInitials(name) {
 
 export default function CareMemberDetailDialog({ member, open, mode = 'view', onClose, onSave, onRemove }) {
   const dialogRef = useRef(null);
+  const titleRef = useRef(null);
+  const fieldRefs = useRef({});
   const [isEditing, setIsEditing] = useState(mode === 'add');
   const [form, setForm] = useState(() => (member ? { ...member } : null));
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   useEffect(() => {
     const el = dialogRef.current;
@@ -29,12 +42,25 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     if (open) {
       el.classList.remove('dialog--enter');
       el.showModal();
+      // Focus the labelled heading so opening context is announced without
+      // adding a non-control to the keyboard tab order.
+      requestAnimationFrame(() => titleRef.current?.focus({ preventScroll: true }));
       void el.offsetWidth;
       el.classList.add('dialog--enter');
     } else {
       el.close();
     }
   }, [open]);
+
+  // Starting edit mode should place keyboard focus in the first form field,
+  // before the Close or Save controls in the dialog footer.
+  useEffect(() => {
+    if (!open || !isEditing) return undefined;
+    const frame = requestAnimationFrame(() => {
+      fieldRefs.current.name?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, isEditing]);
 
   if (!member || !form) return null;
 
@@ -47,7 +73,8 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     role: member.role.trim(),
     relationship: member.relationship.trim(),
     phone: member.phone.trim(),
-    notes: member.notes.trim(),
+    notes: (member.notes ?? '').trim(),
+    email: (member.email ?? '').trim(),
   };
   const currentForm = {
     ...form,
@@ -55,12 +82,18 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     role: form.role.trim(),
     relationship: form.relationship.trim(),
     phone: form.phone.trim(),
-    notes: form.notes.trim(),
+    notes: (form.notes ?? '').trim(),
+    email: (form.email ?? '').trim(),
   };
   const hasUnsavedChanges = isEditing && JSON.stringify(currentForm) !== JSON.stringify(savedForm);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
+    setErrors((current) => {
+      if (!current[field]) return current;
+      const { [field]: _message, ...remaining } = current;
+      return remaining;
+    });
   }
 
   function requestClose() {
@@ -71,13 +104,29 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     onClose();
   }
 
-  function handleSave() {
+  async function handleSave() {
+    const nextErrors = validateCaregiver(currentForm);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      const firstInvalidField = Object.keys(nextErrors)[0];
+      requestAnimationFrame(() => fieldRefs.current[firstInvalidField]?.focus());
+      return;
+    }
+    setErrors({});
     const nextMember = {
       ...currentForm,
       initials: getInitials(currentForm.name) || member.initials,
     };
-    const didSave = onSave(nextMember);
-    if (didSave) setIsEditing(false);
+    setSaveError(null);
+    setIsSaving(true);
+    try {
+      const didSave = await onSave(nextMember);
+      if (didSave) setIsEditing(false);
+    } catch {
+      setSaveError('Could not save this caregiver. Your changes are still here. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -94,7 +143,7 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
     >
       <div className="dialog__inner">
         <div className="dialog__header">
-          <h2 id={titleId}>{title}</h2>
+          <h2 ref={titleRef} id={titleId} tabIndex="-1">{title}</h2>
           <button
             type="button"
             className="dialog__close"
@@ -137,46 +186,86 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
             </dl>
           ) : (
             <div className="edit-form">
-              <label className="edit-field">
-                <span className="edit-field__label">Name</span>
+              {Object.keys(errors).length > 0 && (
+                <div className="operation-status operation-status--error" role="alert" tabIndex="-1">
+                  <p>Please correct the highlighted caregiver fields.</p>
+                </div>
+              )}
+              <label className="edit-field" htmlFor="caregiver-name">
+                <span className="edit-field__label"><strong>Name</strong> <em>(required)</em></span>
                 <input
+                  id="caregiver-name"
+                  ref={(element) => { fieldRefs.current.name = element; }}
                   className="edit-field__control"
                   value={form.name}
                   onChange={(event) => updateField('name', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.name)}
+                  aria-describedby={errors.name ? 'caregiver-name-error' : undefined}
                 />
+                {errors.name && <span id="caregiver-name-error" className="field-error">{errors.name}</span>}
               </label>
-              <label className="edit-field">
-                <span className="edit-field__label">Role</span>
+              <label className="edit-field" htmlFor="caregiver-role">
+                <span className="edit-field__label"><strong>Role</strong> <em>(required)</em></span>
                 <input
+                  id="caregiver-role"
                   className="edit-field__control"
                   value={form.role}
                   onChange={(event) => updateField('role', event.target.value)}
                   required
                 />
               </label>
-              <label className="edit-field">
-                <span className="edit-field__label">Relationship</span>
+              <label className="edit-field" htmlFor="caregiver-relationship">
+                <span className="edit-field__label"><strong>Relationship</strong> <em>(required)</em></span>
                 <input
+                  id="caregiver-relationship"
+                  ref={(element) => { fieldRefs.current.relationship = element; }}
                   className="edit-field__control"
                   value={form.relationship}
                   onChange={(event) => updateField('relationship', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.relationship)}
+                  aria-describedby={errors.relationship ? 'caregiver-relationship-error' : undefined}
                 />
+                {errors.relationship && <span id="caregiver-relationship-error" className="field-error">{errors.relationship}</span>}
               </label>
-              <label className="edit-field">
-                <span className="edit-field__label">Phone</span>
+              <label className="edit-field" htmlFor="caregiver-phone">
+                <span className="edit-field__label"><strong>Phone</strong> <em>(required)</em></span>
                 <input
+                  id="caregiver-phone"
+                  ref={(element) => { fieldRefs.current.phone = element; }}
                   className="edit-field__control"
                   type="tel"
                   value={form.phone}
                   onChange={(event) => updateField('phone', event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.phone)}
+                  aria-describedby={describedBy('caregiver-phone-help', errors.phone && 'caregiver-phone-error')}
                 />
+                <FieldHelpText id="caregiver-phone-help">
+                  Enter at least {CAREGIVER_PHONE_MIN_DIGITS} digits.
+                </FieldHelpText>
+                {errors.phone && <span id="caregiver-phone-error" className="field-error">{errors.phone}</span>}
               </label>
-              <label className="edit-field edit-field--full">
+              <label className="edit-field edit-field--full" htmlFor="caregiver-email">
+                <span className="edit-field__label">Email (optional)</span>
+                <input
+                  id="caregiver-email"
+                  ref={(element) => { fieldRefs.current.email = element; }}
+                  className="edit-field__control"
+                  type="email"
+                  value={form.email ?? ''}
+                  onChange={(event) => updateField('email', event.target.value)}
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={describedBy('caregiver-email-help', errors.email && 'caregiver-email-error')}
+                />
+                <FieldHelpText id="caregiver-email-help">Optional. Example: name@example.com.</FieldHelpText>
+                {errors.email && <span id="caregiver-email-error" className="field-error">{errors.email}</span>}
+              </label>
+              <label className="edit-field edit-field--full" htmlFor="caregiver-notes">
                 <span className="edit-field__label">Notes</span>
                 <textarea
+                  id="caregiver-notes"
                   className="edit-field__control"
                   rows="4"
                   value={form.notes}
@@ -215,15 +304,18 @@ export default function CareMemberDetailDialog({ member, open, mode = 'view', on
             </>
           ) : (
             <>
+              {isSaving && <SavingStatus message="Saving caregiver..." />}
+              {saveError && <InlineError message={saveError} onRetry={handleSave} />}
               <button
                 type="button"
                 className="secondary-btn"
                 onClick={requestClose}
+                disabled={isSaving}
               >
                 Close
               </button>
-              <button type="button" className="primary-btn" onClick={handleSave}>
-                {isAdding ? 'Add Member' : 'Save Changes'}
+              <button type="button" className="primary-btn" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? 'Saving...' : isAdding ? 'Add Member' : 'Save Changes'}
               </button>
             </>
           )}

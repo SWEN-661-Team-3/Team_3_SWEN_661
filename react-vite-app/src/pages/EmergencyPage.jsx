@@ -2,6 +2,12 @@ import { Helmet } from 'react-helmet-async';
 import EmergencyPanel from '../components/EmergencyPanel';
 
 export default function EmergencyPage({ contacts }) {
+  function returnFocusToMenu(event) {
+    if (event.key !== 'Tab' || event.shiftKey) return;
+    event.preventDefault();
+    document.querySelector('.menu-toggle')?.focus();
+  }
+
   return (
     <>
       <Helmet>
@@ -12,15 +18,11 @@ export default function EmergencyPage({ contacts }) {
         <meta property="og:type" content="website" />
       </Helmet>
 
-      <div className="app-layout app-layout--wide">
-        <main id="main-content" aria-labelledby="emergency-heading">
-          <div className="main-content">
-            <div className="page-header">
-              <h1 id="emergency-heading" className="page-title">Emergency</h1>
-            </div>
-            <EmergencyPanel contacts={contacts} />
-          </div>
-        </main>
+      <div className="main-content main-content--wide emergency-page">
+        <div className="page-header">
+          <h1 id="emergency-page-heading" className="page-title">Emergency</h1>
+        </div>
+        <EmergencyPanel contacts={contacts} onActionKeyDown={returnFocusToMenu} />
       </div>
     </>
   );

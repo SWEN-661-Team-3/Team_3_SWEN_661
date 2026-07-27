@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 const COUNTDOWN_SECONDS = 5;
 
-export default function EmergencyPanel({ contacts }) {
+export default function EmergencyPanel({ contacts, onActionKeyDown }) {
   const [phase, setPhase] = useState('idle');
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
   const intervalRef = useRef(null);
@@ -20,6 +20,8 @@ export default function EmergencyPanel({ contacts }) {
     announce('Emergency alert countdown started');
   }
 
+  // Cancellation is announced immediately because it changes whether an
+  // alert will be sent; the visible countdown itself remains available too.
   function cancelAlert() {
     clearInterval(intervalRef.current);
     setPhase('idle');
@@ -44,12 +46,18 @@ export default function EmergencyPanel({ contacts }) {
     return () => clearInterval(intervalRef.current);
   }, [phase]);
 
+  // Countdown announcements: only the 2-second mark is announced to avoid
+  // overwhelming screen reader users with per-second updates. The visual
+  // countdown still updates every second for sighted users.
   useEffect(() => {
     if (phase === 'countdown' && countdown === 2) {
       announce('2 seconds remaining');
     }
   }, [phase, countdown, announce]);
 
+  // The sent transition is assertive because it is safety-critical. Start,
+  // cancellation, and the two-second warning share that urgent status region;
+  // per-second updates are deliberately omitted above to avoid noise.
   useEffect(() => {
     if (phase === 'confirmed') {
       announce('Emergency alert sent');
@@ -57,7 +65,7 @@ export default function EmergencyPanel({ contacts }) {
   }, [phase, announce]);
 
   return (
-    <section aria-labelledby="emergency-heading">
+    <section aria-labelledby="emergency-panel-heading">
       <div
         ref={statusRef}
         className="visually-hidden"
@@ -66,23 +74,26 @@ export default function EmergencyPanel({ contacts }) {
       />
 
       {phase === 'idle' && (
-        <div className="emergency-panel">
-          <div className="emergency-panel__icon emergency-panel__icon--warning" aria-hidden="true">
-            !
+        <div className="emergency-panel emergency-panel--idle">
+          <div className="emergency-panel__action">
+            <div className="emergency-panel__icon emergency-panel__icon--warning" aria-hidden="true">
+              !
+            </div>
+            <h2 id="emergency-panel-heading">Need Help?</h2>
+            <p className="emergency-panel__copy">
+              Press the button below to send an alert to your emergency contacts.
+              A {COUNTDOWN_SECONDS}-second countdown will begin before the alert is sent.
+            </p>
+            <button
+              type="button"
+              className="emergency-help-button"
+              onClick={startAlert}
+              onKeyDown={onActionKeyDown}
+              aria-label="Send emergency alert"
+            >
+              Get Help Now
+            </button>
           </div>
-          <h2 id="emergency-heading">Need Help?</h2>
-          <p className="emergency-panel__copy">
-            Press the button below to send an alert to your emergency contacts.
-            A {COUNTDOWN_SECONDS}-second countdown will begin before the alert is sent.
-          </p>
-          <button
-            type="button"
-            className="emergency-help-button"
-            onClick={startAlert}
-            aria-label="Send emergency alert"
-          >
-            Get Help Now
-          </button>
 
           {contacts.length > 0 && (
             <div className="emergency-contacts">
@@ -109,7 +120,7 @@ export default function EmergencyPanel({ contacts }) {
 
       {phase === 'countdown' && (
         <div className="emergency-panel">
-          <h2 id="emergency-heading">Sending Alert...</h2>
+          <h2 id="emergency-panel-heading">Sending Alert...</h2>
           <p className="emergency-panel__copy">
             Alert will be sent in {countdown} second{countdown !== 1 ? 's' : ''}.
           </p>
@@ -117,6 +128,7 @@ export default function EmergencyPanel({ contacts }) {
             type="button"
             className="danger-btn"
             onClick={cancelAlert}
+            onKeyDown={onActionKeyDown}
           >
             Cancel Alert
           </button>
@@ -128,13 +140,14 @@ export default function EmergencyPanel({ contacts }) {
           <div className="emergency-panel__icon emergency-panel__icon--success" aria-hidden="true">
             &#10003;
           </div>
-          <h2 id="emergency-heading">Alert Sent</h2>
+          <h2 id="emergency-panel-heading">Alert Sent</h2>
           <p className="emergency-panel__copy">
             Help is on the way. Your emergency contacts have been notified.
           </p>
           <button
             type="button"
             className="primary-btn"
+            onKeyDown={onActionKeyDown}
             onClick={() => {
               setPhase('idle');
               setCountdown(COUNTDOWN_SECONDS);
