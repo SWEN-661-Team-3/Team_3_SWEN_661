@@ -29,4 +29,9 @@ describe('EmergencyPage', () => {
     renderWithProviders(<EmergencyPage contacts={contacts} />);
     expect(document.getElementById('main-content')).not.toBeInTheDocument();
   });
+
+  it('renders the page title via Helmet', () => {
+    renderWithProviders(<EmergencyPage contacts={contacts} />);
+    expect(document.title).toBe('Emergency - CareConnect');
+  });
 });
