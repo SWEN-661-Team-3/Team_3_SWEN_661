@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import NotificationScreen from '../NotificationScreen';
 import { AppProvider } from '../../context/AppContext';
 
@@ -8,32 +8,60 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   setItem: jest.fn(() => Promise.resolve()),
 }));
 
-const navigation = { navigate: jest.fn() };
-const route = { params: {} };
+const navigation = { navigate: jest.fn(), goBack: jest.fn() };
 
-function renderWithProvider() {
+beforeEach(() => { navigation.navigate.mockClear(); });
+
+function renderScreen(params = {}) {
   return render(
     <AppProvider>
-      <NotificationScreen navigation={navigation} route={route} />
+      <NotificationScreen navigation={navigation} route={{ params }} />
     </AppProvider>
   );
 }
 
 describe('NotificationScreen', () => {
   test('renders reminder heading', () => {
-    const { getByText } = renderWithProvider();
+    const { getByText } = renderScreen();
     expect(getByText('Reminder')).toBeTruthy();
   });
 
   test('renders reminder title', () => {
-    const { getByText } = renderWithProvider();
+    const { getByText } = renderScreen();
     expect(getByText('Afternoon Medication')).toBeTruthy();
   });
 
-  test('renders action buttons', () => {
-    const { getByText } = renderWithProvider();
-    expect(getByText('View Details')).toBeTruthy();
-    expect(getByText('Snooze')).toBeTruthy();
-    expect(getByText('Mark Done')).toBeTruthy();
+  test('renders due time', () => {
+    const { getByText } = renderScreen();
+    expect(getByText('12:30 PM')).toBeTruthy();
+  });
+
+  test('renders instructions', () => {
+    const { getByText } = renderScreen();
+    expect(getByText('Instructions')).toBeTruthy();
+    expect(getByText(/Take one white pill/)).toBeTruthy();
+  });
+
+  test('View Details navigates with reminderId', () => {
+    const { getByText } = renderScreen();
+    fireEvent.press(getByText('View Details'));
+    expect(navigation.navigate).toHaveBeenCalledWith('ReminderDetail', { reminderId: '1' });
+  });
+
+  test('Snooze navigates with reminderId', () => {
+    const { getByText } = renderScreen();
+    fireEvent.press(getByText('Snooze'));
+    expect(navigation.navigate).toHaveBeenCalledWith('SnoozeOptions', { reminderId: '1' });
+  });
+
+  test('Mark Done navigates to ReminderSuccess', () => {
+    const { getByText } = renderScreen();
+    fireEvent.press(getByText('Mark Done'));
+    expect(navigation.navigate).toHaveBeenCalledWith('ReminderSuccess');
+  });
+
+  test('uses specific reminderId param', () => {
+    const { getByText } = renderScreen({ reminderId: '2' });
+    expect(getByText('Hydration Check')).toBeTruthy();
   });
 });

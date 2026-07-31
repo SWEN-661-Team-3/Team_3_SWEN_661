@@ -22,7 +22,7 @@ const CareTeamMemberCard = memo(function CareTeamMemberCard({ helper, onSelectMe
       onClick={(event) => onSelectMember(helper.id, event)}
       aria-label={`${helper.name}, ${helper.role}`}
     >
-      <div className="care-helper-card__header">
+      <div className="care-helper-card__header" aria-hidden="true">
         <span
           className="care-helper-card__avatar"
           style={{ '--helper-color': HELPER_COLORS[helper.colorIndex % HELPER_COLORS.length] }}
@@ -31,16 +31,16 @@ const CareTeamMemberCard = memo(function CareTeamMemberCard({ helper, onSelectMe
           {helper.initials}
         </span>
         <div>
-          <h3 className="care-helper-card__name">{helper.name}</h3>
+          <p className="care-helper-card__name">{helper.name}</p>
           <p className="care-helper-card__role">{helper.role}</p>
         </div>
       </div>
 
-      <span className={`availability-badge availability-badge--${helper.availability}`}>
+      <span className={`availability-badge availability-badge--${helper.availability}`} aria-hidden="true">
         {availabilityLabels[helper.availability]}
       </span>
 
-      <div className="care-helper-card__details">
+      <div className="care-helper-card__details" aria-hidden="true">
         <p className="care-helper-card__phone">
           <span className="care-helper-card__meta-label">Phone: </span>
           {helper.phone}
