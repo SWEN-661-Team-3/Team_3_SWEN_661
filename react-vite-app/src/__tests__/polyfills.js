@@ -9,3 +9,16 @@ if (typeof globalThis.TextDecoder === 'undefined') {
 if (typeof globalThis.structuredClone === 'undefined') {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
+
+if (typeof window.matchMedia === 'undefined') {
+  window.matchMedia = (query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+    addListener: () => {},
+    removeListener: () => {},
+  });
+}
