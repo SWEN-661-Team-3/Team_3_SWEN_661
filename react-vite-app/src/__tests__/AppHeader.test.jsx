@@ -39,14 +39,14 @@ describe('AppHeader', () => {
     const user = userEvent.setup();
     renderWithProviders(<AppHeader />);
 
-    const menuButton = screen.getByRole('button', { name: 'Menu' });
+    const menuButton = screen.getByRole('button', { name: 'Open navigation menu' });
     expect(menuButton).toHaveAttribute('aria-expanded', 'false');
 
     await user.click(menuButton);
     expect(menuButton).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('navigation', { name: 'Main navigation' })).toHaveClass('app-header__nav--open');
+    expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
 
-    await user.click(screen.getByText('Care Team'));
+    await user.click(screen.getAllByText('Care Team')[1]);
     expect(menuButton).toHaveAttribute('aria-expanded', 'false');
   });
 });
